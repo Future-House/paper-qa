@@ -29,10 +29,12 @@ async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parsed_text_full_page.content["1"], tuple)
     matches = re.findall(
         r"Abstract\nWe introduce PaSa, an advanced Paper ?Search"
-        r"\nagent powered by large language models.",
+        r"\nagent powered by large language models\.",
         parsed_text_full_page.content["1"][0],
     )
-    assert len(matches) == 1, "Parsing failed to handle abstract"
+    assert (
+        len(matches) == 1
+    ), f"Parsing failed to handle abstract in {parsed_text_full_page.content['1'][0]}."
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text_full_page.content["2"], str)
@@ -41,7 +43,10 @@ async def test_parse_pdf_to_pages() -> None:
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
     (p2_image,) = p2_media
     assert p2_image.index == 0
+    assert p2_image.info["type"] == "screenshot"
     assert p2_image.info["page_num"] == 2
+    assert p2_image.info["page_height"] == pytest.approx(842, rel=0.1)
+    assert p2_image.info["page_width"] == pytest.approx(596, rel=0.1)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
@@ -176,3 +181,9 @@ def test_invalid_pdf_is_denied(tmp_path) -> None:
 
     with pytest.raises(ImpossibleParsingError, match="corrupt"):
         parse_pdf_to_pages(bad_pdf_path)
+
+
+def test_nonexistent_file_failure() -> None:
+    filename = "/nonexistent/path/file.pdf"
+    with pytest.raises(FileNotFoundError, match=filename):
+        parse_pdf_to_pages(filename)

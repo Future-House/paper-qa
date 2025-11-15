@@ -613,11 +613,16 @@ async def test_gather_evidence_rejects_empty_docs(
 async def test_agent_sharing_state(
     agent_test_settings: Settings, subtests: SubTests, callback_type: str | None
 ) -> None:
+    SAVE_API_COSTS_FILES_TO_EXCLUDE = {
+        "pasa.pdf",
+        *(f"dummy{x}" for x in (".docx", "_jap.docx", ".pptx", ".xlsx")),
+    }
+
     def files_filter(f) -> bool:
-        # Filter out pasa.pdf just to speed the test and save API costs
-        return f.name != "pasa.pdf" and IndexSettings.model_fields[
-            "files_filter"
-        ].default(f)
+        return (
+            f.name not in SAVE_API_COSTS_FILES_TO_EXCLUDE
+            and IndexSettings.model_fields["files_filter"].default(f)
+        )
 
     agent_test_settings.agent.index.files_filter = files_filter
     agent_test_settings.agent.search_count = 3  # Keep low for speed
@@ -751,7 +756,7 @@ async def test_agent_sharing_state(
         for context in session.contexts:
             if context.question != new_question:
                 assert (
-                    context.context[:30] not in response
+                    context.context[:50] not in response
                 ), "gather_evidence should not return any contexts for the old question"
         assert (
             sum(

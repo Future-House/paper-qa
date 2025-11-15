@@ -32,10 +32,12 @@ async def test_parse_pdf_to_pages() -> None:
     # Weird spaces are because 'Pa S a' is bolded in the original PDF
     matches = re.findall(
         r"Abstract\n+We introduce PaSa, an advanced Pa ?per S ?e ?a ?rch"
-        r" agent powered by large language models.",
+        r" agent powered by large language models\.",
         parsed_text.content["1"][0],
     )
-    assert len(matches) == 1, "Parsing failed to handle abstract"
+    assert (
+        len(matches) == 1
+    ), f"Parsing failed to handle abstract in {parsed_text.content['1'][0]}."
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text.content["2"], str)
@@ -46,6 +48,12 @@ async def test_parse_pdf_to_pages() -> None:
     (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
     assert p2_image.info["page_num"] == 2
+    assert p2_image.info["height"] == pytest.approx(130, rel=0.1)
+    assert p2_image.info["width"] == pytest.approx(452, rel=0.1)
+    p2_bbox = p2_image.info["bbox"]
+    assert isinstance(p2_bbox, tuple)
+    for i, value in enumerate((71, 643.90, 522, 770.35)):
+        assert p2_bbox[i] == pytest.approx(value, rel=0.1)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
@@ -185,10 +193,10 @@ def test_media_deduplication() -> None:
     # We allow for one table to be misinterpreted as an image
     assert (
         10 <= len(all_images) <= 11
-    ), "Expected each image (one/page) and formula (one/page) to be read"
+    ), "Expected each image (one/page) and equation (one/page) to be read"
     assert (
         len({m for m in all_images if cast(int, m.info["page_num"]) > 1}) <= 2
-    ), "Expected images/formulas on all pages beyond 1 to be deduplicated"
+    ), "Expected images/equations on all pages beyond 1 to be deduplicated"
 
     all_tables = [m for m in all_media if m.info.get("type") == "table"]
     assert len(all_tables) == 5, "Expected each table (one/page) to be read"
@@ -220,6 +228,12 @@ def test_invalid_pdf_is_denied(tmp_path) -> None:
 
     with pytest.raises(ImpossibleParsingError, match="corrupt"):
         parse_pdf_to_pages(bad_pdf_path)
+
+
+def test_nonexistent_file_failure() -> None:
+    filename = "/nonexistent/path/file.pdf"
+    with pytest.raises(FileNotFoundError, match=filename):
+        parse_pdf_to_pages(filename)
 
 
 def test_table_parsing() -> None:
@@ -264,3 +278,16 @@ def test_document_timeout_denial() -> None:
         assert (
             time.perf_counter() - tic < 10
         ), "Expected document timeout to have taken much less time than a normal read"
+
+
+def test_equation_parsing() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert isinstance(parsed_text.content["1"], tuple)
+    p1_text, p1_media = parsed_text.content["1"]
+    # SEE: https://regex101.com/r/pyOHLq/1
+    assert re.search(
+        r"[_*]*E[_*]* ?= ?[_*]*mc[_*]*(?:<sup>)?[ ^]?[2²] ?(?:<\/sup>)?", p1_text
+    ), "Expected inline equation in page 1 text"
+    assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
+    assert p1_media
