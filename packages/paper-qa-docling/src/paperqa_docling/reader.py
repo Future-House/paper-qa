@@ -54,8 +54,8 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         parse_media: Flag to also parse media (e.g. images, tables).
         pipeline_cls: Optional custom pipeline class for document conversion.
             Default is Docling's standard PDF pipeline.
-        dpi: Optional DPI (dots per inch) for image resolution.
-            Default PDF resolution is 72 DPI, so dpi of 144 would render at 2x scale.
+        dpi: Optional DPI (dots per inch) for image resolution,
+            if left unspecified Docling's default 1.0 scale will be employed.
         custom_pipeline_options: Optional keyword arguments to use to construct the
             PDF pipeline's options.
         page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)

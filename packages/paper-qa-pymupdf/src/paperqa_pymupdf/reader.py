@@ -70,7 +70,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             Can be a single value to apply to both X and Y directions,
             or a two-tuple to specify X and Y directions separately.
             The default was chosen to perform well on image extraction from LitQA2 PDFs.
-        dpi: Optional DPI (dots per inch) for image resolution.
+        dpi: Optional DPI (dots per inch) for image resolution,
+            if left unspecified PyMuPDF's default resolution from
+            pymupdf.Page.get_pixmap will be applied.
         page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
             to parse only specific pages, where pages are one-indexed.
             Leaving as the default of None will parse all pages.
