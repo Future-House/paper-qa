@@ -53,7 +53,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     parse_media: bool = True,
     full_page: bool = False,
     image_cluster_tolerance: float | tuple[float, float] = 25,
-    image_dpi: float | None = 150,
+    dpi: float | None = None,
     **_,
 ) -> ParsedText:
     """Parse a PDF.
@@ -70,7 +70,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             Can be a single value to apply to both X and Y directions,
             or a two-tuple to specify X and Y directions separately.
             The default was chosen to perform well on image extraction from LitQA2 PDFs.
-        image_dpi: Dots per inch for images captured from the PDF.
+        dpi: Optional DPI (dots per inch) for image resolution,
+            if left unspecified PyMuPDF's default resolution from
+            pymupdf.Page.get_pixmap will be applied.
         page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
             to parse only specific pages, where pages are one-indexed.
             Leaving as the default of None will parse all pages.
@@ -131,7 +133,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             media: list[ParsedMedia] = []
             if parse_media:
                 if full_page:  # Capture the entire page as one image
-                    pix = page.get_pixmap(dpi=image_dpi)
+                    pix = page.get_pixmap(dpi=dpi)
                     media_metadata: dict[str, JsonValue] = {"type": "screenshot"} | {
                         a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
                     }
@@ -153,7 +155,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             y_tolerance=y_tol,
                         )
                     ):
-                        pix = page.get_pixmap(clip=box, dpi=image_dpi)
+                        pix = page.get_pixmap(clip=box, dpi=dpi)
                         media_metadata = {"bbox": tuple(box), "type": "drawing"} | {
                             a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
                         }
@@ -171,7 +173,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
 
                     # Capture tables
                     for table_i, table in enumerate(t for t in page.find_tables()):
-                        pix = page.get_pixmap(clip=table.bbox, dpi=image_dpi)
+                        pix = page.get_pixmap(clip=table.bbox, dpi=dpi)
                         media_metadata = {
                             "bbox": tuple(table.bbox),
                             "type": "table",
@@ -201,7 +203,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             total_length += len(text)
             count_media += len(media)
 
-    multimodal_string = f"|multimodal|dpi={image_dpi}" + (
+    multimodal_string = f"|multimodal|dpi={dpi}" + (
         "|mode=full-page"
         if full_page
         else f"|mode=individual|x-tol={x_tol}|y-tol={y_tol}"

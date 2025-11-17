@@ -1,5 +1,6 @@
 import base64
 import json
+import re
 from pathlib import Path
 from typing import cast
 from unittest.mock import MagicMock, patch
@@ -39,6 +40,12 @@ async def test_parse_pdf_to_pages() -> None:
     (p2_image,) = [m for m in p2_media if m.info["type"] == "drawing"]
     assert p2_image.index == 0
     assert p2_image.info["page_num"] == 2
+    assert p2_image.info["height"] == pytest.approx(130, rel=0.1)
+    assert p2_image.info["width"] == pytest.approx(452, rel=0.1)
+    p2_bbox = p2_image.info["bbox"]
+    assert isinstance(p2_bbox, tuple)
+    for i, value in enumerate((71, 70.87, 522, 202.98)):
+        assert p2_bbox[i] == pytest.approx(value, rel=0.1)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
@@ -118,7 +125,10 @@ async def test_parse_pdf_to_pages() -> None:
         page_text, (full_page_image,) = page_content
         assert page_text
         assert full_page_image.index == 0, "Full page image should have index 0"
+        assert full_page_image.info["type"] == "screenshot"
         assert full_page_image.info["page_num"] == int(page_num)
+        assert full_page_image.info["height"] == pytest.approx(842, rel=0.01)
+        assert full_page_image.info["width"] == pytest.approx(596, rel=0.01)
         assert isinstance(full_page_image.data, bytes)
         assert full_page_image.data, "Full page image should have data"
         # Check useful attributes are present and are JSON serializable
@@ -202,6 +212,12 @@ async def test_invalid_pdf_is_denied(tmp_path) -> None:
         )
 
 
+def test_nonexistent_file_failure() -> None:
+    filename = "/nonexistent/path/file.pdf"
+    with pytest.raises((pymupdf.FileNotFoundError, FileNotFoundError), match=filename):
+        parse_pdf_to_pages(filename)
+
+
 def test_table_parsing() -> None:
     spy_to_markdown = MagicMock(side_effect=pymupdf.table.Table.to_markdown)
     zeroth_raw_table_text = ""
@@ -258,3 +274,16 @@ def test_table_parsing() -> None:
             "\n|**2.0** <br>|3/6 (50%)|2/6 (33%)|1/6 (17%)|"
             "\n\n"  # NOTE: this is before strip, so there can be trailing whitespace
         )
+
+
+def test_equation_parsing() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert isinstance(parsed_text.content["1"], tuple)
+    p1_text, p1_media = parsed_text.content["1"]
+    # SEE: https://regex101.com/r/pyOHLq/1
+    assert re.search(
+        r"[_*]*E[_*]* ?= ?[_*]*mc[_*]*(?:<sup>)?[ ^]?[2²] ?(?:<\/sup>)?", p1_text
+    ), "Expected inline equation in page 1 text"
+    assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
+    assert p1_media

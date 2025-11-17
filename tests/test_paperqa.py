@@ -2173,6 +2173,30 @@ async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
     assert session.cost > 0, "Expected some costs to have been incurred in our attempt"
 
 
+@pytest.mark.vcr(before_record_request=record_non_llm_requests)
+@pytest.mark.parametrize(
+    "parser", [pymupdf_parse_pdf_to_pages, docling_parse_pdf_to_pages]
+)
+@pytest.mark.asyncio
+async def test_equations(stub_data_dir: Path, parser: PDFParserFn) -> None:
+    settings = Settings(parsing={"parse_pdf": parser})
+
+    docs = Docs()
+    assert await docs.aadd(
+        stub_data_dir / "duplicate_media.pdf",
+        citation="FutureHouse, 2025, Accessed now",  # Skip citation inference
+        title="SF Districts in the style of Andy Warhol, with Math",  # Skip title inference
+        settings=settings,
+    )
+    assert docs.texts
+    for m in docs.texts[0].media:
+        enrichment = m.info["enriched_description"]
+        assert isinstance(enrichment, str)
+        if any(x in enrichment for x in ("LaTeX", "latex")) and r"\sqrt" in enrichment:
+            return
+    raise AssertionError("Failed to find enrichment for the target equation")
+
+
 def test_missing_page_doesnt_crash_us() -> None:
     stub_parsed_text = ParsedText(
         content={
@@ -2320,6 +2344,11 @@ async def test_context_inner_outer_prompt(stub_data_dir: Path) -> None:
             id="parse_pdf",
         ),
         pytest.param({}, {"multimodal": False}, id="multimodal"),
+        pytest.param(
+            {"reader_config": {"chunk_chars": 5000, "overlap": 250}},
+            {"reader_config": {"chunk_chars": 5000, "overlap": 250, "full_page": True}},
+            id="full-page",
+        ),
     ],
 )
 def test_get_index_name_uniqueness(
