@@ -968,7 +968,7 @@ llm = [
 
 [[package]]
 name = "fhlmi"
-version = "0.40.1"
+version = "0.41.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "coredis" },
@@ -979,9 +979,9 @@ dependencies = [
     { name = "tiktoken" },
     { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/15/7e/e390a14f10d4a3d3df2ea33f785b62b423b58d2ccd8b4448c4ce1c9e5670/fhlmi-0.40.1.tar.gz", hash = "sha256:5225fbc4ed1ab0fdef5491d24f523a8cc30fc3329d8dee99d56dcd1d0ef8196a", size = 402903, upload-time = "2025-11-10T18:45:17.513Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a8/32/e28a991580aefdd6e384bd43b2c4a416f4c2ce19ac7cf57421ee64167e22/fhlmi-0.41.0.tar.gz", hash = "sha256:7a04391798fd169784d8dc54f034357347e9e31b4515316409aa31776b7788d1", size = 420990, upload-time = "2025-11-12T23:59:48.423Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/74/1f/039e158438666eb7cf3a1c3e34447ca42cae820f2dd6b0bc6f28e20340e8/fhlmi-0.40.1-py3-none-any.whl", hash = "sha256:0d24367d7913a3fa615160e8064104714c48418a861986af6a71d63d0398b0a8", size = 42975, upload-time = "2025-11-10T18:45:16.357Z" },
+    { url = "https://files.pythonhosted.org/packages/54/54/c765f06db4d32c6bb2b61a5d68f5ddf03a3f138cbc7bdddc5adac7cea760/fhlmi-0.41.0-py3-none-any.whl", hash = "sha256:930abf4fcf7bde655ba6224578e9030d74e10798c759280e075f1b450f1f95cb", size = 43896, upload-time = "2025-11-12T23:59:47.087Z" },
 ]
 
 [package.optional-dependencies]
@@ -2775,7 +2775,7 @@ dev = [
 requires-dist = [
     { name = "anyio" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.27" },
-    { name = "fhlmi", specifier = ">=0.40.1" },
+    { name = "fhlmi", specifier = ">=0.41.0" },
     { name = "fhlmi", extras = ["image"], marker = "extra == 'image'" },
     { name = "html2text" },
     { name = "httpx" },
