@@ -473,7 +473,7 @@ async def test_chain_completion(caplog) -> None:
     except AssertionError:
         # Account for https://github.com/BerriAI/litellm/issues/10572
         assert any(
-            "Could not find cost for model".lower() in r.message.lower()
+            "Failed to calculate cost".lower() in r.message.lower()
             for r in caplog.records
         )
 
