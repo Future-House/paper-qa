@@ -1,7 +1,9 @@
 """This module gets PDF files from the user's Zotero library."""
 
+import asyncio
 import logging
 import os
+from collections.abc import Awaitable
 from pathlib import Path
 from typing import cast
 
@@ -256,6 +258,8 @@ class ZoteroDB(zotero.Zotero):
                 title = item["data"].get("title", "")
                 if len(items) >= start:
                     parsed_text = self._parse_pdf(pdf)
+                    if isinstance(parsed_text, Awaitable):
+                        parsed_text = asyncio.run(parsed_text)
                     if not isinstance(parsed_text.content, dict):
                         raise ValueError(
                             "The content type coming from the PDF parser"
