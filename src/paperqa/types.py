@@ -394,14 +394,14 @@ class PQASession(BaseModel):
                 prompt_count=result.info["usage"][0],
                 completion_count=result.info["usage"][1],
             )
+
+        prompt_count = result.prompt_count or 0
+        completion_count = result.completion_count or 0
         if result.model not in self.token_counts:
-            self.token_counts[result.model] = [
-                result.prompt_count,
-                result.completion_count,
-            ]
+            self.token_counts[result.model] = [prompt_count, completion_count]
         else:
-            self.token_counts[result.model][0] += result.prompt_count
-            self.token_counts[result.model][1] += result.completion_count
+            self.token_counts[result.model][0] += prompt_count
+            self.token_counts[result.model][1] += completion_count
 
         self.cost += result.cost
 

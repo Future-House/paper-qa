@@ -24,6 +24,8 @@ jobs:
           activate-environment: true # Activate for simple `uv sync` below
       - run: uv sync
       - uses: j178/prek-action@v1
+        with:
+          prek-version: 0.2.14 # Downpin for https://github.com/j178/prek/issues/1104
       - uses: pre-commit-ci/lite-action@v1.1.0
         if: always()
   lint:

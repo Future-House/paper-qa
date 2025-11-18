@@ -447,7 +447,9 @@ async def test_chain_completion(caplog) -> None:
     assert isinstance(first_id, UUID)
     assert completion.text
     assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count is not None
     assert completion.prompt_count > 0
+    assert completion.completion_count is not None
     assert completion.completion_count > 0
     assert completion.model == "babbage-002"
     assert str(completion) == "".join(outputs)
@@ -461,7 +463,9 @@ async def test_chain_completion(caplog) -> None:
     assert completion.text
     assert completion.seconds_to_first_token == 0
     assert completion.seconds_to_last_token > 0
+    assert completion.prompt_count is not None
     assert completion.prompt_count > 0
+    assert completion.completion_count is not None
     assert completion.completion_count > 0
     try:
         assert completion.model == "babbage-002"
@@ -469,7 +473,7 @@ async def test_chain_completion(caplog) -> None:
     except AssertionError:
         # Account for https://github.com/BerriAI/litellm/issues/10572
         assert any(
-            "Could not find cost for model".lower() in r.message.lower()
+            "Failed to calculate cost".lower() in r.message.lower()
             for r in caplog.records
         )
 
@@ -492,7 +496,9 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
         callbacks=[accum],
     )
     assert completion.seconds_to_first_token > 0
+    assert completion.prompt_count is not None
     assert completion.prompt_count > 0
+    assert completion.completion_count is not None
     assert completion.completion_count > 0
     assert str(completion) == "".join(outputs)
     assert isinstance(completion.text, str)

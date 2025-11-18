@@ -82,8 +82,9 @@ repos:
     rev: v1.18.1
     hooks:
       - id: jupytext
-        args: [--to, md, --pipe, black]
-        additional_dependencies: [black<25.11.0] # Downpin for https://github.com/mwouts/jupytext/issues/1467
+        # SEE: https://github.com/mwouts/jupytext/issues/1467
+        args: [--to, md, --pipe-fmt, ipynb, --pipe, "black {}"]
+        additional_dependencies: [black]
         files: ^docs/.*\.ipynb$
   - repo: https://github.com/jsh9/markdown-toc-creator
     rev: 0.1.3
