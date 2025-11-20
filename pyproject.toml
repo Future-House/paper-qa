@@ -66,6 +66,7 @@ dev = [
     "paper-qa[docling,image,ldp,memory,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek<0.2.15",  # Downpin for https://github.com/j178/prek/issues/1104
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
+    "pylint-per-file-ignores",
     "pylint-pydantic",
     "pytest-asyncio",
     "pytest-recording",
@@ -234,6 +235,7 @@ jobs = 0
 # List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
 load-plugins = [
+    "pylint_per_file_ignores",
     "pylint_pydantic",
 ]
 
@@ -304,6 +306,11 @@ disable = [
 # Enable the message, report, category or checker with the given id(s).
 enable = [
     "useless-suppression",  # Print unused `pylint: disable` comments
+]
+# Newline-separated list of ignores from https://github.com/SAP/pylint-per-file-ignores
+per-file-ignores = [
+    "packages/**/*.py:duplicate-code",  # Readers can have duplicated code
+    "tests/**/*.py:duplicate-code",  # Tests can have duplicated code
 ]
 
 [tool.pylint.reports]

@@ -27,14 +27,22 @@ async def test_parse_pdf_to_pages() -> None:
     assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
     assert isinstance(parsed_text_full_page.content["1"], tuple)
+    p1_text = parsed_text_full_page.content["1"][0]
     matches = re.findall(
         r"Abstract\nWe introduce PaSa, an advanced Paper ?Search"
         r"\nagent powered by large language models\.",
-        parsed_text_full_page.content["1"][0],
+        p1_text,
     )
+    assert len(matches) == 1, f"Parsing failed to handle abstract in {p1_text}."
     assert (
-        len(matches) == 1
-    ), f"Parsing failed to handle abstract in {parsed_text_full_page.content['1'][0]}."
+        p1_text.count("outperforms existing") == 1
+    ), "Test expects one match of this substring"
+    col_1_bottom_idx = p1_text.index("outperforms existing")
+    assert (
+        p1_text.count("address fine-grained") == 1
+    ), "Test expects one match of this substring"
+    col_2_top_idx = p1_text.index("address fine-grained")
+    assert col_1_bottom_idx < col_2_top_idx, "Expected column ordering to be correct"
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text_full_page.content["2"], str)
@@ -78,7 +86,6 @@ async def test_parse_pdf_to_pages() -> None:
         ),
     )
     texts = chunk_pdf(parsed_text_full_page, doc=doc, chunk_chars=3000, overlap=100)
-    # pylint: disable=duplicate-code
     fig_1_text = texts[1]
     assert (
         "Figure 1: Architecture of PaSa" in fig_1_text.text

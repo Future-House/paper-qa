@@ -29,22 +29,31 @@ async def test_parse_pdf_to_pages() -> None:
     assert len(parsed_text.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text.content, "Parsed text should contain page 1"
     assert isinstance(parsed_text.content["1"], tuple)
+    p1_text = parsed_text.content["1"][0]
     # Weird spaces are because 'Pa S a' is bolded in the original PDF
     matches = re.findall(
         r"Abstract\n+We introduce PaSa, an advanced Pa ?per S ?e ?a ?rch"
         r" agent powered by large language models\.",
-        parsed_text.content["1"][0],
+        p1_text,
     )
     assert (
         len(matches) == 1
     ), f"Parsing failed to handle abstract in {parsed_text.content['1'][0]}."
+    assert (
+        p1_text.count("outperforms existing") == 1
+    ), "Test expects one match of this substring"
+    col_1_bottom_idx = p1_text.index("outperforms existing")
+    assert (
+        p1_text.count("address fine-grained") == 1
+    ), "Test expects one match of this substring"
+    col_2_top_idx = p1_text.index("address fine-grained")
+    assert col_1_bottom_idx < col_2_top_idx, "Expected column ordering to be correct"
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text.content["2"], str)
     p2_text, p2_media = parsed_text.content["2"]
     assert "Figure 1" in p2_text, "Expected Figure 1 title"
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
-    # pylint: disable=duplicate-code
     (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
     assert p2_image.info["page_num"] == 2
@@ -211,7 +220,6 @@ def test_page_size_limit_denial() -> None:
 
 
 def test_invalid_pdf_is_denied(tmp_path) -> None:
-    # pylint: disable=duplicate-code
     # This PDF content (actually it's a 404 HTML page) was seen with open access
     # in June 2025, so let's make sure it's denied
     bad_pdf_content = """<html>
@@ -237,7 +245,6 @@ def test_nonexistent_file_failure() -> None:
 
 
 def test_table_parsing() -> None:
-    # pylint: disable=duplicate-code
     filepath = STUB_DATA_DIR / "influence.pdf"
     parsed_text = parse_pdf_to_pages(filepath)
     assert isinstance(parsed_text.content, dict)
