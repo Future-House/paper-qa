@@ -3209,6 +3209,17 @@ def test_pqa_context_id_parsing(raw_text: str, cleaned_text: str) -> None:
     ), "Expecting no leading/trailing whitespace"
 
 
+def test_pqa_session_serialization() -> None:
+    """Test that PQASession can be deserialized with and without extra_info."""
+    extra_data = {"foo": "bar", "baz": [1, 2, 3]}
+    session = PQASession(question="test", extra_info=extra_data)
+
+    dump = session.model_dump()
+    assert PQASession.model_validate(dump).extra_info == extra_data
+    dump.pop("extra_info")
+    assert PQASession.model_validate(dump).extra_info == {}
+
+
 @pytest.mark.asyncio
 async def test_timeout_resilience() -> None:
     model_name = CommonLLMNames.ANTHROPIC_TEST.value
@@ -3584,7 +3595,7 @@ def test_context_comparison() -> None:
     ), "Different context text should make contexts unequal"
     assert hash(context_base) == hash(context_with_list_extras), (
         "Since we discard extras that aren't hashable,"
-        "these should receive the same hash"
+        " these should receive the same hash"
     )
     assert (
         context_with_extras != context_with_list_extras

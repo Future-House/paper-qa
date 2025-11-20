@@ -357,6 +357,12 @@ class PQASession(BaseModel):
         ),
     )
 
+    extra_info: dict[str, JsonValue] = Field(
+        default_factory=dict,
+        description="A field for any extra user-defined information. "
+        "Can be used for things like metadata.",
+    )
+
     def __str__(self) -> str:
         """Return the answer as a string."""
         return self.formatted_answer
@@ -1050,7 +1056,6 @@ class DocDetails(Doc):
     @model_validator(mode="before")
     @classmethod
     def validate_all_fields(cls, data: Mapping[str, Any]) -> dict[str, Any]:
-
         data = deepcopy(data)  # Avoid mutating input
         data = dict(data)
         if "fields_to_overwrite_from_metadata" in data:
@@ -1113,7 +1118,6 @@ class DocDetails(Doc):
     @computed_field  # type: ignore[prop-decorator]
     @property
     def formatted_citation(self) -> str:
-
         if self.is_retracted:
             base_message = "**RETRACTED ARTICLE**"
             retract_info = "Retrieved from http://retractiondatabase.org/."
