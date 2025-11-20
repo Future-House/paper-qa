@@ -259,13 +259,6 @@ def test_table_parsing() -> None:
 IN_GITHUB_ACTIONS: bool = os.getenv("GITHUB_ACTIONS") == "true"
 
 
-@pytest.mark.xfail(
-    reason=(
-        "Docling not respecting document_timeout,"
-        " SEE: https://github.com/docling-project/docling/issues/2610"
-    ),
-    raises=pytest.fail.Exception,
-)
 def test_document_timeout_denial() -> None:
     tic = time.perf_counter()
     with pytest.raises(ImpossibleParsingError, match="partial"):
