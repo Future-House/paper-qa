@@ -408,7 +408,6 @@ async def read_doc(
     include_metadata: Literal[True],
     chunk_chars: int = ...,
     overlap: int = ...,
-    image_enrichment_pages: int | bool = ...,
     multimodal_enricher: Callable[[ParsedText], Awaitable] | None = ...,
     parse_pdf: PDFParserFn | None = ...,
     **parser_kwargs,
