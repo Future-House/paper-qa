@@ -307,6 +307,11 @@ disable = [
 enable = [
     "useless-suppression",  # Print unused `pylint: disable` comments
 ]
+# Newline-separated list of ignores from https://github.com/SAP/pylint-per-file-ignores
+per-file-ignores = [
+    "packages/**/*.py:duplicate-code",  # Readers can have duplicated code
+    "tests/**/*.py:duplicate-code",  # Tests can have duplicated code
+]
 
 [tool.pylint.reports]
 # Set true to activate the evaluation score.

@@ -86,7 +86,6 @@ async def test_parse_pdf_to_pages() -> None:
         ),
     )
     texts = chunk_pdf(parsed_text_full_page, doc=doc, chunk_chars=3000, overlap=100)
-    # pylint: disable=duplicate-code
     fig_1_text = texts[1]
     assert (
         "Figure 1: Architecture of PaSa" in fig_1_text.text

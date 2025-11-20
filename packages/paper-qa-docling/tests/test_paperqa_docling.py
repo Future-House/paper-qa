@@ -54,7 +54,6 @@ async def test_parse_pdf_to_pages() -> None:
     p2_text, p2_media = parsed_text.content["2"]
     assert "Figure 1" in p2_text, "Expected Figure 1 title"
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
-    # pylint: disable=duplicate-code
     (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
     assert p2_image.info["page_num"] == 2
@@ -221,7 +220,6 @@ def test_page_size_limit_denial() -> None:
 
 
 def test_invalid_pdf_is_denied(tmp_path) -> None:
-    # pylint: disable=duplicate-code
     # This PDF content (actually it's a 404 HTML page) was seen with open access
     # in June 2025, so let's make sure it's denied
     bad_pdf_content = """<html>
@@ -247,7 +245,6 @@ def test_nonexistent_file_failure() -> None:
 
 
 def test_table_parsing() -> None:
-    # pylint: disable=duplicate-code
     filepath = STUB_DATA_DIR / "influence.pdf"
     parsed_text = parse_pdf_to_pages(filepath)
     assert isinstance(parsed_text.content, dict)
