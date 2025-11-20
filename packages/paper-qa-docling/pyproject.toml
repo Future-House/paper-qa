@@ -37,7 +37,7 @@ requires-python = ">=3.11"
 [project.optional-dependencies]
 dev = [
     "docling-ibm-models[opencv-python-headless]>=3.10.0",  # Lower pin and specify opencv after https://github.com/docling-project/docling-ibm-models/pull/130
-    "docling>=2.56",  # Pin for EasyOCR deprecation
+    "docling>=2.63",  # Pin for StandardPdfPipeline timeout fix
     "fhlmi>=0.39",  # Pin for bytes_to_string
     "paper-qa>=5.23",  # Pin for PDFParserFn
     "pytest-asyncio",
