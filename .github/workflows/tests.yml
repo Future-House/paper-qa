@@ -70,6 +70,16 @@ jobs:
       - name: Clean up paper-qa-docling build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         if: matrix.python-version == '3.11'
         run: rm -r ${{ steps.build-paper-qa-docling.outputs.dist }}
+      - name: Check paper-qa-nemotron build
+        id: build-paper-qa-nemotron
+        if: matrix.python-version == '3.11'
+        uses: hynek/build-and-inspect-python-package@v2
+        with:
+          path: packages/paper-qa-nemotron
+          upload-name-suffix: -paper-qa-nemotron
+      - name: Clean up paper-qa-nemotron build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
+        if: matrix.python-version == '3.11'
+        run: rm -r ${{ steps.build-paper-qa-nemotron.outputs.dist }}
       - name: Check paper-qa build
         id: build-paper-qa
         if: matrix.python-version == '3.11'
@@ -102,6 +112,7 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
           CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
   test-packages:
     runs-on: ubuntu-latest
     strategy:
@@ -135,3 +146,4 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SEMANTIC_SCHOLAR_API_KEY: ${{ secrets.SEMANTIC_SCHOLAR_API_KEY }}
           CROSSREF_API_KEY: ${{ secrets.CROSSREF_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}

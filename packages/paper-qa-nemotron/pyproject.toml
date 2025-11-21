@@ -1,0 +1,63 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+
+[project]
+authors = [
+    {email = "hello@futurehouse.org", name = "FutureHouse technical staff"},
+]
+classifiers = [
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "fhlmi>=0.27.0",  # Pin for request_limited
+    "litellm>=1.71.0",  # Pin for aiohttp transport optimization
+    "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition
+]
+description = "PaperQA reader implemented using Nvidia's nemotron-parse VLM API"
+dynamic = ["version"]
+license = {file = "LICENSE"}
+maintainers = [
+    {email = "jamesbraza@gmail.com", name = "James Braza"},
+    {email = "michael.skarlinski@gmail.com", name = "Michael Skarlinski"},
+    {email = "white.d.andrew@gmail.com", name = "Andrew White"},
+]
+name = "paper-qa-nemotron"
+readme = "README.md"
+requires-python = ">=3.11"
+
+[project.optional-dependencies]
+dev = [
+    "docling>=2.56",  # Pin for EasyOCR deprecation
+    "fhlmi>=0.39",  # Pin for bytes_to_string
+    "httpx-aiohttp",
+    "paper-qa-nemotron[sagemaker,typing]",
+    "paper-qa>=5.23",  # Pin for PDFParserFn
+    "pytest-asyncio",
+    "pytest-recording",
+    "pytest-rerunfailures",
+    "pytest>=8",  # Pin to keep recent
+    "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
+]
+sagemaker = ["aiobotocore"]
+typing = [
+    "types-aiobotocore",
+]
+
+[tool.ruff]
+extend = "../../pyproject.toml"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools_scm]
+root = "../.."
+version_file = "src/paperqa_nemotron/version.py"

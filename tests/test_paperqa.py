@@ -40,6 +40,7 @@ from lmi import (
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
 from paperqa_docling import parse_pdf_to_pages as docling_parse_pdf_to_pages
+from paperqa_nemotron import parse_pdf_to_pages as nemotron_parse_pdf_to_pages
 from paperqa_pymupdf import parse_pdf_to_pages as pymupdf_parse_pdf_to_pages
 from paperqa_pypdf import parse_pdf_to_pages as pypdf_parse_pdf_to_pages
 from pydantic import ValidationError
@@ -2181,7 +2182,12 @@ async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
 
 @pytest.mark.vcr(before_record_request=record_non_llm_requests)
 @pytest.mark.parametrize(
-    "parser", [pymupdf_parse_pdf_to_pages, docling_parse_pdf_to_pages]
+    "parser",
+    [
+        pymupdf_parse_pdf_to_pages,
+        docling_parse_pdf_to_pages,
+        nemotron_parse_pdf_to_pages,
+    ],
 )
 @pytest.mark.asyncio
 async def test_equations(stub_data_dir: Path, parser: PDFParserFn) -> None:
