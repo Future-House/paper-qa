@@ -18,9 +18,12 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
+    "fhaviary[image]",
     "fhlmi>=0.27.0",  # Pin for request_limited
     "litellm>=1.71.0",  # Pin for aiohttp transport optimization
+    "paper-qa",
     "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition
+    "tenacity",
 ]
 description = "PaperQA reader implemented using Nvidia's nemotron-parse VLM API"
 dynamic = ["version"]
