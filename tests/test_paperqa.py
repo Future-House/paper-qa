@@ -3287,6 +3287,47 @@ def test_reader_params_deprecation_warnings(recwarn: pytest.WarningsRecorder) ->
     ], "Expected clean settings to have no warnings"
 
 
+def test_parse_pdf_string_resolution() -> None:
+    # Test with a valid string FQN
+    pymupdf_str = Settings(
+        parsing=ParsingSettings(parse_pdf="paperqa_pymupdf.parse_pdf_to_pages")
+    )
+    assert pymupdf_str.parsing.parse_pdf == pymupdf_parse_pdf_to_pages
+    assert (
+        pymupdf_str.model_dump(mode="json")["parsing"]["parse_pdf"]
+        == "paperqa_pymupdf.reader.parse_pdf_to_pages"
+    )
+    assert "parse_pdf" not in pymupdf_str.model_dump()["parsing"]
+
+    # Test another valid string FQN
+    pypdf_str = Settings(
+        parsing=ParsingSettings(parse_pdf="paperqa_pypdf.parse_pdf_to_pages")
+    )
+    assert pypdf_str.parsing.parse_pdf == pypdf_parse_pdf_to_pages
+    assert (
+        pypdf_str.model_dump(mode="json")["parsing"]["parse_pdf"]
+        == "paperqa_pypdf.reader.parse_pdf_to_pages"
+    )
+    assert "parse_pdf" not in pypdf_str.model_dump()["parsing"]
+
+    # Test directly passing a parser
+    pymupdf_fn = Settings(parsing=ParsingSettings(parse_pdf=pymupdf_parse_pdf_to_pages))
+    assert pymupdf_fn.parsing.parse_pdf == pymupdf_parse_pdf_to_pages
+    assert (
+        pymupdf_fn.model_dump(mode="json")["parsing"]["parse_pdf"]
+        == "paperqa_pymupdf.reader.parse_pdf_to_pages"
+    )
+    assert "parse_pdf" not in pymupdf_fn.model_dump()["parsing"]
+
+    # Test a nonexistent FQN
+    with pytest.raises(ValueError, match="Failed to locate"):
+        Settings(parsing=ParsingSettings(parse_pdf="nonexistent.module.function"))
+
+    # Test a valid FQN that is not a parser
+    with pytest.raises(TypeError, match="not a PDF parser"):
+        Settings(parsing=ParsingSettings(parse_pdf="os.path.sep"))
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("multimodal", [False, True])
 async def test_reader_config_propagation(stub_data_dir: Path, multimodal: bool) -> None:
