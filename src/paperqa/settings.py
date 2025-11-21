@@ -34,11 +34,14 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
+    SerializerFunctionWrapHandler,
     computed_field,
     field_validator,
+    model_serializer,
     model_validator,
 )
 from pydantic.fields import FieldInfo
+from pydantic_core.core_schema import SerializationInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
 import paperqa.configs
@@ -311,7 +314,7 @@ class ParsingSettings(BaseModel):
         default_factory=get_default_pdf_parser,
         description="Function to parse PDF, or a fully qualified name to import.",
         examples=["paperqa_docling.parse_pdf_to_pages"],
-        exclude=True,
+        exclude=True,  # NOTE: a custom serializer is used below, so it's not excluded
     )
     configure_pdf_parser: Callable[[], Any] = Field(
         default=default_pdf_parser_configurator,
@@ -334,6 +337,25 @@ class ParsingSettings(BaseModel):
                 raise TypeError(f"Value {v!r} is not a PDF parser function.")
             return resolved
         return v
+
+    @model_serializer(mode="wrap")
+    def _custom_serializer(
+        self, serializer: SerializerFunctionWrapHandler, info: SerializationInfo
+    ) -> dict[str, Any]:
+        data = serializer(self)
+        # NOTE: due to parse_pdf's exclude=True flag, it's not yet in this data.
+        # Let's now add it back if we can safely deserialize "over the network"
+        if isinstance(self.parse_pdf, str):
+            # Already JSON-compliant, so let's un-exclude
+            data["parse_pdf"] = self.parse_pdf
+        elif (
+            info.mode == "json"
+            and hasattr(self.parse_pdf, "__module__")
+            and hasattr(self.parse_pdf, "__name__")
+        ):
+            # If going to JSON, and we can get a FQN, do so for JSON compliance
+            data["parse_pdf"] = f"{self.parse_pdf.__module__}.{self.parse_pdf.__name__}"
+        return data
 
     chunking_algorithm: ChunkingOptions = Field(
         default=ChunkingOptions.SIMPLE_OVERLAP,
