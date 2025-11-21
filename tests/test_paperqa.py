@@ -3287,6 +3287,40 @@ def test_reader_params_deprecation_warnings(recwarn: pytest.WarningsRecorder) ->
     ], "Expected clean settings to have no warnings"
 
 
+def test_parse_pdf_string_resolution() -> None:
+    # Test with a valid string FQN
+    assert (
+        Settings(
+            parsing=ParsingSettings(parse_pdf="paperqa_pymupdf.parse_pdf_to_pages")
+        ).parsing.parse_pdf
+        == pymupdf_parse_pdf_to_pages
+    )
+
+    # Test another valid string FQN
+    assert (
+        Settings(
+            parsing=ParsingSettings(parse_pdf="paperqa_pypdf.parse_pdf_to_pages")
+        ).parsing.parse_pdf
+        == pypdf_parse_pdf_to_pages
+    )
+
+    # Test directly passing a parser
+    assert (
+        Settings(
+            parsing=ParsingSettings(parse_pdf=pymupdf_parse_pdf_to_pages)
+        ).parsing.parse_pdf
+        == pymupdf_parse_pdf_to_pages
+    )
+
+    # Test a nonexistent FQN
+    with pytest.raises(ValueError, match="Failed to locate"):
+        Settings(parsing=ParsingSettings(parse_pdf="nonexistent.module.function"))
+
+    # Test a valid FQN that is not a parser
+    with pytest.raises(TypeError, match="not a PDF parser"):
+        Settings(parsing=ParsingSettings(parse_pdf="os.path.sep"))
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("multimodal", [False, True])
 async def test_reader_config_propagation(stub_data_dir: Path, multimodal: bool) -> None:

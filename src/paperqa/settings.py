@@ -309,7 +309,8 @@ class ParsingSettings(BaseModel):
     )
     parse_pdf: PDFParserFn = Field(
         default_factory=get_default_pdf_parser,
-        description="Function to parse PDF.",
+        description="Function to parse PDF, or a fully qualified name to import.",
+        examples=["paperqa_docling.parse_pdf_to_pages"],
         exclude=True,
     )
     configure_pdf_parser: Callable[[], Any] = Field(
@@ -320,6 +321,20 @@ class ParsingSettings(BaseModel):
         ),
         exclude=True,
     )
+
+    @field_validator("parse_pdf", mode="before")
+    @classmethod
+    def _resolve_parse_pdf(cls, v: str | PDFParserFn) -> PDFParserFn:
+        """Resolve a fully qualified name to a parser function."""
+        if isinstance(v, str):
+            resolved = locate(v)
+            if resolved is None:
+                raise ValueError(f"Failed to locate PDF parser function {v!r}.")
+            if not isinstance(resolved, PDFParserFn):
+                raise TypeError(f"Value {v!r} is not a PDF parser function.")
+            return resolved
+        return v
+
     chunking_algorithm: ChunkingOptions = Field(
         default=ChunkingOptions.SIMPLE_OVERLAP,
         deprecated="This field is deprecated and will be removed in version 6.",
