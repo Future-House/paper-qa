@@ -22,3 +22,5 @@ For more info on nemotron-parse, check out:
   <https://docs.nvidia.com/nim/vision-language-models/1.5.0/examples/nemotron-parse/overview.html#nemotron-parse-overview>
 - Cookbook:
   <https://github.com/NVIDIA-NeMo/Nemotron/blob/main/usage-cookbook/Nemotron-Parse-v1.1/build_general_usage_cookbook.ipynb>
+- AWS Marketplace:
+  <https://aws.amazon.com/marketplace/pp/prodview-ny2ngku2i4ge6>

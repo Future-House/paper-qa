@@ -17,7 +17,7 @@ interactions:
         host:
           - integrate.api.nvidia.com
         user-agent:
-          - AsyncOpenAI/Python 2.7.2
+          - AsyncOpenAI/Python 2.8.1
         x-stainless-arch:
           - arm64
         x-stainless-async:
@@ -27,7 +27,7 @@ interactions:
         x-stainless-os:
           - MacOS
         x-stainless-package-version:
-          - 2.7.2
+          - 2.8.1
         x-stainless-raw-response:
           - "true"
         x-stainless-read-timeout:
@@ -43,33 +43,34 @@ interactions:
     response:
       body:
         string:
-          '{"id":"chatcmpl-8fe0280c1fd4460585cc36990646e20d","object":"chat.completion","created":1763417248,"model":"nvidia/nemotron-parse","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[{"id":"chatcmpl-tool-ca98390a431e4bd1b7a90585f58cee4e","type":"function","function":{"name":"markdown_bbox","arguments":"[[{\"bbox\":
-          {\"xmin\": 0.1572594458438287, \"ymin\": 0.08857577197149645, \"xmax\": 0.8395674223341729,
-          \"ymax\": 0.10098052256532067}, \"text\": \"# PaSa: An LLM Agent for Comprehensive
-          Academic Paper Search\", \"type\": \"Title\"}, {\"bbox\": {\"xmin\": 0.25716339210747274,
-          \"ymin\": 0.41450451306413305, \"xmax\": 0.34226162888329137, \"ymax\": 0.43347648456057003},
-          \"text\": \"**Abstract**\", \"type\": \"Section-header\"}, {\"bbox\": {\"xmin\":
-          0.1436990764063812, \"ymin\": 0.44867838479809974, \"xmax\": 0.46264450041981525,
-          \"ymax\": 0.8515895486935867}, \"text\": \"We introduce PaSa, an advanced
-          **Paper Search** agent powered by large language models. PaSa can autonomously
-          make a series of decisions, including invoking search tools, reading papers,
-          and selecting relevant references, to ultimately obtain comprehensive and
-          accurate results for complex scholarly queries. We optimize PaSa using reinforcement
-          learning with a synthetic dataset, AutoScholarQuery, which includes 35k fine-grained
-          academic queries and corresponding papers sourced from top-tier AI conference
-          publications. Additionally, we develop RealScholarQuery, a benchmark collecting
-          real-world academic queries to assess PaSa performance in more realistic scenarios.
-          Despite being trained on synthetic data, PaSa significantly outperforms existing
-          baselines on RealScholarQuery, including Google, Google Scholar, Google with
-          GPT-4 for paraphrased queries, chatGPT (search-enabled GPT-4o), GPT-o1, and
-          PaSa-GPT-4o (PaSa implemented by prompting GPT-4o). Notably, PaSa-7B surpasses
-          the best Google-based baseline, Google with GPT-4o, by 37.78% in recall@20
-          and 39.90% in recall@50. It also exceeds PaSa- GPT-4o by 30.36% in recall
-          and 4.25% in precision. Model, datasets, and code are available at **https://github.com/bytedance/pasa**.**\",
-          \"type\": \"Text\"}, {\"bbox\": {\"xmin\": 0.5112127623845508, \"ymin\": 0.4154774346793349,
-          \"xmax\": 0.6585780016792611, \"ymax\": 0.434449406175772}, \"text\": \"###
-          1 Introduction\", \"type\": \"Section-header\"}, {\"bbox\": {\"xmin\": 0.5085837111670864,
-          \"ymin\": 0.45159714964370545, \"xmax\": 0.8841229219143576, \"ymax\": 0.7080836104513064},
+          '{"id":"chatcmpl-aa55ac3327c74cfc83c793dc2cf209cd","object":"chat.completion","created":1763687129,"model":"nvidia/nemotron-parse","choices":[{"index":0,"message":{"role":"assistant","content":null,"refusal":null,"annotations":null,"audio":null,"function_call":null,"tool_calls":[{"id":"chatcmpl-tool-d9ae2e3b6f4547fa9aec89ab607a3d8b","type":"function","function":{"name":"markdown_bbox","arguments":"[[{\"bbox\":
+          {\"xmin\": 0.12474223341729643, \"ymin\": 0.49428408551068886, \"xmax\": 0.34226162888329137,
+          \"ymax\": 0.5085130641330167}, \"text\": \"<sup>\\u2217</sup> : # other words,
+          _A-mail address_: pada@civ.org\", \"type\": \"Text\"}, {\"bbox\": {\"xmin\":
+          0.24498673383711173, \"ymin\": 0.41353159144893115, \"xmax\": 0.35582199832073885,
+          \"ymax\": 0.43639524940617574}, \"text\": \"## Abstract\", \"type\": \"Section-header\"},
+          {\"bbox\": {\"xmin\": 0.1423153652392947, \"ymin\": 0.4496513064133017, \"xmax\":
+          0.47343744752308975, \"ymax\": 0.8543866983372922}, \"text\": \"We introduce
+          PaSa, an advanced **Paper S erech agent powered by large language models.
+          PaSa can autonomously make a series of decisions, including invoking search
+          tools, reading papers, and selecting relevant references, to ultimately obtain
+          comprehensive and accurate results for complex scholarly queries. We optimize
+          PaSa using reinforcement learning with a synthetic dataset, AutoScholar Query,
+          which includes 35k fine-grained academic queries and corresponding papers
+          sourced from top-tier AI conference publications. Additionally, we develop
+          RealScholar Query, a benchmark collecting real-world academic queries to assess
+          PaSa performance in more realistic scenarios. Despite being trained on synthetic
+          data, PaSa significantly outperforms existing baselines on RealScholar Query,
+          including Google, Google Scholar, Google with GPT-4 for paraphrased queries,
+          chatGPT (search-enabled GPT-4o), GPT-01, and PaSa-GPT-4o (PaSa implemented
+          by prompting GPT-4o). Notably, PaSa-7B surpasses the best Google-based baseline,
+          Google with GPT-4o, by 37.78% in recall@20 and 39.90% in recall@50. It also
+          exceeds PaSa- GPT-4o by 30.36% in recall and 4.25% in precision. Model, datasets,
+          and code are available at <u>https://github.com/bytedance/pasa</u>.\", \"type\":
+          \"Text\"}, {\"bbox\": {\"xmin\": 0.5004198152812762, \"ymin\": 0.41450451306413305,
+          \"xmax\": 0.6666035264483627, \"ymax\": 0.4325035629453682}, \"text\": \"###
+          1 Introduction\", \"type\": \"Section-header\"}, {\"bbox\": {\"xmin\": 0.504432577665827,
+          \"ymin\": 0.45062422802850355, \"xmax\": 0.8909031066330814, \"ymax\": 0.7108807600950119},
           \"text\": \"Academic paper search lies at the core of research yet represents
           a particularly challenging information retrieval task. It requires long-tail
           specialized knowledge, comprehensive survey-level coverage, and the ability
@@ -80,8 +81,8 @@ interactions:
           often fall short when addressing these complex queries (Gusenbauer and Haddaway,
           2020). Consequently, researchers frequently spend substantial time conducting
           literature surveys (Kingsley et al., 2011; Gusenbauer and Haddaway, 2021).\",
-          \"type\": \"Text\"}, {\"bbox\": {\"xmin\": 0.5139801847187239, \"ymin\": 0.7204883610451307,
-          \"xmax\": 0.8868903442485306, \"ymax\": 0.9228560570071259}, \"text\": \"The
+          \"type\": \"Text\"}, {\"bbox\": {\"xmin\": 0.5031872376154493, \"ymin\": 0.7128266033254157,
+          \"xmax\": 0.8909031066330814, \"ymax\": 0.9323420427553445}, \"text\": \"The
           advancements in large language models (LLMs) (OpenAI, 2023; Anthropic, 2024;
           Gemini, 2023; Yang et al., 2024) have inspired numerous studies leveraging
           LLMs to enhance information retrieval, particularly by refining or reformulating
@@ -91,29 +92,44 @@ interactions:
           tools, but also engage in deeper activities, such as reading relevant papers
           and checking citations, to perform comprehensive and accurate literature surveys.\",
           \"type\": \"Text\"}, {\"bbox\": {\"xmin\": 0.13691889168765745, \"ymin\":
-          0.8952494061757719, \"xmax\": 0.2855294710327456, \"ymax\": 0.9237073634204276},
-          \"text\": \"\\\\*Equal contribution.<br> \\u2020 Corresponding author.\",
-          \"type\": \"Footnote\"}, {\"bbox\": {\"xmin\": 0.492255919395466, \"ymin\":
-          0.9380579572446556, \"xmax\": 0.5125964735516374, \"ymax\": 0.9550840855106888},
-          \"text\": \"1\", \"type\": \"Page-footer\"}, {\"bbox\": {\"xmin\": 0.06261360201511337,
-          \"ymin\": 0.08857577197149645, \"xmax\": 0.4017612090680101, \"ymax\": 0.14755914489311164},
-          \"text\": \"H1A | 7-225 / VecSS SAYS1+210110425000 | /\", \"type\": \"Picture\"},
-          {\"bbox\": {\"xmin\": 0.3314686817800168, \"ymin\": 0.2691743467933491, \"xmax\":
-          0.5936819479429051, \"ymax\": 0.38981662707838477}, \"text\": \"Paper Search\",
-          \"type\": \"Picture\"}]]"}}],"reasoning_content":null},"logprobs":null,"finish_reason":"stop","stop_reason":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":5,"total_tokens":781,"completion_tokens":776,"prompt_tokens_details":null},"prompt_logprobs":null,"kv_transfer_params":null}'
+          0.8962223277909739, \"xmax\": 0.28290041981528125, \"ymax\": 0.9237073634204276},
+          \"text\": \"<sup>\\u2217</sup>Equal contribution. <sup>\\u2020</sup>Corresponding
+          author.\", \"type\": \"Footnote\"}, {\"bbox\": {\"xmin\": 0.48685944584382873,
+          \"ymin\": 0.9475439429928741, \"xmax\": 0.5058162888329135, \"ymax\": 0.9635971496437055},
+          \"text\": \"1\", \"type\": \"Page-footer\"}, {\"bbox\": {\"xmin\": 0.34364534005037783,
+          \"ymin\": 0.2739173396674584, \"xmax\": 0.6571942905121746, \"ymax\": 0.3803306413301663},
+          \"text\": \"Paper Search\", \"type\": \"Picture\"}, {\"bbox\": {\"xmin\":
+          0.147711838790932, \"ymin\": 0.07908978622327792, \"xmax\": 0.8557568429890848,
+          \"ymax\": 0.1085206650831354}, \"text\": \"PaSa: An LLM Agent for Comprehensive
+          Academic Paper Search\", \"type\": \"Caption\"}, {\"bbox\": {\"xmin\": 0.21800436607892526,
+          \"ymin\": 0.11520950118764847, \"xmax\": 0.7976409739714525, \"ymax\": 0.14755914489311164},
+          \"text\": \"**Yichen He<sup>\\u2217</sup>1 <u>uanhua Huang\\u2217</u>1 <u>Peyyuan
+          Feng</u>1 <u>Yuan Lin</u>1 <u>Yuchen Zhang</u>1 <u>Hang Li</u>1 <u>Weinan
+          E</u>2\", \"type\": \"Caption\"}, {\"bbox\": {\"xmin\": 0.31929202350965574,
+          \"ymin\": 0.151329216152019, \"xmax\": 0.6639744752308984, \"ymax\": 0.18076009501187648},
+          \"text\": \"<sup>1</sup>ByteDance Research <sup>2</sup>Peking University\",
+          \"type\": \"Caption\"}, {\"bbox\": {\"xmin\": 0.15850478589420655, \"ymin\":
+          0.18076009501187648, \"xmax\": 0.8477313182199832, \"ymax\": 0.21590688836104516},
+          \"text\": \"{hyc,huangguanhua,fpy,linyuan.0}@bytedance.com, {zhangyuchen.zyc,lihang.lh}@bytedance.com,
+          weinan@math.pku.edu.cn\", \"type\": \"Caption\"}, {\"bbox\": {\"xmin\": 0.3518092359361881,
+          \"ymin\": 0.22441995249406174, \"xmax\": 0.6356083963056255, \"ymax\": 0.24254061757719714},
+          \"text\": \"Demo: https://pasa-agent.ai\", \"type\": \"Caption\"}, {\"bbox\":
+          {\"xmin\": 0.027467338371116697, \"ymin\": 0.31952304038004753, \"xmax\":
+          0.07202283795130143, \"ymax\": 0.7355686460807601}, \"text\": \"ArrXiv:17
+          Jan 2025\", \"type\": \"Caption\"}]]"}}],"reasoning_content":null},"logprobs":null,"finish_reason":"stop","stop_reason":null}],"service_tier":null,"system_fingerprint":null,"usage":{"prompt_tokens":5,"total_tokens":1022,"completion_tokens":1017,"prompt_tokens_details":null},"prompt_logprobs":null,"kv_transfer_params":null}'
       headers:
         Access-Control-Expose-Headers:
           - nvcf-reqid
         Connection:
           - keep-alive
         Content-Length:
-          - "5268"
+          - "6559"
         Content-Type:
           - application/json
         Date:
-          - Mon, 17 Nov 2025 22:07:29 GMT
+          - Fri, 21 Nov 2025 01:05:33 GMT
         Nvcf-Reqid:
-          - d2b5b569-2775-445d-b0a5-fdd1b347102c
+          - 91acc0f4-26f9-46d5-b5d0-2018be2be40c
         Nvcf-Status:
           - fulfilled
         Server:

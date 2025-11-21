@@ -2,41 +2,38 @@ import base64
 import json
 import re
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
-import numpy as np
-import pypdfium2 as pdfium
 import pytest
 from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs
 from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import ImpossibleParsingError, get_citation_ids
-from pydantic import ValidationError
 
 from paperqa_nemotron import parse_pdf_to_pages
-from paperqa_nemotron.reader import (
-    NemotronParseAnnotatedBBox,
-    NemotronParseBBox,
-    NemotronParseMarkdown,
-    NemotronParseMarkdownBBox,
-    _call_nemotron_parse_api,
-)
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["RuntimeError", "AssertionError"])
+@pytest.mark.parametrize(
+    "api_params_base",
+    [
+        pytest.param({}, id="nvidia"),
+        # Uncomment to test with AWS SageMaker
+        # pytest.param({"model_name": "sagemaker/nvidia/nemotron-parse"}, id="sagemaker"),
+    ],
+)
 @pytest.mark.asyncio
-async def test_parse_pdf_to_pages() -> None:
+async def test_parse_pdf_to_pages(api_params_base: dict[str, Any]) -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
-
     filepath = STUB_DATA_DIR / "pasa.pdf"
     # Lower temperature a bit so shape assertions are more reliable,
     # and use null DPI here as later 'high DPI' assertions compare
     # against the 'default' DPI from pypdfium2
     parsed_text = await parse_pdf_to_pages(
-        filepath, dpi=None, api_params={"temperature": 0.5}
+        filepath, dpi=None, api_params={"temperature": 0.5} | api_params_base
     )
     assert isinstance(parsed_text.content, dict)
     assert len(parsed_text.content) == 15, "Expected all pages to be parsed"
@@ -141,7 +138,9 @@ async def test_parse_pdf_to_pages() -> None:
             ), f"Expected {raw_answer_no_citations=} to have {substrings} present"
 
     # Let's check the full page parsing behavior
-    parsed_text_full_page = await parse_pdf_to_pages(filepath, dpi=None, full_page=True)
+    parsed_text_full_page = await parse_pdf_to_pages(
+        filepath, dpi=None, full_page=True, api_params=api_params_base
+    )
     assert isinstance(parsed_text_full_page.content, dict)
     assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
     assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
@@ -169,7 +168,7 @@ async def test_parse_pdf_to_pages() -> None:
     # Check our ability to get a high DPI, and lower temperature a bit
     # so shape assertions are more reliable
     parsed_text_high_dpi = await parse_pdf_to_pages(
-        filepath, dpi=216, api_params={"temperature": 0.5}
+        filepath, dpi=216, api_params={"temperature": 0.5} | api_params_base
     )
     assert isinstance(parsed_text_high_dpi.content, dict)
     assert len(parsed_text_high_dpi.content) == 15, "Expected all pages to be parsed"
@@ -187,7 +186,9 @@ async def test_parse_pdf_to_pages() -> None:
     )
 
     # Check the no-media behavior
-    parsed_text_no_media = await parse_pdf_to_pages(filepath, parse_media=False)
+    parsed_text_no_media = await parse_pdf_to_pages(
+        filepath, parse_media=False, api_params=api_params_base
+    )
     assert isinstance(parsed_text_no_media.content, dict)
     assert all(isinstance(c, str) for c in parsed_text_no_media.content.values())
     assert len(parsed_text_no_media.content) == 15, "Expected all pages to be parsed"
@@ -199,8 +200,8 @@ async def test_parse_pdf_to_pages() -> None:
         parsed_text_high_dpi,
         parsed_text_no_media,
     ):
-        parsing_library = pt.metadata.parsing_libraries[0]
-        assert "pypdfium2" in parsing_library
+        assert "pypdfium2" in pt.metadata.parsing_libraries[0]
+        assert "nemotron-parse" in pt.metadata.parsing_libraries[1]
         assert pt.metadata.name
         assert "pdf" in pt.metadata.name
         assert "page_range=None" in pt.metadata.name
@@ -297,122 +298,6 @@ async def test_nonexistent_file_failure() -> None:
     filename = "/nonexistent/path/file.pdf"
     with pytest.raises(FileNotFoundError, match=filename):
         await parse_pdf_to_pages(filename)
-
-
-@pytest.fixture(name="pdf_page_np")
-def fixture_pdf_page_np() -> np.ndarray:
-    pdf_doc = pdfium.PdfDocument(STUB_DATA_DIR / "pasa.pdf")
-    # nemotron-parse's markdown_no_bbox tool will start
-    # babbling \\n if using default scale=1
-    page_np = pdf_doc[0].render(scale=2).to_numpy()
-    assert page_np.shape == (1684, 1191, 3), "Expected particular page size"
-    return page_np
-
-
-class TestNemotronAPI:
-    def test_bbox_validation(self) -> None:
-        bbox = NemotronParseBBox(xmin=0.1, xmax=0.9, ymin=0.2, ymax=0.8)
-        assert bbox.xmin == 0.1
-        assert bbox.xmax == 0.9
-        assert bbox.ymin == 0.2
-        assert bbox.ymax == 0.8
-
-        bbox_full = NemotronParseBBox(xmin=0.0, xmax=1.0, ymin=0.0, ymax=1.0)
-        assert bbox_full.xmin == 0.0
-        assert bbox_full.xmax == 1.0
-        assert bbox_full.ymin == 0.0
-        assert bbox_full.ymax == 1.0
-
-        with pytest.raises(ValidationError, match="greater than or equal to 0"):
-            NemotronParseBBox(xmin=-0.1, xmax=0.5, ymin=0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="less than or equal to 1"):
-            NemotronParseBBox(xmin=1.1, xmax=1.5, ymin=0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="greater than or equal to 0"):
-            NemotronParseBBox(xmin=0.1, xmax=-0.5, ymin=0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="less than or equal to 1"):
-            NemotronParseBBox(xmin=0.1, xmax=1.5, ymin=0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="greater than or equal to 0"):
-            NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=-0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="less than or equal to 1"):
-            NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=1.2, ymax=1.8)
-
-        with pytest.raises(ValidationError, match="greater than or equal to 0"):
-            NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=-0.8)
-
-        with pytest.raises(ValidationError, match="less than or equal to 1"):
-            NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=1.8)
-
-        with pytest.raises(ValidationError, match="xmin must be less than xmax"):
-            NemotronParseBBox(xmin=0.5, xmax=0.5, ymin=0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="xmin must be less than xmax"):
-            NemotronParseBBox(xmin=0.7, xmax=0.3, ymin=0.2, ymax=0.8)
-
-        with pytest.raises(ValidationError, match="ymin must be less than ymax"):
-            NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.5, ymax=0.5)
-
-        with pytest.raises(ValidationError, match="ymin must be less than ymax"):
-            NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.8, ymax=0.2)
-
-    def test_bbox_to_page_coordinates(self) -> None:
-        bbox = NemotronParseBBox(xmin=0.1, xmax=0.9, ymin=0.2, ymax=0.8)
-        assert bbox.to_page_coordinates(height=1000, width=800) == pytest.approx(
-            (80.0, 200.0, 720.0, 800.0)
-        )
-        # Also check different page dimensions
-        assert bbox.to_page_coordinates(height=100, width=200) == pytest.approx(
-            (20.0, 20.0, 180.0, 80.0)
-        )
-
-    @pytest.mark.vcr
-    @pytest.mark.parametrize("temperature", [0, 1])
-    @pytest.mark.asyncio
-    async def test_markdown_bbox(
-        self, pdf_page_np: np.ndarray, temperature: float
-    ) -> None:
-        response = await _call_nemotron_parse_api(
-            pdf_page_np, tool_name="markdown_bbox", temperature=temperature
-        )
-        assert response
-        for r in response:
-            assert isinstance(r, NemotronParseMarkdownBBox)
-            assert isinstance(r.bbox, NemotronParseBBox)
-            assert r.type
-            assert r.text
-
-    @pytest.mark.vcr
-    @pytest.mark.parametrize("temperature", [0, 1])
-    @pytest.mark.asyncio
-    async def test_markdown_no_bbox(
-        self, pdf_page_np: np.ndarray, temperature: float
-    ) -> None:
-        response = await _call_nemotron_parse_api(
-            pdf_page_np, tool_name="markdown_no_bbox", temperature=temperature
-        )
-        assert response
-        for r in response:
-            assert isinstance(r, NemotronParseMarkdown)
-            assert r.text
-
-    @pytest.mark.vcr
-    @pytest.mark.parametrize("temperature", [0, 1])
-    @pytest.mark.asyncio
-    async def test_detection_only(
-        self, pdf_page_np: np.ndarray, temperature: float
-    ) -> None:
-        response = await _call_nemotron_parse_api(
-            pdf_page_np, tool_name="detection_only", temperature=temperature
-        )
-        assert response
-        for r in response:
-            assert isinstance(r, NemotronParseAnnotatedBBox)
-            assert isinstance(r.bbox, NemotronParseBBox)
-            assert r.type
 
 
 @pytest.mark.asyncio

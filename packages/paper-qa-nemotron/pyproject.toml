@@ -39,12 +39,17 @@ dev = [
     "docling>=2.56",  # Pin for EasyOCR deprecation
     "fhlmi>=0.39",  # Pin for bytes_to_string
     "httpx-aiohttp",
+    "paper-qa-nemotron[sagemaker,typing]",
     "paper-qa>=5.23",  # Pin for PDFParserFn
     "pytest-asyncio",
     "pytest-recording",
     "pytest-rerunfailures",
     "pytest>=8",  # Pin to keep recent
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
+]
+sagemaker = ["aiobotocore"]
+typing = [
+    "types-aiobotocore",
 ]
 
 [tool.ruff]

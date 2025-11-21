@@ -1,336 +1,26 @@
-"""
-Reader for PaperQA using Nvidia's nemotron-parse VLM.
-
-For more info on `nemotron-parse`, check out:
-- Technical blog: https://developer.nvidia.com/blog/turn-complex-documents-into-usable-data-with-vlm-nvidia-nemotron-parse-1-1/
-- Hugging Face weights: https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1
-- Model card: https://build.nvidia.com/nvidia/nemotron-parse/modelcard
-- API docs: https://docs.nvidia.com/nim/vision-language-models/1.5.0/examples/nemotron-parse/overview.html#nemotron-parse-overview
-- Cookbook: https://github.com/NVIDIA-NeMo/Nemotron/blob/main/usage-cookbook/Nemotron-Parse-v1.1/build_general_usage_cookbook.ipynb
-"""
+"""Reader for PaperQA using Nvidia's nemotron-parse VLM."""
 
 import asyncio
-import contextlib
 import io
 import json
-import logging
 import os
 from collections.abc import Mapping
 from contextlib import closing
-from enum import StrEnum, unique
-from typing import (
-    TYPE_CHECKING,
-    Annotated,
-    Any,
-    Literal,
-    TypeAlias,
-    assert_never,
-    cast,
-    overload,
-)
+from typing import Any, cast
 
-import litellm
 import pypdfium2 as pdfium
-from aviary.core import Message, ToolCall
-from lmi.rate_limiter import GLOBAL_LIMITER, GLOBAL_RATE_LIMITER_TIMEOUT
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
-from pydantic import (
-    AfterValidator,
-    BaseModel,
-    Field,
-    TypeAdapter,
-    ValidationError,
-    ValidationInfo,
+from tenacity import RetryError
+
+from paperqa_nemotron.api import (
+    CLASSIFICATIONS_WITH_MEDIA,
+    NemotronBBoxError,
+    NemotronLengthError,
+    NemotronParseClassification,
+    _call_nvidia_api,
+    _call_sagemaker_api,
 )
-from tenacity import (
-    RetryError,
-    before_sleep_log,
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
-
-if TYPE_CHECKING:
-    import numpy as np
-
-logger = logging.getLogger(__name__)
-
-NEMOTRON_PARSE_RATE_LIMIT = "40 per 1 minute"  # Default rate for nemotron-parse API
-
-
-class NemotronLengthError(ValueError):
-    r"""
-    Error for nemotron-parse rejecting an input with 'length' finish reason.
-
-    This can happen if nemotron-parse starts babbling '\\n' a bunch
-    at lower DPI, but a re-request can skirt this error.
-    """
-
-
-class NemotronBBoxError(ValueError):
-    """
-    Error for nemotron-parse returning an invalid bounding box.
-
-    Examples include values outside of [0, 1] or a non-positive gap between min and max.
-    """
-
-
-NemotronParseToolName: TypeAlias = Literal[
-    "markdown_bbox", "markdown_no_bbox", "detection_only"
-]
-
-
-class NemotronParseBBox(BaseModel):
-    """
-    Bounding box, values target the range [0, 1], origin is upper left corner.
-
-    In practice, nemotron-parse commonly gives values outside of [0, 1]
-    at temperature of 1, but a re-request can get values inside [0, 1].
-    """
-
-    @staticmethod
-    def validate_min_less_than_max(v: float, info: ValidationInfo) -> float:
-        if info.field_name in {"xmax", "ymax"}:
-            min_field_name = info.field_name.replace("max", "min")
-            with contextlib.suppress(KeyError):
-                if info.data[min_field_name] >= v:
-                    raise ValueError(
-                        f"{min_field_name} must be less than {info.field_name}."
-                    )
-        return v
-
-    xmin: float = Field(
-        description="Lower bound, when looking right across (horizontally) the page.",
-        examples=[0.33],
-        ge=0,
-        le=1,
-    )
-    xmax: Annotated[
-        float,
-        Field(
-            description="Upper bound, when looking right across (horizontally) the page.",
-            examples=[0.65],
-            ge=0,
-            le=1,
-        ),
-        AfterValidator(validate_min_less_than_max),
-    ]
-    ymin: float = Field(
-        description="Lower bound, when looking down (vertically) the page.",
-        examples=[0.26],
-        ge=0,
-        le=1,
-    )
-    ymax: Annotated[
-        float,
-        Field(
-            description="Upper bound, when looking down (vertically) the page.",
-            examples=[0.34],
-            ge=0,
-            le=1,
-        ),
-        AfterValidator(validate_min_less_than_max),
-    ]
-
-    def to_page_coordinates(
-        self, height: float, width: float
-    ) -> tuple[float, float, float, float]:
-        return (
-            self.xmin * width,
-            self.ymin * height,
-            self.xmax * width,
-            self.ymax * height,
-        )
-
-
-@unique
-class NemotronParseClassification(StrEnum):
-    """
-    Classes that can come from nemotron-parse, values match the API.
-
-    SEE: https://docs.nvidia.com/nim/vision-language-models/1.2.0/examples/retriever/overview.html
-    """
-
-    BIBLIOGRAPHY = "Bibliography"
-    CAPTION = "Caption"  # Table or picture
-    FOOTNOTE = "Footnote"
-    FORMULA = "Formula"
-    LIST_ITEM = "List-item"  # Numbered, alphanumeric, or bullet point
-    PAGE_FOOTER = "Page-footer"
-    PAGE_HEADER = "Page-header"
-    PICTURE = "Picture"
-    SECTION_HEADER = "Section-header"
-    TABLE = "Table"
-    TABLE_OF_CONTENTS = "TOC"
-    TEXT = "Text"  # Regular paragraph text
-    TITLE = "Title"
-
-
-# These classifications will lead to parsing a media in addition to text
-CLASSIFICATIONS_WITH_MEDIA = {
-    NemotronParseClassification.FORMULA,
-    NemotronParseClassification.PICTURE,
-    NemotronParseClassification.TABLE,
-}
-
-
-class NemotronParseAnnotatedBBox(BaseModel):
-    """Payload for 'detection_only' tool."""
-
-    bbox: NemotronParseBBox
-    type: NemotronParseClassification = Field(
-        description="Possible classifications of the bbox."
-    )
-
-
-class NemotronParseMarkdown(BaseModel):
-    """Payload for 'markdown_no_bbox' tool."""
-
-    text: str = Field(description="Markdown text.")
-
-
-class NemotronParseMarkdownBBox(NemotronParseAnnotatedBBox, NemotronParseMarkdown):
-    """Payload for 'markdown_bbox' tool."""
-
-
-MatrixNemotronParseAnnotatedBBox = TypeAdapter(list[list[NemotronParseAnnotatedBBox]])
-VectorNemotronParseMarkdown = TypeAdapter(list[NemotronParseMarkdown])
-MatrixNemotronParseMarkdownBBox = TypeAdapter(list[list[NemotronParseMarkdownBBox]])
-
-
-@overload
-async def _call_nemotron_parse_api(
-    image: "np.ndarray",
-    tool_name: Literal["markdown_bbox"],
-    api_key: str | None = None,
-    api_base: str = ...,
-    model_name: str = ...,
-    **completion_kwargs,
-) -> list[NemotronParseMarkdownBBox]: ...
-
-
-@overload
-async def _call_nemotron_parse_api(
-    image: "np.ndarray",
-    tool_name: Literal["markdown_no_bbox"],
-    api_key: str | None = None,
-    api_base: str = ...,
-    model_name: str = ...,
-    **completion_kwargs,
-) -> list[NemotronParseMarkdown]: ...
-
-
-@overload
-async def _call_nemotron_parse_api(
-    image: "np.ndarray",
-    tool_name: Literal["detection_only"],
-    api_key: str | None = None,
-    api_base: str = ...,
-    model_name: str = ...,
-    **completion_kwargs,
-) -> list[NemotronParseAnnotatedBBox]: ...
-
-
-@retry(
-    retry=retry_if_exception_type((NemotronLengthError, NemotronBBoxError)),
-    stop=stop_after_attempt(3),
-    before_sleep=before_sleep_log(logger, logging.WARNING),
-)
-@retry(
-    retry=retry_if_exception_type(TimeoutError),  # Hitting rate limits
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT),
-    before_sleep=before_sleep_log(logger, logging.WARNING),
-)
-async def _call_nemotron_parse_api(
-    image: "np.ndarray",
-    tool_name: NemotronParseToolName,
-    api_key: str | None = None,
-    api_base: str = "https://integrate.api.nvidia.com/v1",
-    model_name: str = "nvidia/nemotron-parse",
-    **completion_kwargs,
-) -> (
-    list[NemotronParseMarkdownBBox]
-    | list[NemotronParseMarkdown]
-    | list[NemotronParseAnnotatedBBox]
-):
-    """Call the nemotron-parse API with an image.
-
-    Args:
-        image: Image to parse.
-        tool_name: Name of the nemotron-parse tool.
-        api_key: Optional API key for Nvidia, default uses the NVIDIA_API_KEY env var.
-        api_base: API base URL to pass to the completion,
-            default uses nemotron-parse API's expected base URL.
-        model_name: Model name to pass to the completion,
-            default uses nemotron-parse API's expected model name.
-        completion_kwargs: Keyword arguments to pass to the completion.
-
-    Returns:
-        Parsed response from the API.
-    """
-    await GLOBAL_LIMITER.try_acquire(
-        ("client|request", "nvidia/nemotron-parse"),
-        rate_limit=NEMOTRON_PARSE_RATE_LIMIT,
-    )
-
-    if api_key is None:
-        api_key = os.environ["NVIDIA_API_KEY"]
-    image_data = Message.create_message(images=[image]).model_dump()["content"][0][
-        "image_url"
-    ]["url"]
-    tool_spec = ToolCall.from_name(tool_name).model_dump(
-        exclude={"id": True, "function": {"arguments"}}
-    )
-    response = await litellm.acompletion(
-        model=model_name,
-        messages=[{"role": "user", "content": f'<img src="{image_data}" />'}],
-        tools=[tool_spec],
-        tool_choice=tool_spec,
-        api_key=api_key,
-        api_base=api_base,
-        base_url=api_base,  # Duplicate so LiteLLM can infer LLM provider
-        **completion_kwargs,
-    )
-    if (
-        not isinstance(response, litellm.ModelResponse)
-        or len(response.choices) != 1
-        or not isinstance(response.choices[0], litellm.Choices)
-    ):
-        raise NotImplementedError(
-            f"Didn't yet handle choices shape of model response {response}."
-        )
-    if response.choices[0].finish_reason == "length":
-        raise NemotronLengthError(
-            f"Model response {response} indicates the input"
-            f" image of shape {image.shape} is too large or the model started babbling."
-        )
-    if (
-        response.choices[0].finish_reason != "tool_calls"
-        or response.choices[0].message.tool_calls is None
-        or len(response.choices[0].message.tool_calls) != 1
-    ):
-        raise NotImplementedError(
-            f"Didn't yet handle choice shape of model response {response}."
-        )
-
-    args_json = response.choices[0].message.tool_calls[0]["function"]["arguments"]
-    try:
-        if tool_name == "markdown_bbox":
-            (response,) = MatrixNemotronParseMarkdownBBox.validate_json(args_json)
-        elif tool_name == "markdown_no_bbox":
-            response = VectorNemotronParseMarkdown.validate_json(args_json)
-        elif tool_name == "detection_only":
-            (response,) = MatrixNemotronParseAnnotatedBBox.validate_json(args_json)
-        else:
-            assert_never(tool_name)
-    except ValidationError as exc:
-        raise NemotronBBoxError(
-            f"nemotron-parse response {args_json} has invalid bounding box."
-        ) from exc
-    return response
 
 
 async def parse_pdf_to_pages(
@@ -370,7 +60,12 @@ async def parse_pdf_to_pages(
             f"PDF reading via {pdfium.__name__} failed on the PDF at path {path!r},"
             " likely this PDF file is corrupt."
         ) from exc
-    api_params = api_params or {}
+    api_params = {"model_name": "nvidia/nemotron-parse"} | dict(api_params or {})
+    if api_params["model_name"].startswith("sagemaker/"):
+        api_params["model_name"] = api_params["model_name"].removeprefix("sagemaker/")
+        call_fn = _call_sagemaker_api
+    else:
+        call_fn = _call_nvidia_api  # type: ignore[assignment]
 
     with closing(pdf_doc):
         page_count = len(pdf_doc)
@@ -401,7 +96,7 @@ async def parse_pdf_to_pages(
 
             rendered_page = page.render(**render_kwargs)
             try:
-                response = await _call_nemotron_parse_api(
+                response = await call_fn(
                     image=rendered_page.to_numpy(),
                     tool_name="markdown_bbox",
                     **api_params,
@@ -526,7 +221,7 @@ async def parse_pdf_to_pages(
     metadata = ParsedMetadata(
         parsing_libraries=[
             f"{pdfium.__name__} ({pdfium.version.PYPDFIUM_INFO})",
-            "nvidia/nemotron-parse",
+            api_params["model_name"],
         ],
         total_parsed_text_length=total_length,
         count_parsed_media=count_media,
