@@ -997,6 +997,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+image = [
+    { name = "pillow" },
+]
 llm = [
     { name = "fhlmi" },
     { name = "litellm" },
@@ -2879,9 +2882,12 @@ provides-extras = ["dev"]
 name = "paper-qa-nemotron"
 source = { editable = "packages/paper-qa-nemotron" }
 dependencies = [
+    { name = "fhaviary", extra = ["image"] },
     { name = "fhlmi" },
     { name = "litellm" },
+    { name = "paper-qa" },
     { name = "pypdfium2" },
+    { name = "tenacity" },
 ]
 
 [package.optional-dependencies]
@@ -2909,10 +2915,12 @@ typing = [
 requires-dist = [
     { name = "aiobotocore", marker = "extra == 'sagemaker'" },
     { name = "docling", marker = "extra == 'dev'", specifier = ">=2.56" },
+    { name = "fhaviary", extras = ["image"] },
     { name = "fhlmi", specifier = ">=0.27.0" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "httpx-aiohttp", marker = "extra == 'dev'" },
     { name = "litellm", specifier = ">=1.71.0" },
+    { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "paper-qa-nemotron", extras = ["sagemaker", "typing"], marker = "extra == 'dev'", editable = "packages/paper-qa-nemotron" },
     { name = "pypdfium2", specifier = ">=4.22.0" },
@@ -2920,6 +2928,7 @@ requires-dist = [
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
     { name = "pytest-recording", marker = "extra == 'dev'" },
     { name = "pytest-rerunfailures", marker = "extra == 'dev'" },
+    { name = "tenacity" },
     { name = "types-aiobotocore", marker = "extra == 'typing'" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=6" },
 ]
