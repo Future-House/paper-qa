@@ -301,7 +301,8 @@ async def _call_nvidia_api(
     if response.choices[0].finish_reason == "length":
         raise NemotronLengthError(
             f"Model response {response} indicates the input"
-            f" image of shape {image.shape} is too large or the model started babbling."
+            f" image of shape {image.shape} is too large or the model started babbling.",
+            response.choices[0],  # Include if callers want
         )
     if (
         response.choices[0].finish_reason != "tool_calls"
@@ -438,7 +439,8 @@ async def _call_sagemaker_api(
     if response.choices[0].finish_reason == "length":
         raise NemotronLengthError(
             f"Model response {response} indicates the input"
-            f" image of shape {image.shape} is too large or the model started babbling."
+            f" image of shape {image.shape} is too large or the model started babbling.",
+            response.choices[0],  # Include if callers want
         )
     if (
         response.choices[0].finish_reason != "stop"
