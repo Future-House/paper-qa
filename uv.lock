@@ -2896,6 +2896,7 @@ dev = [
     { name = "docling" },
     { name = "fhlmi" },
     { name = "httpx-aiohttp" },
+    { name = "numpy" },
     { name = "paper-qa" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -2908,6 +2909,7 @@ sagemaker = [
     { name = "aiobotocore" },
 ]
 typing = [
+    { name = "numpy" },
     { name = "types-aiobotocore" },
 ]
 
@@ -2920,6 +2922,7 @@ requires-dist = [
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "httpx-aiohttp", marker = "extra == 'dev'" },
     { name = "litellm", specifier = ">=1.71.0" },
+    { name = "numpy", marker = "extra == 'typing'" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "paper-qa-nemotron", extras = ["sagemaker", "typing"], marker = "extra == 'dev'", editable = "packages/paper-qa-nemotron" },
