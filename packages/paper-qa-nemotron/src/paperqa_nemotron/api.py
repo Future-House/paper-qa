@@ -280,7 +280,9 @@ async def _call_nvidia_api(
         tool_choice=tool_spec,
         api_key=api_key,
         api_base=api_base,
-        base_url=api_base,  # Duplicate so LiteLLM can infer LLM provider
+        # Explicitly specify OpenAI-compatible provider over Nvidia NIM provider,
+        # so this works with both Nvidia API and DGX Cloud Lepton
+        custom_llm_provider=litellm.types.utils.LlmProviders.CUSTOM_OPENAI,
         **completion_kwargs,
     )
     if (
