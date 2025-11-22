@@ -9,6 +9,7 @@ from contextlib import closing
 from typing import Any, cast
 
 import pypdfium2 as pdfium
+from lmi.utils import gather_with_concurrency
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
 from tenacity import RetryError
@@ -31,6 +32,7 @@ async def parse_pdf_to_pages(
     full_page: bool = False,
     dpi: int | None = 300,
     api_params: Mapping[str, Any] | None = None,
+    concurrency: int | asyncio.Semaphore | None = 128,
     **_: Any,
 ) -> ParsedText:
     """Parse a PDF using Nvidia's nemotron-parse VLM.
@@ -48,6 +50,10 @@ async def parse_pdf_to_pages(
         dpi: Optional DPI (dots per inch) for image resolution,
             if set as None then pypdfium2's default 1 scale will be employed.
         api_params: Optional parameters to pass to the nemotron-parse API.
+        concurrency: Optional concurrency semaphore on concurrent processing of pages,
+            use to put a ceiling on memory usage. Default is 128 to prioritize reader
+            speed over memory, but not get obliterated by huge 1000-page PDFs.
+            Set as None to disable concurrency limits, processing all pages at once.
         **_: Thrown away kwargs.
 
     Returns:
@@ -203,9 +209,15 @@ async def parse_pdf_to_pages(
 
         content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
         total_length = count_media = 0
-        for page_num, page_content in await asyncio.gather(
-            *(process_page(i) for i in range(start_page, end_page))
-        ):
+
+        gather = (
+            asyncio.gather(*(process_page(i) for i in range(start_page, end_page)))
+            if concurrency is None
+            else gather_with_concurrency(
+                concurrency, (process_page(i) for i in range(start_page, end_page))
+            )
+        )
+        for page_num, page_content in await gather:
             content[page_num] = page_content
             if parse_media:
                 page_text, page_media = page_content  # type: ignore[misc]
