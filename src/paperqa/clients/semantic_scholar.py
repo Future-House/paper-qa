@@ -200,7 +200,7 @@ async def parse_s2_to_doc_details(
         volume=journal_data.get("volume"),
         pages=journal_data.get("pages"),
         journal=journal_data.get("name"),
-        url=(paper_data.get("openAccessPdf") or {}).get("url"),
+        pdf_url=(paper_data.get("openAccessPdf") or {}).get("url"),
         title=paper_data.get("title"),
         citation_count=paper_data.get("citationCount"),
         doi=doi,
