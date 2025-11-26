@@ -40,7 +40,8 @@ SEMANTIC_SCHOLAR_API_MAPPING: dict[str, Collection[str]] = {
     "volume": {"journal"},
     "pages": {"journal"},
     "journal": {"journal"},
-    "url": {"url", "openAccessPdf"},
+    "url": {"url"},
+    "pdf_url": {"openAccessPdf"},
     "bibtex": {"citationStyles"},
     "doi_url": {"url"},
     "other": {"isOpenAccess", "influentialCitationCount", "publicationTypes", "venue"},
@@ -189,6 +190,8 @@ async def parse_s2_to_doc_details(
 
     journal_data = paper_data.get("journal") or {}
 
+    maybe_pdf_url = (paper_data.get("openAccessPdf") or {}).get("url")
+
     doc_details = DocDetails(
         key=None if not bibtex else bibtex.split("{")[1].split(",")[0],
         bibtex_type="article",  # s2 should be basically all articles
@@ -199,7 +202,8 @@ async def parse_s2_to_doc_details(
         volume=journal_data.get("volume"),
         pages=journal_data.get("pages"),
         journal=journal_data.get("name"),
-        url=(paper_data.get("openAccessPdf") or {}).get("url"),
+        url=maybe_pdf_url,
+        pdf_url=maybe_pdf_url,
         title=paper_data.get("title"),
         citation_count=paper_data.get("citationCount"),
         doi=doi,
