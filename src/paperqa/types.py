@@ -783,7 +783,9 @@ class DocDetails(Doc):
             " that could be preprint). None means unknown/unset."
         ),
     )
-    pdf_url: str | None = None
+    pdf_url: str | None = Field(
+        default=None, description="URL to the PDF of the paper, if known."
+    )
     other: dict[str, Any] = Field(
         default_factory=dict,
         description="Other metadata besides the above standardized fields.",
