@@ -227,11 +227,17 @@ async def parse_pdf_to_pages(
                         rendered_page_padded_pil.height, rendered_page_padded_pil.width
                     )
                     # Adjust bbox to account for padding offsets
+                    # Also if the bbox had extended into the padding zone,
+                    # clamp it here as we're ditching the padding
                     original_bbox = (
-                        padded_bbox[0] - offset_x,  # xmin  # pylint: disable=possibly-used-before-assignment
-                        padded_bbox[1] - offset_y,  # ymin  # pylint: disable=possibly-used-before-assignment
-                        padded_bbox[2] - offset_x,  # xmax
-                        padded_bbox[3] - offset_y,  # ymax
+                        # xmin, ymin
+                        # pylint: disable-next=possibly-used-before-assignment
+                        max(0, padded_bbox[0] - offset_x),
+                        # pylint: disable-next=possibly-used-before-assignment
+                        max(0, padded_bbox[1] - offset_y),
+                        # xmax, ymax
+                        min(rendered_page_pil.width, padded_bbox[2] - offset_x),
+                        min(rendered_page_pil.height, padded_bbox[3] - offset_y),
                     )
                     region_pix = rendered_page_pil.crop(original_bbox)
                     img_bytes = io.BytesIO()
