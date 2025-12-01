@@ -9,8 +9,10 @@ from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs
 from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import ImpossibleParsingError, get_citation_ids
+from PIL import Image
 
 from paperqa_nemotron import parse_pdf_to_pages
+from paperqa_nemotron.reader import pad_image_with_border
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
@@ -331,3 +333,44 @@ async def test_equation_parsing() -> None:
     ), "Expected inline equation in page 1 text"
     assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
     assert p1_media
+
+
+def test_pad_image_with_border(subtests: pytest.Subtests) -> None:
+    stub_gray_image = Image.new("RGB", (1000, 1500), (128, 128, 128))
+
+    with subtests.test(msg="default-size"):
+        padded, offset_x, offset_y = pad_image_with_border(stub_gray_image)
+        assert padded.width == stub_gray_image.width + 84
+        assert padded.height == stub_gray_image.height + 84
+        assert offset_x == offset_y == 42
+
+    with subtests.test(msg="custom-size"):
+        padded, offset_x, offset_y = pad_image_with_border(stub_gray_image, border=30)
+        assert padded.width == stub_gray_image.width + 60
+        assert padded.height == stub_gray_image.height + 60
+        assert offset_x == offset_y == 30
+
+    with subtests.test(msg="tuple-size"):
+        padded, offset_x, offset_y = pad_image_with_border(
+            stub_gray_image, border=(20, 40)
+        )
+        assert padded.width == stub_gray_image.width + 40
+        assert padded.height == stub_gray_image.height + 80
+        assert offset_x == 20
+        assert offset_y == 40
+
+    with subtests.test(msg="rgba-mode"):
+        rgba_image = Image.new("RGBA", (500, 800), (100, 100, 100, 255))
+        padded, offset_x, offset_y = pad_image_with_border(rgba_image)
+        assert padded.mode == "RGBA"
+        assert padded.width == rgba_image.width + 84
+        assert padded.height == rgba_image.height + 84
+
+    with subtests.test(msg="grayscale-mode"):
+        grayscale_image = Image.new("L", (600, 900), 128)
+        padded, offset_x, offset_y = pad_image_with_border(
+            grayscale_image, pad_color=255
+        )
+        assert padded.mode == "L"
+        assert padded.width == grayscale_image.width + 84
+        assert padded.height == grayscale_image.height + 84
