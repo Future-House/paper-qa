@@ -47,7 +47,7 @@ dev = [
     "pytest-asyncio",
     "pytest-recording",
     "pytest-rerunfailures",
-    "pytest>=8",  # Pin to keep recent
+    "pytest>=9",  # Pin for pytest-subtests upstreaming
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 sagemaker = ["aiobotocore"]

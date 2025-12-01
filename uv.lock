@@ -2930,7 +2930,7 @@ requires-dist = [
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "paper-qa-nemotron", extras = ["sagemaker", "typing"], marker = "extra == 'dev'", editable = "packages/paper-qa-nemotron" },
     { name = "pypdfium2", specifier = ">=4.22.0" },
-    { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
+    { name = "pytest", marker = "extra == 'dev'", specifier = ">=9" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
     { name = "pytest-recording", marker = "extra == 'dev'" },
     { name = "pytest-rerunfailures", marker = "extra == 'dev'" },
