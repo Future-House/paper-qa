@@ -18,9 +18,11 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
+    "Pillow",  # Also comes from fhaviary's image extra
     "fhaviary[image]",
     "fhlmi>=0.27.0",  # Pin for request_limited
     "litellm>=1.71.0",  # Pin for aiohttp transport optimization
+    "numpy",
     "paper-qa",
     "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition
     "tenacity",
@@ -47,13 +49,14 @@ dev = [
     "pytest-asyncio",
     "pytest-recording",
     "pytest-rerunfailures",
-    "pytest>=8",  # Pin to keep recent
+    "pytest>=9",  # Pin for pytest-subtests upstreaming
     "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
 ]
 sagemaker = ["aiobotocore"]
 typing = [
     "limits",
     "numpy",
+    "types-Pillow",
     "types-aiobotocore",
 ]
 

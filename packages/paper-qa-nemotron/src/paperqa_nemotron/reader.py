@@ -6,12 +6,14 @@ import json
 import os
 from collections.abc import Mapping
 from contextlib import closing
-from typing import Any, cast
+from typing import Any, Literal, cast
 
+import numpy as np
 import pypdfium2 as pdfium
 from lmi.utils import gather_with_concurrency
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
+from PIL import Image
 from tenacity import RetryError
 
 from paperqa_nemotron.api import (
@@ -19,9 +21,49 @@ from paperqa_nemotron.api import (
     NemotronBBoxError,
     NemotronLengthError,
     NemotronParseClassification,
+    NemotronParseMarkdownBBox,
     _call_nvidia_api,
     _call_sagemaker_api,
 )
+
+WHITE_RGB = (255, 255, 255)
+# On DOI 10.1016/j.neuron.2011.12.023, 36-px was an insufficient border
+# with temperature of 0
+DEFAULT_BORDER_SIZE = 42  # pixels
+
+
+def pad_image_with_border(
+    image: "Image.Image",
+    border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
+    pad_color: float | tuple[float, ...] | str = WHITE_RGB,
+) -> "tuple[Image.Image, int, int]":
+    """Pad image with colored borders.
+
+    Padding the border can improve nemotron-parse performance
+    because now there's room to bound PDF artwork that extends to the edge of the PDF.
+    Without a border margin, the bounding box can extend beyond [0, 1].
+
+    Args:
+        image: Image to pad.
+        border: Border size (pixels) to add on all sides.
+            If a two-tuple it's the x border and y border,
+            otherwise both x and y borders are symmetric.
+        pad_color: Color to use for padding, default is white.
+
+    Returns:
+        Three-tuple of padded image and x + y image offset (pixels), where offsets
+            indicate where the original image starts in the padded image.
+    """
+    border_x, border_y = border if isinstance(border, tuple) else (border, border)
+
+    # Create canvas with border on all sides, while not manipulating the original image
+    orig_w, orig_h = image.size
+    canvas = Image.new(
+        image.mode, (orig_w + 2 * border_x, orig_h + 2 * border_y), pad_color  # type: ignore[arg-type]
+    )
+    # Paste original image onto canvas with border offset
+    canvas.paste(image, (border_x, border_y))
+    return canvas, border_x, border_y
 
 
 async def parse_pdf_to_pages(
@@ -33,6 +75,7 @@ async def parse_pdf_to_pages(
     dpi: int | None = 300,
     api_params: Mapping[str, Any] | None = None,
     concurrency: int | asyncio.Semaphore | None = 128,
+    border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
     **_: Any,
 ) -> ParsedText:
     """Parse a PDF using Nvidia's nemotron-parse VLM.
@@ -54,6 +97,9 @@ async def parse_pdf_to_pages(
             use to put a ceiling on memory usage. Default is 128 to prioritize reader
             speed over memory, but not get obliterated by huge 1000-page PDFs.
             Set as None to disable concurrency limits, processing all pages at once.
+        border: Border size (pixels) to add on all sides.
+            If a two-tuple it's the x border and y border,
+            otherwise both x and y borders are symmetric.
         **_: Thrown away kwargs.
 
     Returns:
@@ -101,11 +147,23 @@ async def parse_pdf_to_pages(
                 render_kwargs["scale"] = dpi / 72
 
             rendered_page = page.render(**render_kwargs)
+            rendered_page_pil = rendered_page.to_pil()
+            if parse_media and not full_page:  # If we need bounding boxes
+                # Apply white border padding to increase bounding box reliability
+                rendered_page_padded_pil, offset_x, offset_y = pad_image_with_border(
+                    rendered_page_pil, border
+                )
+                image_for_api = np.array(rendered_page_padded_pil)
+                tool_name: Literal["markdown_bbox", "markdown_no_bbox"] = (
+                    "markdown_bbox"
+                )
+            else:
+                image_for_api = rendered_page.to_numpy()
+                tool_name = "markdown_no_bbox"
+
             try:
                 response = await call_fn(
-                    image=rendered_page.to_numpy(),
-                    tool_name="markdown_bbox",
-                    **api_params,
+                    image=image_for_api, tool_name=tool_name, **api_params
                 )
             except RetryError as model_err:
                 if isinstance(
@@ -140,14 +198,13 @@ async def parse_pdf_to_pages(
 
             media: list[ParsedMedia] = []
             if parse_media and full_page:
-                pil_image = rendered_page.to_pil()
                 img_bytes = io.BytesIO()
-                pil_image.save(img_bytes, format="PNG")
+                rendered_page_pil.save(img_bytes, format="PNG")
 
                 media_metadata = render_kwargs | {
                     "type": "screenshot",
-                    "width": pil_image.width,
-                    "height": pil_image.height,
+                    "width": rendered_page_pil.width,
+                    "height": rendered_page_pil.height,
                 }
                 media_metadata["info_hashable"] = json.dumps(
                     media_metadata, sort_keys=True
@@ -161,16 +218,32 @@ async def parse_pdf_to_pages(
             elif parse_media:
                 counters = dict.fromkeys(CLASSIFICATIONS_WITH_MEDIA, 0)
                 for item in (
-                    item for item in response if item.type in CLASSIFICATIONS_WITH_MEDIA
+                    item
+                    for item in cast(list[NemotronParseMarkdownBBox], response)
+                    if item.type in CLASSIFICATIONS_WITH_MEDIA
                 ):
-                    bbox = item.bbox.to_page_coordinates(
-                        rendered_page.height, rendered_page.width
+                    # Convert bbox from normalized [0, 1] to padded image pixel coordinates
+                    padded_bbox = item.bbox.to_page_coordinates(
+                        rendered_page_padded_pil.height, rendered_page_padded_pil.width
                     )
-                    region_pix = rendered_page.to_pil().crop(bbox)
+                    # Adjust bbox to account for padding offsets
+                    # Also if the bbox had extended into the padding zone,
+                    # clamp it here as we're ditching the padding
+                    original_bbox = (
+                        # xmin, ymin
+                        # pylint: disable-next=possibly-used-before-assignment
+                        max(0, padded_bbox[0] - offset_x),
+                        # pylint: disable-next=possibly-used-before-assignment
+                        max(0, padded_bbox[1] - offset_y),
+                        # xmax, ymax
+                        min(rendered_page_pil.width, padded_bbox[2] - offset_x),
+                        min(rendered_page_pil.height, padded_bbox[3] - offset_y),
+                    )
+                    region_pix = rendered_page_pil.crop(original_bbox)
                     img_bytes = io.BytesIO()
                     region_pix.save(img_bytes, format="PNG")
                     media_metadata = render_kwargs | {
-                        "bbox": bbox,
+                        "bbox": original_bbox,
                         "type": item.type.name.lower(),
                         "width": region_pix.width,
                         "height": region_pix.height,
@@ -226,7 +299,7 @@ async def parse_pdf_to_pages(
             else:
                 total_length += len(page_content)
 
-    # No need to reflect api_params such as api_base or temperature here
+    # No need to reflect border or api_params such as api_base or temperature here
     multimodal_string = (
         f"|multimodal|dpi={dpi}|mode={'full-page' if full_page else 'individual'}"
     )

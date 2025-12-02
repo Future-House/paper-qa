@@ -299,13 +299,18 @@ async def _call_nvidia_api(
             f"Didn't yet handle choices shape of model response {response}."
         )
     if response.choices[0].finish_reason == "length":
-        raise NemotronLengthError(
+        # Unfortunately Nvidia API will give a 'length' error even if the response
+        # is fine. It's unclear if this is an API bug or a model bug,
+        # but for now let's ignore this
+        cached_exc = NemotronLengthError(
             f"Model response {response} indicates the input"
             f" image of shape {image.shape} is too large or the model started babbling.",
             response.choices[0],  # Include if callers want
         )
+    else:
+        cached_exc = None
     if (
-        response.choices[0].finish_reason != "tool_calls"
+        response.choices[0].finish_reason not in {"tool_calls", "length"}
         or response.choices[0].message.tool_calls is None
         or len(response.choices[0].message.tool_calls) != 1
     ):
@@ -324,6 +329,12 @@ async def _call_nvidia_api(
         else:
             assert_never(tool_name)
     except ValidationError as exc:
+        if cached_exc is not None:
+            if exc.__cause__ is not None:
+                raise NotImplementedError(
+                    "Didn't handle if response validation already had a cause."
+                ) from exc
+            exc.__cause__ = cached_exc
         raise NemotronBBoxError(
             f"nemotron-parse response {args_json} has invalid bounding box."
         ) from exc
