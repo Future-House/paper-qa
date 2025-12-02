@@ -18,6 +18,7 @@ from docling.pipeline.standard_pdf_pipeline import StandardPdfPipeline
 from docling_core.types.doc import (
     DescriptionAnnotation,
     DocItem,
+    FormulaItem,
     PictureItem,
     TableItem,
     TextItem,
@@ -123,10 +124,14 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         # NOTE: docling pages are 1-indexed
         page_nums = [prov.page_no for prov in item.prov]
 
-        if isinstance(item, TextItem):
+        if isinstance(item, TextItem | FormulaItem):  # Handle items with text
+            item_text = item.text
+            if not item_text and isinstance(item, FormulaItem) and item.orig:
+                # Sometimes the sanitization of formula text fails, so use the original
+                item_text = item.orig
             for page_num in page_nums:
                 new_text = (
-                    item.text if not content[str(page_num)][0] else "\n\n" + item.text
+                    item_text if not content[str(page_num)][0] else "\n\n" + item_text
                 )
                 total_length += len(new_text)
                 if page_size_limit and total_length > page_size_limit:
@@ -137,7 +142,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     )
                 content[str(page_num)][0] += new_text
 
-        if parse_media and isinstance(item, PictureItem):  # Handle images
+        if parse_media and isinstance(  # Handle images and formulae
+            item, PictureItem | FormulaItem
+        ):
             image_data = item.get_image(doc)
             if image_data:
                 try:
@@ -154,14 +161,16 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                 img_bytes.seek(0)  # Reset pointer before read to avoid empty data
 
                 media_metadata = {
-                    "type": "picture",
+                    "type": "formula" if isinstance(item, FormulaItem) else "picture",
                     "width": image_data.width,
                     "height": image_data.height,
                     "bbox": item.prov[0].bbox.as_tuple(),
                     "images_scale": pipeline_options.images_scale,
                 }
                 annotations = [
-                    x for x in item.annotations if isinstance(x, DescriptionAnnotation)
+                    x
+                    for x in getattr(item, "annotations", [])
+                    if isinstance(x, DescriptionAnnotation)
                 ]
                 if len(annotations) == 1:
                     # We don't set this text in ParsedMedia.text because it's
