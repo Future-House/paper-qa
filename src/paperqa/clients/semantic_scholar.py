@@ -150,7 +150,7 @@ def s2_authors_match(authors: list[str], data: dict) -> bool:
     return any(
         starmap(
             lambda x, y: x in y or y in x,
-            zip(s2_authors_noinit, authors_noinit, strict=False),
+            zip(s2_authors_noinit, authors_noinit, strict=False),  # noqa: FURB120
         )
     )
 
