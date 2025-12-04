@@ -3,9 +3,13 @@
 <!-- pyml disable-num-lines 5 line-length -->
 
 [//]: # "To generate `stub_data/duplicate_media.pdf` from this:"
-[//]: # "1. `pandoc duplicate_media_template.md --standalone --self-contained --katex -t html -o temp.html`"
+[//]: # "1. `pandoc duplicate_media_template.md --standalone --katex -t html -o temp.html`"
 [//]: # "2. `Chromium --headless --disable-gpu --print-to-pdf=stub_data/duplicate_media.pdf --no-pdf-header-footer temp.html`"
 [//]: # "3. `rm temp.html`"
+
+<div style="text-align: right; margin-bottom: 10px;">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Wikimedia_logo_text_RGB.svg/330px-Wikimedia_logo_text_RGB.svg.png" alt="Wikimedia logo" height="100"/>
+</div>
 
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
 
@@ -28,6 +32,10 @@ $$
 
 <div style="page-break-after: always;"></div>
 
+<div style="text-align: right; margin-bottom: 10px;">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Wikimedia_logo_text_RGB.svg/330px-Wikimedia_logo_text_RGB.svg.png" alt="Wikimedia logo" height="100"/>
+</div>
+
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
 
 Text under image 2.
@@ -48,6 +56,10 @@ x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt
 $$
 
 <div style="page-break-after: always;"></div>
+
+<div style="text-align: right; margin-bottom: 10px;">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Wikimedia_logo_text_RGB.svg/330px-Wikimedia_logo_text_RGB.svg.png" alt="Wikimedia logo" height="100"/>
+</div>
 
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
 
@@ -70,6 +82,10 @@ $$
 
 <div style="page-break-after: always;"></div>
 
+<div style="text-align: right; margin-bottom: 10px;">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Wikimedia_logo_text_RGB.svg/330px-Wikimedia_logo_text_RGB.svg.png" alt="Wikimedia logo" height="100"/>
+</div>
+
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
 
 Text under image 4.
@@ -90,6 +106,10 @@ x + n + a = \sqrt{ax + (n + a)^2 + x \sqrt{a (x + n) + (n + a)^2 + (x + n) \sqrt
 $$
 
 <div style="page-break-after: always;"></div>
+
+<div style="text-align: right; margin-bottom: 10px;">
+<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Wikimedia_logo_text_RGB.svg/330px-Wikimedia_logo_text_RGB.svg.png" alt="Wikimedia logo" height="100"/>
+</div>
 
 <img src="stub_data/sf_districts.png" alt="Map of SF districts" height="200"/>
 
