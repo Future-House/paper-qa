@@ -24,3 +24,47 @@ For more info on nemotron-parse, check out:
   <https://github.com/NVIDIA-NeMo/Nemotron/blob/main/usage-cookbook/Nemotron-Parse-v1.1/build_general_usage_cookbook.ipynb>
 - AWS Marketplace:
   <https://aws.amazon.com/marketplace/pp/prodview-ny2ngku2i4ge6>
+
+## Installation
+
+```bash
+pip install paper-qa[nemotron]
+# Or
+pip install paper-qa-nemotron
+```
+
+If you want to prompt nemotron-parse hosted on AWS SageMaker:
+
+```bash
+pip install paper-qa-nemotron[sagemaker]
+```
+
+## Getting Started
+
+To use nemotron-parse via the Nvidia API,
+set the `NVIDIA_API_KEY` environment variable.
+
+Then to directly access the reader:
+
+```python
+from paperqa.types import ParsedText
+from paperqa_nemotron import parse_pdf_to_pages
+
+async def main(pdf_path) -> ParsedText:
+    return await parse_pdf_to_pages(pdf_path)
+```
+
+Or use the reader within PaperQA:
+
+```python
+from paperqa import Docs, PQASession, Settings
+
+from paperqa_nemotron import parse_pdf_to_pages
+
+
+async def main(pdf_path, question: str | PQASession) -> PQASession:
+    settings = Settings(parsing={"parse_pdf": parse_pdf_to_pages})
+    docs = Docs()
+    await docs.aadd(pdf_path, settings=settings)
+    return await docs.aquery(question, settings=settings)
+```
