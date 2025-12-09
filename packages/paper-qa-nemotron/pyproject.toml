@@ -50,7 +50,7 @@ dev = [
     "pytest-recording",
     "pytest-rerunfailures",
     "pytest>=9",  # Pin for pytest-subtests upstreaming
-    "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
+    "vcrpy>=8",  # Pin for dropping unused requests support
 ]
 sagemaker = ["aiobotocore"]
 typing = [

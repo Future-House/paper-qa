@@ -81,7 +81,7 @@ dev = [
     "python-dotenv",
     "refurb>=2",  # Pin to keep recent
     "typeguard",
-    "vcrpy>=6",  # Pin for https://github.com/kevin1024/vcrpy/issues/884
+    "vcrpy>=8",  # Pin for dropping unused requests support
 ]
 docling = ["paper-qa-docling"]
 image = ["fhlmi[image]"]
