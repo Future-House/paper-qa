@@ -9,7 +9,7 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - id: build-paper-qa-pymupdf
         uses: hynek/build-and-inspect-python-package@v2
         with:
