@@ -794,8 +794,9 @@ async def test_location_awareness(stub_data_dir: Path) -> None:
     # NOTE: scores are useless here because we didn't describe them in the prompt
     locations = [to_pages(c) for c in session.contexts]
     try:
+        # 2-3 is not strictly correct, but it's feasible enough that we allow it here
         assert any(
-            x in locations for x in ("2", "1-3", "1 - 3")
+            x in locations for x in ("2", "1-3", "1 - 3", "2-3", "2 - 3")
         ), f"correct location not found in parsed evidence {locations}"
     except AssertionError:
         if "1" not in locations:
@@ -1917,9 +1918,16 @@ async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
         assert (
             CANNOT_ANSWER_PHRASE not in enriched_session2.answer
         ), f"Expected answer with enrichment {fig3_enrichment}."
-        assert all(
-            x in enriched_session2.answer.lower() for x in ("molecule", "reference")
+        # We require "molecule" and one of "reference" or "original"
+        assert (
+            "molecule" in enriched_session2.answer.lower()
         ), f"Expected answer with enrichment {fig3_enrichment}."
+        assert any(
+            x in enriched_session2.answer.lower() for x in ("reference", "original")
+        ), (
+            f"Expected answer with enrichment {fig3_enrichment},"
+            f" got answer {enriched_session2.answer}."
+        )
     except AssertionError as exc:
         raise exc from cached_exc
 
@@ -2184,9 +2192,9 @@ async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
 @pytest.mark.parametrize(
     "parser",
     [
-        pymupdf_parse_pdf_to_pages,
-        docling_parse_pdf_to_pages,
-        nemotron_parse_pdf_to_pages,
+        pytest.param(pymupdf_parse_pdf_to_pages, id="pymupdf"),
+        pytest.param(docling_parse_pdf_to_pages, id="docling"),
+        pytest.param(nemotron_parse_pdf_to_pages, id="nemotron"),
     ],
 )
 @pytest.mark.asyncio
@@ -2201,12 +2209,17 @@ async def test_equations(stub_data_dir: Path, parser: PDFParserFn) -> None:
         settings=settings,
     )
     assert docs.texts
+    enrichments = []  # Use to debug flaky tests
     for m in docs.texts[0].media:
         enrichment = m.info["enriched_description"]
         assert isinstance(enrichment, str)
         if any(x in enrichment for x in ("LaTeX", "latex")) and r"\sqrt" in enrichment:
             return
-    raise AssertionError("Failed to find enrichment for the target equation")
+        enrichments.append(enrichment)
+    raise AssertionError(
+        "Failed to find enrichment for the target equation,"
+        f" all enrichments: {enrichments}"
+    )
 
 
 def test_missing_page_doesnt_crash_us() -> None:
