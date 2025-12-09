@@ -2208,12 +2208,17 @@ async def test_equations(stub_data_dir: Path, parser: PDFParserFn) -> None:
         settings=settings,
     )
     assert docs.texts
+    enrichments = []  # Use to debug flaky tests
     for m in docs.texts[0].media:
         enrichment = m.info["enriched_description"]
         assert isinstance(enrichment, str)
         if any(x in enrichment for x in ("LaTeX", "latex")) and r"\sqrt" in enrichment:
             return
-    raise AssertionError("Failed to find enrichment for the target equation")
+        enrichments.append(enrichment)
+    raise AssertionError(
+        "Failed to find enrichment for the target equation,"
+        f" all enrichments: {enrichments}"
+    )
 
 
 def test_missing_page_doesnt_crash_us() -> None:
