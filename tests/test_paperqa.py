@@ -1919,7 +1919,10 @@ async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
         ), f"Expected answer with enrichment {fig3_enrichment}."
         assert all(
             x in enriched_session2.answer.lower() for x in ("molecule", "reference")
-        ), f"Expected answer with enrichment {fig3_enrichment}."
+        ), (
+            f"Expected answer with enrichment {fig3_enrichment},"
+            f" got answer {enriched_session2.answer}."
+        )
     except AssertionError as exc:
         raise exc from cached_exc
 
