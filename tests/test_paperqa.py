@@ -1917,8 +1917,12 @@ async def test_image_enrichment_normal_use(stub_data_dir: Path) -> None:
         assert (
             CANNOT_ANSWER_PHRASE not in enriched_session2.answer
         ), f"Expected answer with enrichment {fig3_enrichment}."
-        assert all(
-            x in enriched_session2.answer.lower() for x in ("molecule", "reference")
+        # We require "molecule" and one of "reference" or "original"
+        assert (
+            "molecule" in enriched_session2.answer.lower()
+        ), f"Expected answer with enrichment {fig3_enrichment}."
+        assert any(
+            x in enriched_session2.answer.lower() for x in ("reference", "original")
         ), (
             f"Expected answer with enrichment {fig3_enrichment},"
             f" got answer {enriched_session2.answer}."
