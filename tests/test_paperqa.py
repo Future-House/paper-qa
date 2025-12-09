@@ -2191,9 +2191,9 @@ async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
 @pytest.mark.parametrize(
     "parser",
     [
-        pymupdf_parse_pdf_to_pages,
-        docling_parse_pdf_to_pages,
-        nemotron_parse_pdf_to_pages,
+        pytest.param(pymupdf_parse_pdf_to_pages, id="pymupdf"),
+        pytest.param(docling_parse_pdf_to_pages, id="docling"),
+        pytest.param(nemotron_parse_pdf_to_pages, id="nemotron"),
     ],
 )
 @pytest.mark.asyncio
