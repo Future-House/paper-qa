@@ -75,7 +75,7 @@ from paperqa.prompts import (
 )
 from paperqa.readers import PDFParserFn
 from paperqa.types import Context, ParsedMedia, ParsedText
-from paperqa.utils import hexdigest, pqa_directory
+from paperqa.utils import hexdigest, parse_enrichment_irrelevance, pqa_directory
 
 logger = logging.getLogger(__name__)
 
@@ -1225,7 +1225,7 @@ class Settings(BaseSettings):
         """Create an enricher function from settings."""
 
         async def enrich_media_with_llm(parsed_text: ParsedText) -> str:
-            """Enrich media in parsed text with LLM-generated descriptions.
+            """Enrich media in parsed text with LLM-generated descriptions and then filter irrelevant media.
 
             Returns:
                 A summary string of the enrichment.
@@ -1310,7 +1310,10 @@ class Settings(BaseSettings):
                         ]
                     )
                     if result.text:
-                        media.info["enriched_description"] = result.text.strip()
+                        (
+                            media.info["is_irrelevant"],
+                            media.info["enriched_description"],
+                        ) = parse_enrichment_irrelevance(result.text)
                 except (litellm.InternalServerError, litellm.BadRequestError) as exc:
                     # Handle image > 5-MB failure mode 1:
                     # > litellm.BadRequestError: AnthropicException -
@@ -1339,13 +1342,26 @@ class Settings(BaseSettings):
                         raise
 
             await asyncio.gather(*list(starmap(enrich_single_media, media_to_enrich)))
-            count_enriched = sum(
-                bool(media.info.get("enriched_description"))
-                for page_num, page_contents in parsed_text.content.items()
-                if isinstance(page_contents, tuple)
-                for media in page_contents[1]
+
+            # Filter out irrelevant media from parsed_text.content in-place,
+            # while counting enrichments and filtration
+            count_enriched = count_filtered = 0
+            for page_num, page_contents in text_content.items():
+                if isinstance(page_contents, tuple):
+                    page_text, media_list = page_contents
+                    count_enriched += sum(
+                        bool(m.info.get("enriched_description")) for m in media_list
+                    )
+                    filtered_media = [
+                        m for m in media_list if not m.info.get("is_irrelevant", False)
+                    ]
+                    count_filtered += len(media_list) - len(filtered_media)
+                    # In-place update the content for the filtered media
+                    text_content[page_num] = (page_text, filtered_media)
+
+            return (
+                f"enriched={count_enriched}|filtered={count_filtered}|radius={radius}"
             )
-            return f"enriched={count_enriched}|radius={radius}"
 
         return enrich_media_with_llm
 
