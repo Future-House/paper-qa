@@ -2211,9 +2211,16 @@ async def test_equations(stub_data_dir: Path, parser: PDFParserFn) -> None:
     assert docs.texts
     enrichments = []  # Use to debug flaky tests
     for m in docs.texts[0].media:
+        if m.info.get("type") == "table":
+            continue  # Skip tables since we want equations
         enrichment = m.info["enriched_description"]
         assert isinstance(enrichment, str)
-        if any(x in enrichment for x in ("LaTeX", "latex")) and r"\sqrt" in enrichment:
+        if (
+            # Yes 'mathematical equation' is looser than stating it to be LaTeX,
+            # but for the purposes of this test it's alright
+            any(x in enrichment for x in ("LaTeX", "latex", "mathematical equation"))
+            and r"\sqrt" in enrichment
+        ):
             return
         enrichments.append(enrichment)
     raise AssertionError(

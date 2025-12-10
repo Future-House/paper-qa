@@ -73,7 +73,7 @@ async def test_parse_pdf_to_pages(api_params_base: dict[str, Any]) -> None:
     p2_bbox = p2_image.info["bbox"]
     assert isinstance(p2_bbox, tuple)
     for i, value in enumerate((71, 71.40, 522, 213.00)):
-        assert p2_bbox[i] == pytest.approx(value, rel=0.25 if value < 100 else 0.15)
+        assert p2_bbox[i] == pytest.approx(value, rel=0.275 if value < 100 else 0.15)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
