@@ -340,9 +340,9 @@ def test_pad_image_with_border(subtests: pytest.Subtests) -> None:
 
     with subtests.test(msg="default-size"):
         padded, offset_x, offset_y = pad_image_with_border(stub_gray_image)
-        assert padded.width == stub_gray_image.width + 84
-        assert padded.height == stub_gray_image.height + 84
-        assert offset_x == offset_y == 42
+        assert padded.width == stub_gray_image.width + 60 * 2
+        assert padded.height == stub_gray_image.height + 60 * 2
+        assert offset_x == offset_y == 60
 
     with subtests.test(msg="custom-size"):
         padded, offset_x, offset_y = pad_image_with_border(stub_gray_image, border=30)
@@ -363,8 +363,8 @@ def test_pad_image_with_border(subtests: pytest.Subtests) -> None:
         rgba_image = Image.new("RGBA", (500, 800), (100, 100, 100, 255))
         padded, offset_x, offset_y = pad_image_with_border(rgba_image)
         assert padded.mode == "RGBA"
-        assert padded.width == rgba_image.width + 84
-        assert padded.height == rgba_image.height + 84
+        assert padded.width == rgba_image.width + 60 * 2
+        assert padded.height == rgba_image.height + 60 * 2
 
     with subtests.test(msg="grayscale-mode"):
         grayscale_image = Image.new("L", (600, 900), 128)
@@ -372,8 +372,8 @@ def test_pad_image_with_border(subtests: pytest.Subtests) -> None:
             grayscale_image, pad_color=255
         )
         assert padded.mode == "L"
-        assert padded.width == grayscale_image.width + 84
-        assert padded.height == grayscale_image.height + 84
+        assert padded.width == grayscale_image.width + 60 * 2
+        assert padded.height == grayscale_image.height + 60 * 2
 
 
 @pytest.mark.asyncio
