@@ -198,8 +198,17 @@ individual_media_enrichment_prompt_template = (
     " In this case, make sure to only detail the subfigure or subtable,"
     " not the entire figure or table."
     " Do not mention other unrelated surrounding text."
-    "\n\n{context_text}Describe the media,"  # Allow for empty context_text
-    " or if uncertain on a description please state why:"
+    "\n\nIMPORTANT: Start your response with exactly one of these labels:"
+    "\n- 'RELEVANT:' if the media contains scientific content"
+    " (e.g. figures, charts, tables, equations, diagrams, data visualizations)"
+    " that could help answer scientific questions,"
+    " or if you're unsure of relevance (e.g. garbled/corrupted content)."
+    "\n- 'IRRELEVANT:' if the media content is not useful for scientific question-answer"
+    " (e.g. journal logo, icon, display type/typography, decorative element,"
+    " design element, margin box, is blank)."
+    "\n\nAfter the label, provide your description."
+    "\n\n{context_text}Label relevance, describe the media,"  # Allow for empty context_text
+    " and if uncertain on a description please state why:"
 )
 full_page_enrichment_prompt_template = (
     "You are analyzing a screenshot of a page from a scientific document."
@@ -217,6 +226,15 @@ full_page_enrichment_prompt_template = (
     " such as journal logos, display type, margin boxes, or PDF design elements."
     " If the screenshot is garbled due to a bad screenshot,"
     " describe the screenshot as garbled, state why it's considered garbled."
-    "\n\n{context_text}Describe the screenshot,"  # Allow for empty context_text
-    " or if uncertain on a description please state why:"
+    "\n\nIMPORTANT: Start your response with exactly one of these labels:"
+    "\n- 'RELEVANT:' if the screenshot contains scientific content"
+    " (e.g. figures, charts, tables, equations, diagrams, data visualizations)"
+    " that could help answer scientific questions,"
+    " or if you're unsure of relevance (e.g. garbled/corrupted content)."
+    "\n- 'IRRELEVANT:' if the screenshot content is not useful for scientific question-answer"
+    " (e.g. journal logo, icon, display type/typography, decorative element,"
+    " design element, margin box, is blank)."
+    "\n\nAfter the label, provide your description."
+    "\n\n{context_text}Label relevance, describe the screenshot,"  # Allow for empty context_text
+    " and if uncertain on a description please state why:"
 )

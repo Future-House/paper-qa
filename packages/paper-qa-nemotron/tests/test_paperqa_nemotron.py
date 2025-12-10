@@ -6,7 +6,7 @@ from typing import Any, cast
 
 import pytest
 from lmi.utils import bytes_to_string
-from paperqa import Doc, Docs
+from paperqa import Doc, Docs, Settings
 from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import ImpossibleParsingError, get_citation_ids
 from PIL import Image
@@ -374,3 +374,66 @@ def test_pad_image_with_border(subtests: pytest.Subtests) -> None:
         assert padded.mode == "L"
         assert padded.width == grayscale_image.width + 84
         assert padded.height == grayscale_image.height + 84
+
+
+@pytest.mark.asyncio
+async def test_media_enrichment_filters_irrelevant() -> None:
+    parsed_text = await parse_pdf_to_pages(
+        STUB_DATA_DIR / "duplicate_media.pdf", api_params={"temperature": 0}
+    )
+    assert isinstance(parsed_text.content, dict)
+
+    # Get media before enrichment to track their types
+    media_before = [
+        m
+        for page_contents in parsed_text.content.values()
+        if isinstance(page_contents, tuple)
+        for m in page_contents[1]
+    ]
+    assert media_before, "Expected some media to be parsed from the PDF"
+
+    # Create settings and run enrichment
+    enricher = Settings().make_media_enricher()
+    enrichment_summary = await enricher(parsed_text)
+    assert "filtered=" in enrichment_summary, "Test extractions require this substring"
+
+    # Game the in-place change of enrichment to get Wikimedia logos,
+    # so we can later confirm they are filtered out
+    wikimedia_media_before = [
+        m
+        for m in media_before
+        if isinstance(m.info["enriched_description"], str)
+        and "wikimedia" in m.info["enriched_description"].lower()
+    ]
+    assert (
+        len(wikimedia_media_before) > 1
+    ), "Test expects several Wikimedia logos to be parsed"
+
+    # Get media after enrichment to track filtration
+    media_after = [
+        m
+        for page_contents in parsed_text.content.values()
+        if isinstance(page_contents, tuple)
+        for m in page_contents[1]
+    ]
+    assert media_after, "Expected some media to remain after enrichment's filtration"
+    for media in media_after:
+        assert not media.info[
+            "is_irrelevant"
+        ], "Expected remaining media to be marked as relevant"
+        assert media.info["enriched_description"], "Expected enriched description"
+    filtered_count = int(
+        enrichment_summary.split("filtered=", maxsplit=1)[1].split("|")[0]
+    )
+    assert (
+        len(media_before) - len(media_after) == filtered_count
+    ), "Filtered summary mismatches actual filtration"
+    assert filtered_count > 0, "Expected some filtration to take place"
+
+    wikimedia_media_after = [
+        m
+        for m in media_after
+        if isinstance(m.info["enriched_description"], str)
+        and "wikimedia" in m.info["enriched_description"].lower()
+    ]
+    assert len(wikimedia_media_after) <= 1, "Expected most Wikimedia logos to be gone"

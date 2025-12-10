@@ -642,3 +642,23 @@ def clean_possessives(text: str) -> str:
     # Remove standalone apostrophes
     text = re.sub(r"\s+'\s+", " ", text)
     return re.sub(r"(?<!\w)'\s*", "", text)
+
+
+def parse_enrichment_irrelevance(enrichment: str) -> tuple[bool, str]:
+    """Parse irrelevance label from enrichment.
+
+    Returns:
+        Two-tuple of (is irrelevant, enrichment without the label).
+    """
+    # Handle optional Markdown formatting (e.g. **RELEVANT:** or *IRRELEVANT:*)
+    normalized_start = enrichment.upper().lstrip("*").lstrip()
+    if normalized_start.startswith("IRRELEVANT:"):
+        label_match = re.match(r"^\**\s*IRRELEVANT:\**\s*", enrichment)
+        is_irrelevant: bool = True
+    elif normalized_start.startswith("RELEVANT:"):
+        label_match = re.match(r"^\**\s*RELEVANT:\**\s*", enrichment)
+        is_irrelevant = False
+    else:  # No explicit label matched, conservatively assume relevant
+        return False, enrichment.strip()
+    no_label_enrichment = enrichment[label_match.end() :] if label_match else enrichment
+    return is_irrelevant, no_label_enrichment.strip()
