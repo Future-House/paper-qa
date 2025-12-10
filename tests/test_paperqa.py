@@ -3440,6 +3440,29 @@ def test_text_comparison() -> None:
     assert hash(text_with_media1) != hash(text_no_media1)
     assert len({text_with_media1, text_with_media2, text_diff_media}) == 2
 
+    # Test with Pydantic extras
+    text_with_extra1 = Text(text="Hello", name="chunk1", doc=doc, custom_field="value1")
+    assert (
+        text_with_extra1 != text_no_media1
+    ), "Presence of an extra should not be equal"
+    text_with_extra2 = Text(text="Hello", name="chunk1", doc=doc, custom_field="value1")
+    assert text_with_extra1 == text_with_extra2
+    text_with_extra_diff = Text(
+        text="Hello", name="chunk1", doc=doc, custom_field="value2"
+    )
+    assert (
+        text_with_extra1 != text_with_extra_diff
+    ), "Different extra values should not be equal"
+    text_with_extra_other = Text(
+        text="Hello", name="chunk1", doc=doc, other_custom_field="value1"
+    )
+    assert (
+        text_with_extra1 != text_with_extra_other
+    ), "Different extra keys should not be equal"
+
+    with pytest.raises(NotImplementedError, match="extras"):
+        hash(text_with_extra1)
+
 
 def test_context_comparison() -> None:
     text1 = Text(

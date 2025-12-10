@@ -172,9 +172,14 @@ class Text(Embeddable):
             and self.text == other.text
             and self.media == other.media
             and self.doc == other.doc
+            and self.__pydantic_extra__ == other.__pydantic_extra__
         )
 
     def __hash__(self) -> int:
+        if self.__pydantic_extra__:
+            raise NotImplementedError(
+                f"Hashing a {type(self).__name__} with extras is not yet supported."
+            )
         return hash((self.name, self.text, tuple(self.media)))
 
     async def get_embeddable_text(self, with_enrichment: bool = False) -> str:
