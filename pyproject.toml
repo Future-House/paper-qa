@@ -639,6 +639,7 @@ extend-ignore-re = ["(?Rm)^.*(#|//)\\s*spellchecker:( )?disable-line$"]
 ECT = "ECT"  # Filter in clinicaltrials.gov
 aadd = "aadd"
 flate = "flate"  # FlateDecode is a valid PDF compression method
+ser = "ser"  # ser is short for serialized
 
 [tool.typos.files]
 extend-exclude = [
