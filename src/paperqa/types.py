@@ -143,6 +143,9 @@ class Doc(Embeddable):
 class Text(Embeddable):
     """A text chunk ready for use in retrieval with a linked document."""
 
+    # We allow extras so one can introduce chunk-specific metadata
+    model_config = ConfigDict(extra="allow")
+
     text: str = Field(description="Processed text content of the chunk.")
     name: str = Field(
         description=(
