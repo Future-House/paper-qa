@@ -177,9 +177,20 @@ class Text(Embeddable):
 
     def __hash__(self) -> int:
         if self.__pydantic_extra__:
-            raise NotImplementedError(
-                f"Hashing a {type(self).__name__} with extras is not yet supported."
-            )
+            unhashable = [
+                k
+                for k, v in self.__pydantic_extra__.items()
+                if not isinstance(v, Hashable)
+            ]
+            if unhashable:
+                raise NotImplementedError(
+                    f"Hashing a {type(self).__name__} with unhashable extras"
+                    " is not yet supported."
+                )
+            # As Python dict equality (used in __eq__) is order independent,
+            # let's go ahead and be order independent in __hash__ too for consistency
+            extras = tuple(sorted(self.__pydantic_extra__.items()))
+            return hash((self.name, self.text, tuple(self.media), extras))
         return hash((self.name, self.text, tuple(self.media)))
 
     async def get_embeddable_text(self, with_enrichment: bool = False) -> str:
