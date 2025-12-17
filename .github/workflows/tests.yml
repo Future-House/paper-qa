@@ -127,7 +127,7 @@ jobs:
       - run: uv sync
       - name: Cache Docling models
         id: cache-models
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/docling
