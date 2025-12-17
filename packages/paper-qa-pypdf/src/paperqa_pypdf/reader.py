@@ -43,7 +43,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             Leaving as the default of None will parse all pages.
         **_: Thrown away kwargs.
     """
-    with open(path, "rb") as file:
+    with open(path, "rb") as file:  # noqa: PLR1702
         try:
             pdf_reader = pypdf.PdfReader(file)
         except pypdf.errors.PdfReadError as exc:
@@ -94,7 +94,14 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             scale=1
                         )
                         buf = io.BytesIO()
-                        pdfium_rendered_page.to_pil().save(buf, format="PNG")
+                        try:
+                            pdfium_rendered_page.to_pil().save(buf, format="PNG")
+                        except AttributeError as exc:
+                            # Nice-ify pypdfium2's bad error message
+                            raise ImportError(
+                                "Full page media rendering requires 'Pillow' to be installed."
+                                " Please install it via `pip install paper-qa-pypdf[media]`."
+                            ) from exc
                         media_metadata = {
                             "type": "screenshot",
                             "page_width": pdfium_page.get_width(),

@@ -3043,12 +3043,14 @@ dependencies = [
 dev = [
     { name = "fhlmi" },
     { name = "paper-qa" },
+    { name = "pillow" },
     { name = "pypdf", extra = ["image"] },
     { name = "pypdfium2" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
 media = [
+    { name = "pillow" },
     { name = "pypdf", extra = ["image"] },
     { name = "pypdfium2" },
 ]
@@ -3059,6 +3061,7 @@ requires-dist = [
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'dev'", editable = "packages/paper-qa-pypdf" },
+    { name = "pillow", marker = "extra == 'media'" },
     { name = "pypdf", specifier = ">=3" },
     { name = "pypdf", extras = ["image"], marker = "extra == 'media'" },
     { name = "pypdfium2", marker = "extra == 'media'", specifier = ">=4.22.0" },
