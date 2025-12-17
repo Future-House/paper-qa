@@ -104,6 +104,7 @@ openreview = [
 ]
 pymupdf = ["paper-qa-pymupdf"]
 pypdf = ["paper-qa-pypdf"]
+pypdf-enhanced = ["paper-qa-pypdf[enhanced]"]
 pypdf-media = ["paper-qa-pypdf[media]"]
 qdrant = [
     "qdrant-client",

@@ -2807,6 +2807,9 @@ pymupdf = [
 pypdf = [
     { name = "paper-qa-pypdf" },
 ]
+pypdf-enhanced = [
+    { name = "paper-qa-pypdf", extra = ["enhanced"] },
+]
 pypdf-media = [
     { name = "paper-qa-pypdf", extra = ["media"] },
 ]
@@ -2856,6 +2859,7 @@ requires-dist = [
     { name = "paper-qa-pymupdf", marker = "extra == 'zotero'", editable = "packages/paper-qa-pymupdf" },
     { name = "paper-qa-pypdf", editable = "packages/paper-qa-pypdf" },
     { name = "paper-qa-pypdf", marker = "extra == 'pypdf'", editable = "packages/paper-qa-pypdf" },
+    { name = "paper-qa-pypdf", extras = ["enhanced"], marker = "extra == 'pypdf-enhanced'", editable = "packages/paper-qa-pypdf" },
     { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'pypdf-media'", editable = "packages/paper-qa-pypdf" },
     { name = "prek", marker = "extra == 'dev'", specifier = "<0.2.15" },
     { name = "pybtex" },
@@ -2891,7 +2895,7 @@ requires-dist = [
     { name = "usearch", marker = "extra == 'memory'", specifier = ">=2.16.4" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=8" },
 ]
-provides-extras = ["dev", "docling", "image", "ldp", "local", "memory", "nemotron", "office", "openreview", "pymupdf", "pypdf", "pypdf-media", "qdrant", "typing", "zotero"]
+provides-extras = ["dev", "docling", "image", "ldp", "local", "memory", "nemotron", "office", "openreview", "pymupdf", "pypdf", "pypdf-media", "pypdf-enhanced", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [

@@ -10,3 +10,11 @@
 
 PDF reading code backed by
 [PyPDF](https://github.com/py-pdf/pypdf).
+
+To also parse images or take full-page screenshots,
+use the `media` extra: `pip install paper-qa-pypdf[media]`.
+This is backed by [pypdfium2](https://github.com/pypdfium2-team/pypdfium2).
+
+From there, to also support grouping images into figures or parsing tables,
+use the `enhanced` extra: `pip install paper-qa-pypdf[enhanced]`.
+This is backed by [pdfplumber](https://github.com/jsvine/pdfplumber).
