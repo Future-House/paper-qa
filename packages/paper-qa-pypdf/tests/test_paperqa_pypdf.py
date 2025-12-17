@@ -1,6 +1,7 @@
 import base64
 import json
 import re
+from collections.abc import Sequence
 from pathlib import Path
 from typing import cast
 
@@ -43,43 +44,20 @@ async def test_parse_pdf_to_pages() -> None:
     col_2_top_idx = p1_text.index("address fine-grained")
     assert col_1_bottom_idx < col_2_top_idx, "Expected column ordering to be correct"
 
-    # Check the full page parsing behavior
-    parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
-    assert isinstance(parsed_text_full_page.content, dict)
-    assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
-    assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
-    assert "2" in parsed_text_full_page.content, "Parsed text should contain page 2"
-    for page_num in ("1", "2"):
-        page_content = parsed_text_full_page.content[page_num]
-        assert not isinstance(page_content, str), f"Page {page_num} should have images"
-        # Check each page has exactly one image
-        page_text, (full_page_image,) = page_content
-        assert page_text
-        assert full_page_image.index == 0, "Full page image should have index 0"
-        assert full_page_image.info["type"] == "screenshot"
-        assert full_page_image.info["page_num"] == int(page_num)
-        assert full_page_image.info["page_height"] == pytest.approx(842, rel=0.01)
-        assert full_page_image.info["page_width"] == pytest.approx(596, rel=0.01)
-        assert isinstance(full_page_image.data, bytes)
-        assert full_page_image.data, "Full page image should have data"
-        # Check useful attributes are present and are JSON serializable
-        json.dumps(full_page_image.info)
-        for attr in ("page_width", "page_height"):
-            dim = full_page_image.info[attr]
-            assert isinstance(dim, int | float)
-            assert dim > 0, "Edge length should be positive"
-
     # Check the images in Figure 1
-    assert not isinstance(parsed_text_full_page.content["2"], str)
-    p2_text, p2_media = parsed_text_full_page.content["2"]
+    assert not isinstance(parsed_text.content["2"], str)
+    p2_text, p2_media = parsed_text.content["2"]
     assert "Figure 1" in p2_text, "Expected Figure 1 title"
     assert "Crawler" in p2_text, "Expected Figure 1 contents"
-    (p2_image,) = p2_media
+    (p2_image,) = [m for m in p2_media if m.info["type"] == "picture"]
     assert p2_image.index == 0
-    assert p2_image.info["type"] == "screenshot"
     assert p2_image.info["page_num"] == 2
-    assert p2_image.info["page_height"] == pytest.approx(842, rel=0.1)
-    assert p2_image.info["page_width"] == pytest.approx(596, rel=0.1)
+    assert p2_image.info["height"] == pytest.approx(135, rel=0.1)
+    assert p2_image.info["width"] == pytest.approx(440, rel=0.1)
+    p2_bbox = p2_image.info["bbox"]
+    assert isinstance(p2_bbox, tuple)
+    for i, value in enumerate((91.4, 65.6, 531.8, 201.7)):
+        assert p2_bbox[i] == pytest.approx(value, rel=0.1)
     assert isinstance(p2_image.data, bytes)
 
     # Check the image is valid base64
@@ -93,7 +71,7 @@ async def test_parse_pdf_to_pages() -> None:
 
     # Check useful attributes are present and are JSON serializable
     json.dumps(p2_image.info)
-    for attr in ("page_width", "page_height"):
+    for attr in ("width", "height"):
         assert (
             p2_image.info[attr] == serde_p2_image.info[attr]
         ), "Expected serialization to match original"
@@ -110,7 +88,7 @@ async def test_parse_pdf_to_pages() -> None:
             ' Search." *arXiv*, 2025, arXiv:2501.10120v1. Accessed 2025.'
         ),
     )
-    texts = chunk_pdf(parsed_text_full_page, doc=doc, chunk_chars=3000, overlap=100)
+    texts = chunk_pdf(parsed_text, doc=doc, chunk_chars=3000, overlap=100)
     fig_1_text = texts[1]
     assert (
         "Figure 1: Architecture of PaSa" in fig_1_text.text
@@ -144,6 +122,32 @@ async def test_parse_pdf_to_pages() -> None:
                 sum(x in raw_answer_no_citations.lower() for x in substrings)
                 >= min_count
             ), f"Expected {raw_answer_no_citations=} to have {substrings} present"
+
+    # Check the full page parsing behavior
+    parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
+    assert isinstance(parsed_text_full_page.content, dict)
+    assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
+    assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
+    assert "2" in parsed_text_full_page.content, "Parsed text should contain page 2"
+    for page_num in ("1", "2"):
+        page_content = parsed_text_full_page.content[page_num]
+        assert not isinstance(page_content, str), f"Page {page_num} should have images"
+        # Check each page has exactly one image
+        page_text, (full_page_image,) = page_content
+        assert page_text
+        assert full_page_image.index == 0, "Full page image should have index 0"
+        assert full_page_image.info["type"] == "screenshot"
+        assert full_page_image.info["page_num"] == int(page_num)
+        assert full_page_image.info["page_height"] == pytest.approx(842, rel=0.01)
+        assert full_page_image.info["page_width"] == pytest.approx(596, rel=0.01)
+        assert isinstance(full_page_image.data, bytes)
+        assert full_page_image.data, "Full page image should have data"
+        # Check useful attributes are present and are JSON serializable
+        json.dumps(full_page_image.info)
+        for attr in ("page_width", "page_height"):
+            dim = full_page_image.info[attr]
+            assert isinstance(dim, int | float)
+            assert dim > 0, "Edge length should be positive"
 
     # Check the no-media behavior
     parsed_text_no_media = parse_pdf_to_pages(filepath, parse_media=False)
@@ -222,6 +226,24 @@ def test_nonexistent_file_failure() -> None:
         parse_pdf_to_pages(filename)
 
 
+def test_table_parsing() -> None:
+    filepath = STUB_DATA_DIR / "influence.pdf"
+    parsed_text = parse_pdf_to_pages(filepath)
+    assert isinstance(parsed_text.content, dict)
+    assert all(
+        t and t[0] != "\n" and t[-1] != "\n" for t in parsed_text.content.values()
+    ), "Expected no leading/trailing newlines in parsed text"
+    all_tables = {
+        i: [m for m in pagenum_media[1] if m.info["type"] == "table"]
+        for i, pagenum_media in parsed_text.content.items()
+        if isinstance(pagenum_media, tuple)
+    }
+    all_tables = {k: v for k, v in all_tables.items() if v}
+    assert (
+        sum(len(tables) for tables in all_tables.values()) >= 2
+    ), "Expected a few tables to be parsed"
+
+
 def test_media_deduplication() -> None:
     parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
     assert isinstance(parsed_text.content, dict)
@@ -248,3 +270,45 @@ def test_equation_parsing() -> None:
     ), "Expected inline equation in page 1 text"
     assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
     assert p1_media
+
+
+def test_clustering() -> None:
+    filepath = STUB_DATA_DIR / "pasa.pdf"
+
+    # With very small tolerance, Figure 1 images shouldn't cluster together
+    parsed_text_small_cluster = parse_pdf_to_pages(
+        filepath, page_range=2, image_cluster_tolerance=1
+    )
+    assert isinstance(parsed_text_small_cluster.content, dict)
+    assert "2" in parsed_text_small_cluster.content, "Parsed text should contain page 2"
+    assert isinstance(parsed_text_small_cluster.content["2"], tuple)
+    p2_small_cluster = parsed_text_small_cluster.content["2"]
+    assert "Figure 1" in p2_small_cluster[0], "Expected Figure 1"
+    for m in p2_small_cluster[1]:
+        assert "bbox" in m.info
+        assert isinstance(m.info["bbox"], Sequence)
+        assert len(m.info["bbox"]) == 4, "bbox should have 4 coordinates"
+        for coord in m.info["bbox"]:
+            assert isinstance(coord, int | float)
+            assert coord >= 0, "bbox coordinates should be non-negative"
+
+    # With normal tolerance, images should cluster into one figure
+    parsed_text_default_cluster = parse_pdf_to_pages(filepath, page_range=2)
+    assert isinstance(parsed_text_default_cluster.content, dict)
+    assert (
+        "2" in parsed_text_default_cluster.content
+    ), "Parsed text should contain page 2"
+    assert isinstance(parsed_text_default_cluster.content["2"], tuple)
+    p2_default_cluster = parsed_text_default_cluster.content["2"]
+    assert "Figure 1" in p2_default_cluster[0], "Expected Figure 1"
+    for m in p2_default_cluster[1]:
+        assert "bbox" in m.info
+        assert isinstance(m.info["bbox"], Sequence)
+        assert len(m.info["bbox"]) == 4, "bbox should have 4 coordinates"
+        for coord in m.info["bbox"]:
+            assert isinstance(coord, int | float)
+            assert coord >= 0, "bbox coordinates should be non-negative"
+
+    assert len(p2_small_cluster[1]) >= len(
+        p2_default_cluster[1]
+    ), "Small tolerance should cluster less aggressively"

@@ -3043,11 +3043,18 @@ dependencies = [
 dev = [
     { name = "fhlmi" },
     { name = "paper-qa" },
+    { name = "pdfplumber" },
     { name = "pillow" },
     { name = "pypdf", extra = ["image"] },
     { name = "pypdfium2" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+]
+enhanced = [
+    { name = "pdfplumber" },
+    { name = "pillow" },
+    { name = "pypdf", extra = ["image"] },
+    { name = "pypdfium2" },
 ]
 media = [
     { name = "pillow" },
@@ -3060,7 +3067,9 @@ requires-dist = [
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
-    { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'dev'", editable = "packages/paper-qa-pypdf" },
+    { name = "paper-qa-pypdf", extras = ["enhanced", "media"], marker = "extra == 'dev'", editable = "packages/paper-qa-pypdf" },
+    { name = "paper-qa-pypdf", extras = ["media"], marker = "extra == 'enhanced'", editable = "packages/paper-qa-pypdf" },
+    { name = "pdfplumber", marker = "extra == 'enhanced'", specifier = ">=0.5" },
     { name = "pillow", marker = "extra == 'media'" },
     { name = "pypdf", specifier = ">=3" },
     { name = "pypdf", extras = ["image"], marker = "extra == 'media'" },
@@ -3068,7 +3077,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
-provides-extras = ["dev", "media"]
+provides-extras = ["dev", "enhanced", "media"]
 
 [[package]]
 name = "parso"
@@ -3086,6 +3095,33 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/ca/bc/f35b8446f4531a7cb215605d100cd88b7ac6f44ab3fc94870c120ab3adbf/pathspec-0.12.1.tar.gz", hash = "sha256:a482d51503a1ab33b1c67a6c3813a26953dbdc71c31dacaef9a838c4e29f5712", size = 51043, upload-time = "2023-12-10T22:30:45Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cc/20/ff623b09d963f88bfde16306a54e12ee5ea43e9b597108672ff3a408aad6/pathspec-0.12.1-py3-none-any.whl", hash = "sha256:a0d503e138a4c123b27490a4f7beda6a01c6f288df0e4a8b79c7eb0dc7b4cc08", size = 31191, upload-time = "2023-12-10T22:30:43.14Z" },
+]
+
+[[package]]
+name = "pdfminer-six"
+version = "20251107"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "charset-normalizer" },
+    { name = "cryptography" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/1d/50/5315f381a25dc80a8d2ea7c62d9a28c0137f10ccc263623a0db8b49fcced/pdfminer_six-20251107.tar.gz", hash = "sha256:5fb0c553799c591777f22c0c72b77fc2522d7d10c70654e25f4c5f1fd996e008", size = 7387104, upload-time = "2025-11-07T20:01:10.286Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/64/29/d1d9f6b900191288b77613ddefb73ed35b48fb35e44aaf8b01b0422b759d/pdfminer_six-20251107-py3-none-any.whl", hash = "sha256:c09df33e4cbe6b26b2a79248a4ffcccafaa5c5d39c9fff0e6e81567f165b5401", size = 5620299, upload-time = "2025-11-07T20:01:08.722Z" },
+]
+
+[[package]]
+name = "pdfplumber"
+version = "0.11.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pdfminer-six" },
+    { name = "pillow" },
+    { name = "pypdfium2" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/09/d8/cb9fda4261ce389656bec0bb0bdde905df109ad97f7ae387747ded070e8c/pdfplumber-0.11.8.tar.gz", hash = "sha256:db29b04bc8bb62f39dd444533bcf2e0ba33584bd24f5a54644f3ba30f4f22d31", size = 102724, upload-time = "2025-11-08T20:52:01.955Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/12/28/3958ed81a9be317610ab73df32f1968076751d651c84dff1bcb45b7c6c0e/pdfplumber-0.11.8-py3-none-any.whl", hash = "sha256:7dda117b8ed21bca9c8e7d7808fee2439f93c8bd6ea45989bfb1aead6dc3cad3", size = 60043, upload-time = "2025-11-08T20:52:00.652Z" },
 ]
 
 [[package]]
