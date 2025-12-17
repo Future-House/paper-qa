@@ -4,7 +4,6 @@ import re
 from pathlib import Path
 from typing import cast
 
-import pypdf
 import pytest
 from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs
@@ -22,15 +21,15 @@ async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
 
     filepath = STUB_DATA_DIR / "pasa.pdf"
-    parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
-    assert isinstance(parsed_text_full_page.content, dict)
-    assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
-    assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
-    assert isinstance(parsed_text_full_page.content["1"], tuple)
-    p1_text = parsed_text_full_page.content["1"][0]
+    parsed_text = parse_pdf_to_pages(filepath)
+    assert isinstance(parsed_text.content, dict)
+    assert len(parsed_text.content) == 15, "Expected all pages to be parsed"
+    assert "1" in parsed_text.content, "Parsed text should contain page 1"
+    assert isinstance(parsed_text.content["1"], tuple)
+    p1_text = parsed_text.content["1"][0]
     matches = re.findall(
-        r"Abstract\nWe introduce PaSa, an advanced Paper ?Search"
-        r"\nagent powered by large language models\.",
+        r"Abstract\nWe introduce PaSa, an advanced Paper Search"
+        r"\s?agent powered by large language models\.",
         p1_text,
     )
     assert len(matches) == 1, f"Parsing failed to handle abstract in {p1_text}."
@@ -43,6 +42,32 @@ async def test_parse_pdf_to_pages() -> None:
     ), "Test expects one match of this substring"
     col_2_top_idx = p1_text.index("address fine-grained")
     assert col_1_bottom_idx < col_2_top_idx, "Expected column ordering to be correct"
+
+    # Check the full page parsing behavior
+    parsed_text_full_page = parse_pdf_to_pages(filepath, full_page=True)
+    assert isinstance(parsed_text_full_page.content, dict)
+    assert len(parsed_text_full_page.content) == 15, "Expected all pages to be parsed"
+    assert "1" in parsed_text_full_page.content, "Parsed text should contain page 1"
+    assert "2" in parsed_text_full_page.content, "Parsed text should contain page 2"
+    for page_num in ("1", "2"):
+        page_content = parsed_text_full_page.content[page_num]
+        assert not isinstance(page_content, str), f"Page {page_num} should have images"
+        # Check each page has exactly one image
+        page_text, (full_page_image,) = page_content
+        assert page_text
+        assert full_page_image.index == 0, "Full page image should have index 0"
+        assert full_page_image.info["type"] == "screenshot"
+        assert full_page_image.info["page_num"] == int(page_num)
+        assert full_page_image.info["page_height"] == pytest.approx(842, rel=0.01)
+        assert full_page_image.info["page_width"] == pytest.approx(596, rel=0.01)
+        assert isinstance(full_page_image.data, bytes)
+        assert full_page_image.data, "Full page image should have data"
+        # Check useful attributes are present and are JSON serializable
+        json.dumps(full_page_image.info)
+        for attr in ("page_width", "page_height"):
+            dim = full_page_image.info[attr]
+            assert isinstance(dim, int | float)
+            assert dim > 0, "Edge length should be positive"
 
     # Check the images in Figure 1
     assert not isinstance(parsed_text_full_page.content["2"], str)
@@ -127,37 +152,38 @@ async def test_parse_pdf_to_pages() -> None:
     assert len(parsed_text_no_media.content) == 15, "Expected all pages to be parsed"
 
     # Check metadata
-    for pt in (parsed_text_full_page, parsed_text_no_media):
+    for pt in (parsed_text, parsed_text_full_page, parsed_text_no_media):
         (parsing_library,) = pt.metadata.parsing_libraries
-        assert pypdf.__name__ in parsing_library
+        assert "pypdf" in parsing_library
         assert pt.metadata.name
         assert "pdf" in pt.metadata.name
+        assert "page_range=None" in pt.metadata.name
 
     # Check commonalities across all modes
-    assert len(parsed_text_full_page.content) == len(
-        parsed_text_no_media.content
+    assert (
+        len(parsed_text.content)
+        == len(parsed_text_full_page.content)
+        == len(parsed_text_no_media.content)
     ), "All modes should parse the same number of pages"
 
 
 def test_page_range() -> None:
     filepath = STUB_DATA_DIR / "pasa.pdf"
 
-    parsed_text_p1 = parse_pdf_to_pages(filepath, page_range=1, parse_media=False)
+    parsed_text_p1 = parse_pdf_to_pages(filepath, page_range=1)
     assert isinstance(parsed_text_p1.content, dict)
     assert list(parsed_text_p1.content) == ["1"]
     assert parsed_text_p1.metadata.name
     assert "page_range=1" in parsed_text_p1.metadata.name
 
-    parsed_text_p12 = parse_pdf_to_pages(filepath, page_range=(1, 2), parse_media=False)
+    parsed_text_p12 = parse_pdf_to_pages(filepath, page_range=(1, 2))
     assert isinstance(parsed_text_p12.content, dict)
     assert list(parsed_text_p12.content) == ["1", "2"]
     assert parsed_text_p12.metadata.name
     assert "page_range=(1,2)" in parsed_text_p12.metadata.name
 
     # NOTE: exceeds 15-page PDF length
-    parsed_text_p1_20 = parse_pdf_to_pages(
-        filepath, page_range=(1, 20), parse_media=False
-    )
+    parsed_text_p1_20 = parse_pdf_to_pages(filepath, page_range=(1, 20))
     assert isinstance(parsed_text_p1_20.content, dict)
     assert list(parsed_text_p1_20.content) == [
         str(i) for i in range(1, 15 + 1)
@@ -194,3 +220,31 @@ def test_nonexistent_file_failure() -> None:
     filename = "/nonexistent/path/file.pdf"
     with pytest.raises(FileNotFoundError, match=filename):
         parse_pdf_to_pages(filename)
+
+
+def test_media_deduplication() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert len(parsed_text.content) == 5, "Expected full PDF read"
+    all_media = [m for _, media in parsed_text.content.values() for m in media]  # type: ignore[misc]
+
+    all_images = [m for m in all_media if m.info.get("type") == "picture"]
+    assert (
+        len(all_images) == 2 * 5
+    ), "Expected each image (one/page) and equation (one/page) to be read"
+    assert (
+        len({m for m in all_images if cast(int, m.info["page_num"]) > 1}) <= 3
+    ), "Expected images/equations on all pages beyond 1 to be deduplicated"
+
+
+def test_equation_parsing() -> None:
+    parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
+    assert isinstance(parsed_text.content, dict)
+    assert isinstance(parsed_text.content["1"], tuple)
+    p1_text, p1_media = parsed_text.content["1"]
+    # SEE: https://regex101.com/r/pyOHLq/1
+    assert re.search(
+        r"[_*]*E[_*]* ?= ?[_*]*mc[_*]*(?:<sup>)?[ ^]?[2²] ?(?:<\/sup>)?", p1_text
+    ), "Expected inline equation in page 1 text"
+    assert re.search(r"n ?\+ ?a", p1_text), "Expected block equation in page 1 text"
+    assert p1_media

@@ -42,6 +42,7 @@ dev = [
     "pytest>=8",  # Pin to keep recent
 ]
 media = [
+    "PyPDF[image]",
     "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition
 ]
 
