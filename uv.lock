@@ -1331,15 +1331,15 @@ http2 = [
 
 [[package]]
 name = "httpx-aiohttp"
-version = "0.1.9"
+version = "0.1.12"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "httpx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d8/f2/9a86ce9bc48cf57dabb3a3160dfed26d8bbe5a2478a51f9d1dbf89f2f1fc/httpx_aiohttp-0.1.9.tar.gz", hash = "sha256:4ee8b22e6f2e7c80cd03be29eff98bfe7d89bd77f021ce0b578ee76b73b4bfe6", size = 206023, upload-time = "2025-10-15T08:52:57.475Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/63/2c/b894861cecf030fb45675ea24aa55b5722e97c602a163d872fca66c5a6d8/httpx_aiohttp-0.1.12.tar.gz", hash = "sha256:81feec51fd82c0ecfa0e9aaf1b1a6c2591260d5e2bcbeb7eb0277a78e610df2c", size = 275945, upload-time = "2025-12-12T10:12:15.283Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a1/db/5cfa8254a86c34a1ab7fe0dbec9f81bb5ebd831cbdd65aa4be4f37027804/httpx_aiohttp-0.1.9-py3-none-any.whl", hash = "sha256:3dc2845568b07742588710fcf3d72db2cbcdf2acc93376edf85f789c4d8e5fda", size = 6180, upload-time = "2025-10-15T08:52:56.521Z" },
+    { url = "https://files.pythonhosted.org/packages/16/8d/85c9701e9af72ca132a1783e2a54364a90c6da832304416a30fc11196ab2/httpx_aiohttp-0.1.12-py3-none-any.whl", hash = "sha256:5b0eac39a7f360fa7867a60bcb46bb1024eada9c01cbfecdb54dc1edb3fb7141", size = 6367, upload-time = "2025-12-12T10:12:14.018Z" },
 ]
 
 [[package]]
@@ -2741,6 +2741,7 @@ dependencies = [
 [package.optional-dependencies]
 dev = [
     { name = "fhlmi", extra = ["image"] },
+    { name = "httpx-aiohttp" },
     { name = "ipykernel" },
     { name = "ipython" },
     { name = "ldp" },
@@ -2844,6 +2845,7 @@ requires-dist = [
     { name = "html2text" },
     { name = "httpx" },
     { name = "httpx-aiohttp" },
+    { name = "httpx-aiohttp", marker = "extra == 'dev'", specifier = ">=0.1.11" },
     { name = "ipykernel", marker = "extra == 'dev'", specifier = ">=6.29" },
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0,<1" },
@@ -2895,7 +2897,7 @@ requires-dist = [
     { name = "usearch", marker = "extra == 'memory'", specifier = ">=2.16.4" },
     { name = "vcrpy", marker = "extra == 'dev'", specifier = ">=8" },
 ]
-provides-extras = ["dev", "docling", "image", "ldp", "local", "memory", "nemotron", "office", "openreview", "pymupdf", "pypdf", "pypdf-media", "pypdf-enhanced", "qdrant", "typing", "zotero"]
+provides-extras = ["dev", "docling", "image", "ldp", "local", "memory", "nemotron", "office", "openreview", "pymupdf", "pypdf", "pypdf-enhanced", "pypdf-media", "qdrant", "typing", "zotero"]
 
 [package.metadata.requires-dev]
 dev = [
