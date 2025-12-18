@@ -266,10 +266,10 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         """Add a document to the collection."""
         all_settings = get_settings(settings)
         parse_config = all_settings.parsing
+        content_hash = md5sum(path)
         dockey_is_content_hash = False
         if dockey is None:
-            # md5 sum of file contents (not path!)
-            dockey = md5sum(path)
+            dockey = content_hash
             dockey_is_content_hash = True
         if llm_model is None:
             llm_model = all_settings.get_llm()
@@ -277,7 +277,9 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             # Peek first chunk
             texts = await read_doc(
                 path,
-                Doc(docname="", citation="", dockey=dockey),  # Fake doc
+                Doc(  # Fake doc
+                    docname="", citation="", dockey=dockey, content_hash=content_hash
+                ),
                 page_size_limit=parse_config.page_size_limit,
                 parse_media=False,  # Peeking is text only
                 # We only use the first chunk, so let's peek just enough pages for that.
@@ -312,6 +314,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             ),
             citation=citation,
             dockey=dockey,
+            content_hash=content_hash,
         )
 
         # try to extract DOI / title from the citation
@@ -365,6 +368,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                     metadata_clients=kwargs.pop("clients", DEFAULT_CLIENTS),
                 )
 
+            # Query here means a query to a metadata provider
             query_kwargs: dict[str, Any] = {}
 
             if doi:

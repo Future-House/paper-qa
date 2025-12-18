@@ -14,7 +14,7 @@ from functools import reduce
 from http import HTTPStatus
 from pathlib import Path
 from typing import Any, BinaryIO, ClassVar, TypeVar
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import httpx
 from lmi import configure_llm_logs
@@ -100,7 +100,7 @@ def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float
 
 def hexdigest(data: str | bytes) -> str:
     if isinstance(data, str):
-        return hashlib.md5(data.encode("utf-8")).hexdigest()  # noqa: S324
+        data = data.encode("utf-8")
     return hashlib.md5(data).hexdigest()  # noqa: S324
 
 
@@ -232,6 +232,14 @@ def encode_id(value: str | bytes | UUID, maxsize: int | None = 16) -> str:
     if isinstance(value, str):
         value = value.lower().encode()
     return hashlib.md5(value).hexdigest()[:maxsize]  # noqa: S324
+
+
+def compute_unique_doc_id(doi: str | None, content_hash: str | None) -> str:
+    if doi:
+        value_to_encode: str = doi.lower() + (content_hash or "")
+    else:
+        value_to_encode = content_hash or str(uuid4())
+    return encode_id(value_to_encode)
 
 
 def get_year(ts: datetime | None = None) -> str:

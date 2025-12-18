@@ -221,16 +221,16 @@ class DocMetadataClient:
         )
 
     async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
-
-        # note we have some extra fields which may have come from reading the doc text,
-        # but aren't in the doc object, we add them here too.
-        extra_fields = {
+        # Collect fields (e.g. title, DOI, or authors) that have been externally
+        # specified (e.g. by a caller, or inferred from the document's contents)
+        # but are not on the input `doc` object
+        provided_fields = {
             k: v for k, v in kwargs.items() if k in set(DocDetails.model_fields)
         }
-        # abuse our doc_details object to be an int if it's empty
-        # our __add__ operation supports int by doing nothing
-        extra_doc: int | DocDetails = (
-            0 if not extra_fields else DocDetails(**extra_fields)
+        # DocDetails.__add__ supports `int` as a no-op route, so if we have no
+        # provided fields, let's use that no-op route
+        provided_doc_details: int | DocDetails = (
+            0 if not provided_fields else DocDetails(**provided_fields)
         )
 
         if doc_details := await self.query(**kwargs):
@@ -246,9 +246,10 @@ class DocMetadataClient:
                 doc_details.key = doc.docname
             if "citation" in doc.fields_to_overwrite_from_metadata:
                 doc_details.citation = doc.citation
-            return extra_doc + doc_details
+            if "content_hash" in doc.fields_to_overwrite_from_metadata:
+                doc_details.content_hash = doc.content_hash
+            return provided_doc_details + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
-        prior_doc = doc.model_dump()
-        prior_doc["fields_to_overwrite_from_metadata"] = set()
-        return DocDetails(**(prior_doc | extra_fields))
+        orig_fields = doc.model_dump() | {"fields_to_overwrite_from_metadata": set()}
+        return DocDetails(**(orig_fields | provided_fields))
