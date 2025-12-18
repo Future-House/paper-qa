@@ -60,6 +60,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
+    "httpx-aiohttp>=0.1.11",  # Pin for raw headers fix
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.71",  # Lower pin for aiohttp transport adoption
