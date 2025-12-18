@@ -13,6 +13,7 @@ from unittest.mock import patch
 import httpx_aiohttp
 import litellm.llms.custom_httpx.aiohttp_transport
 import pytest
+import vcr.stubs.aiohttp_stubs
 import vcr.stubs.httpcore_stubs
 from dotenv import load_dotenv
 from lmi.utils import (
@@ -234,3 +235,22 @@ httpx_aiohttp.transport.AiohttpResponseStream = (  # type: ignore[misc]
 # Permanently patch vcrpy's async VCR recording functionality,
 # to work around https://github.com/kevin1024/vcrpy/issues/944
 vcr.stubs.httpcore_stubs._vcr_handle_async_request = _vcr_handle_async_request
+
+# Permanently patch vcrpy's aiohttp build_response to set raw_headers,
+# to work around https://github.com/kevin1024/vcrpy/issues/970
+_original_aiohttp_stubs_build_response = vcr.stubs.aiohttp_stubs.build_response
+
+
+def _build_response_with_raw_headers(vcr_request, vcr_response, history):
+    """Patched build_response that also sets _raw_headers on MockClientResponse."""
+    response = _original_aiohttp_stubs_build_response(
+        vcr_request, vcr_response, history
+    )
+    if response._raw_headers is None and response._headers is not None:
+        response._raw_headers = tuple(
+            (k.encode("utf-8"), v.encode("utf-8")) for k, v in response._headers.items()
+        )
+    return response
+
+
+vcr.stubs.aiohttp_stubs.build_response = _build_response_with_raw_headers
