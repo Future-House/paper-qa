@@ -9,7 +9,6 @@ import pathlib
 import pickle
 import re
 import sys
-import warnings
 import zlib
 from collections import Counter
 from collections.abc import AsyncIterator, Callable, Sequence
@@ -620,11 +619,8 @@ def _make_progress_bar_update(
     return contextlib.nullcontext(), None
 
 
-async def get_directory_index(  # noqa: PLR0912
-    index_name: str | None = None,
-    sync_index_w_directory: bool = True,
-    settings: MaybeSettings = None,
-    build: bool = True,
+async def get_directory_index(
+    settings: MaybeSettings = None, build: bool = True
 ) -> SearchIndex:
     """
     Create a Tantivy index by reading from a directory of text files.
@@ -632,26 +628,12 @@ async def get_directory_index(  # noqa: PLR0912
     This function only reads from the source directory, not edits or writes to it.
 
     Args:
-        index_name: Deprecated override on the name of the index. If unspecified,
-            the default behavior is to generate the name from the input settings.
-        sync_index_w_directory: Opt-out flag to sync the index (add or delete index
-            files) with the source paper directory.
         settings: Application settings.
         build: Opt-out flag (default is True) to read the contents of the source paper
             directory and if sync_index_w_directory is enabled also update the index.
     """
     _settings = get_settings(settings)
     index_settings = _settings.agent.index
-    if index_name:
-        warnings.warn(
-            "The index_name argument has been moved to"
-            f" {type(_settings.agent.index).__name__},"
-            " this deprecation will conclude in version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        index_settings.name = index_name
-    del index_name
 
     search_index = SearchIndex(
         fields=[*SearchIndex.REQUIRED_FIELDS, "title", "year"],
@@ -666,17 +648,6 @@ async def get_directory_index(  # noqa: PLR0912
                 f"Index {search_index.index_name} was empty, please rebuild it."
             )
         return search_index
-
-    if not sync_index_w_directory:
-        warnings.warn(
-            "The sync_index_w_directory argument has been moved to"
-            f" {type(_settings.agent.index).__name__},"
-            " this deprecation will conclude in version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        index_settings.sync_with_paper_directory = sync_index_w_directory
-    del sync_index_w_directory
 
     paper_directory = anyio.Path(index_settings.paper_directory)
     manifest = await maybe_get_manifest(

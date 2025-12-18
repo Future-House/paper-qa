@@ -33,7 +33,6 @@ from paperqa.settings import MaybeSettings, get_settings
 from paperqa.types import Doc, DocDetails, DocKey, PQASession, Text
 from paperqa.utils import (
     citation_to_docname,
-    get_loop,
     maybe_is_html,
     maybe_is_pdf,
     maybe_is_text,
@@ -91,35 +90,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         docname += suffix
         return docname
 
-    def add_file(
-        self,
-        file: BinaryIO,
-        citation: str | None = None,
-        docname: str | None = None,
-        dockey: DocKey | None = None,
-        settings: MaybeSettings = None,
-        llm_model: LLMModel | None = None,
-        embedding_model: EmbeddingModel | None = None,
-    ) -> str | None:
-        warnings.warn(
-            "The synchronous `add_file` method is being deprecated in favor of the"
-            " asynchronous `aadd_file` method, this deprecation will conclude in"
-            " version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_loop().run_until_complete(
-            self.aadd_file(
-                file,
-                citation=citation,
-                docname=docname,
-                dockey=dockey,
-                settings=settings,
-                llm_model=llm_model,
-                embedding_model=embedding_model,
-            )
-        )
-
     async def aadd_file(
         self,
         file: BinaryIO,
@@ -159,35 +129,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 **kwargs,
             )
 
-    def add_url(
-        self,
-        url: str,
-        citation: str | None = None,
-        docname: str | None = None,
-        dockey: DocKey | None = None,
-        settings: MaybeSettings = None,
-        llm_model: LLMModel | None = None,
-        embedding_model: EmbeddingModel | None = None,
-    ) -> str | None:
-        warnings.warn(
-            "The synchronous `add_url` method is being deprecated in favor of the"
-            " asynchronous `aadd_url` method, this deprecation will conclude in"
-            " version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_loop().run_until_complete(
-            self.aadd_url(
-                url,
-                citation=citation,
-                docname=docname,
-                dockey=dockey,
-                settings=settings,
-                llm_model=llm_model,
-                embedding_model=embedding_model,
-            )
-        )
-
     async def aadd_url(
         self,
         url: str,
@@ -211,43 +152,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 llm_model=llm_model,
                 embedding_model=embedding_model,
             )
-
-    def add(
-        self,
-        path: str | os.PathLike,
-        citation: str | None = None,
-        docname: str | None = None,
-        dockey: DocKey | None = None,
-        title: str | None = None,
-        doi: str | None = None,
-        authors: list[str] | None = None,
-        settings: MaybeSettings = None,
-        llm_model: LLMModel | None = None,
-        embedding_model: EmbeddingModel | None = None,
-        **kwargs,
-    ) -> str | None:
-        warnings.warn(
-            "The synchronous `add` method is being deprecated in favor of the"
-            " asynchronous `aadd` method, this deprecation will conclude in"
-            " version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_loop().run_until_complete(
-            self.aadd(
-                path,
-                citation=citation,
-                docname=docname,
-                dockey=dockey,
-                title=title,
-                doi=doi,
-                authors=authors,
-                settings=settings,
-                llm_model=llm_model,
-                embedding_model=embedding_model,
-                **kwargs,
-            )
-        )
 
     async def aadd(  # noqa: PLR0912
         self,
@@ -433,26 +337,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             return doc.docname
         return None
 
-    def add_texts(
-        self,
-        texts: list[Text],
-        doc: Doc,
-        settings: MaybeSettings = None,
-        embedding_model: EmbeddingModel | None = None,
-    ) -> bool:
-        warnings.warn(
-            "The synchronous `add_texts` method is being deprecated in favor of the"
-            " asynchronous `aadd_texts` method, this deprecation will conclude in"
-            " version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_loop().run_until_complete(
-            self.aadd_texts(
-                texts, doc, settings=settings, embedding_model=embedding_model
-            )
-        )
-
     async def aadd_texts(
         self,
         texts: list[Text],
@@ -605,39 +489,9 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
         return matches[:k]
 
-    def get_evidence(
-        self,
-        query: PQASession | str,
-        exclude_text_filter: set[str] | None = None,
-        settings: MaybeSettings = None,
-        callbacks: Sequence[Callable] | None = None,
-        embedding_model: EmbeddingModel | None = None,
-        summary_llm_model: LLMModel | None = None,
-        partitioning_fn: Callable[[Embeddable], int] | None = None,
-    ) -> PQASession:
-        warnings.warn(
-            "The synchronous `get_evidence` method is being deprecated in favor of the"
-            " asynchronous `aget_evidence` method, this deprecation will conclude in"
-            " version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_loop().run_until_complete(
-            self.aget_evidence(
-                query=query,
-                exclude_text_filter=exclude_text_filter,
-                settings=settings,
-                callbacks=callbacks,
-                embedding_model=embedding_model,
-                summary_llm_model=summary_llm_model,
-                partitioning_fn=partitioning_fn,
-            )
-        )
-
     async def aget_evidence(
         self,
         query: PQASession | str,
-        exclude_text_filter: set[str] | None = None,
         settings: MaybeSettings = None,
         callbacks: Sequence[Callable] | None = None,
         embedding_model: EmbeddingModel | None = None,
@@ -663,21 +517,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
         if summary_llm_model is None:
             summary_llm_model = evidence_settings.get_summary_llm()
-
-        if exclude_text_filter is not None:
-            text_name = Text.__name__
-            warnings.warn(
-                (
-                    "The 'exclude_text_filter' argument did not work as intended"
-                    f" due to a mix-up in excluding {text_name}.name vs {text_name}."
-                    f" This bug enabled us to have 2+ contexts per {text_name}, so to"
-                    " first-class that capability and simplify our implementation,"
-                    " we're removing the 'exclude_text_filter' argument."
-                    " This deprecation will conclude in version 6"
-                ),
-                category=DeprecationWarning,
-                stacklevel=2,
-            )
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
@@ -745,35 +584,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             }
         )
         return session
-
-    def query(
-        self,
-        query: PQASession | str,
-        settings: MaybeSettings = None,
-        callbacks: Sequence[Callable] | None = None,
-        llm_model: LLMModel | None = None,
-        summary_llm_model: LLMModel | None = None,
-        embedding_model: EmbeddingModel | None = None,
-        partitioning_fn: Callable[[Embeddable], int] | None = None,
-    ) -> PQASession:
-        warnings.warn(
-            "The synchronous `query` method is being deprecated in favor of the"
-            " asynchronous `aquery` method, this deprecation will conclude in"
-            " version 6.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
-        return get_loop().run_until_complete(
-            self.aquery(
-                query,
-                settings=settings,
-                callbacks=callbacks,
-                llm_model=llm_model,
-                summary_llm_model=summary_llm_model,
-                embedding_model=embedding_model,
-                partitioning_fn=partitioning_fn,
-            )
-        )
 
     async def aquery(
         self,

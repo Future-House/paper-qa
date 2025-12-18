@@ -48,7 +48,6 @@ from pydantic import ValidationError
 from pytest_subtests import SubTests
 
 from paperqa import (
-    Answer,
     Doc,
     DocDetails,
     Docs,
@@ -2434,37 +2433,10 @@ def test_get_index_name_uniqueness(
     ), "Expected index names to be clear they're associated with PaperQA"
 
 
-@pytest.mark.asyncio
-async def test_evidence_detailed_citations_shim(stub_data_dir: Path) -> None:
-    # TODO: delete this test in v6
-    settings = Settings.from_name("fast")
-    # NOTE: this bypasses DeprecationWarning, as the warning is done on construction
-    settings.answer.evidence_detailed_citations = False
-    docs = Docs()
-    await docs.aadd(
-        stub_data_dir / "bates.txt", "WikiMedia Foundation, 2023, Accessed now"
-    )
-    response = await docs.aquery("What country is Bates from?", settings=settings)
-    assert "WikiMedia Foundation, 2023, Accessed now" not in response.context
-
-
 def test_case_insensitive_matching():
     assert strings_similarity("my test sentence", "My test sentence") == 1.0
     assert strings_similarity("a b c d e", "a b c f") == 0.5
     assert strings_similarity("A B c d e", "a b c f") == 0.5
-
-
-@pytest.mark.flaky(
-    reruns=3,  # pytest-xdist can lead to >1 DeprecationWarning
-    only_rerun=["AssertionError"],
-)
-def test_answer_rename(recwarn) -> None:
-    # TODO: delete this test in v6
-    answer = Answer(question="")
-    assert isinstance(answer, PQASession)
-    assert len(recwarn) == 1
-    warning_msg = recwarn.pop(DeprecationWarning)
-    assert "'Answer' class is deprecated" in str(warning_msg.message)
 
 
 @pytest.mark.parametrize(
@@ -3315,33 +3287,6 @@ async def test_timeout_resilience() -> None:
     context, llm_results = await map_fxn_summary(**kw)
     assert context is None
     assert not llm_results
-
-
-def test_reader_params_deprecation_warnings(recwarn: pytest.WarningsRecorder) -> None:
-    """Test that deprecated settings trigger warnings and are migrated to reader_config."""
-    with pytest.warns(DeprecationWarning, match="chunk_size.*deprecated"):
-        settings1 = Settings(parsing=ParsingSettings(chunk_size=2000))
-    assert settings1.parsing.reader_config["chunk_chars"] == 2000
-    with pytest.warns(DeprecationWarning, match="overlap.*deprecated"):
-        settings2 = Settings(parsing=ParsingSettings(overlap=50))
-    assert settings2.parsing.reader_config["overlap"] == 50
-    with pytest.warns(DeprecationWarning, match="pdfs_use_block_parsing.*deprecated"):
-        settings3 = Settings(parsing=ParsingSettings(pdfs_use_block_parsing=True))
-    assert settings3.parsing.reader_config["use_block_parsing"]
-    with pytest.warns(DeprecationWarning, match="chunk_size.*deprecated"):
-        settings4 = Settings(
-            parsing=ParsingSettings(
-                chunk_size=4000, reader_config={"chunk_chars": 2000}
-            )
-        )
-    assert (
-        settings4.parsing.reader_config["chunk_chars"] == 2000
-    ), "Expected reader_config to win out"
-
-    _ = Settings(parsing=ParsingSettings())
-    assert not [
-        w for w in recwarn if issubclass(w.category, DeprecationWarning)
-    ], "Expected clean settings to have no warnings"
 
 
 def test_parse_pdf_string_resolution() -> None:
