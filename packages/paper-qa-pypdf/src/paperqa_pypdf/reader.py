@@ -2,7 +2,7 @@ import io
 import json
 import os
 from contextlib import AbstractContextManager, closing, nullcontext
-from enum import StrEnum
+from enum import StrEnum, unique
 from typing import TYPE_CHECKING, Any, cast
 
 import pypdf
@@ -26,17 +26,23 @@ if TYPE_CHECKING:
     from PIL import Image
 
 
+@unique
 class MediaMode(StrEnum):
-    """
-    Mode for media extraction from PDFs.
-
-    Enum values are used in metadata.
-    """
+    """Mode for media extraction from PDFs."""
 
     NONE = ""  # No media extraction
     FULL_PAGE = "full-page"  # Screenshot entire page
-    INDIVIDUAL_CLUSTERING = "individual"  # Extract individual images then cluster
+    INDIVIDUAL_CLUSTERING = (  # Extract individual images then cluster
+        "individual-clustering"
+    )
     INDIVIDUAL = "individual"  # Extract individual images
+
+    def __str__(self) -> str:
+        return self.metadata_value
+
+    @property
+    def metadata_value(self) -> str:
+        return self.value.removesuffix("-clustering")
 
 
 # Attributes of pdfium.PdfBitmap that contain useful metadata
@@ -339,7 +345,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                 f"pdfplumber ({pdfplumber.__version__})",
             ]
         )
-    multimodal_string = f"|multimodal|dpi={dpi}|mode={media_mode.value}"
+    multimodal_string = f"|multimodal|dpi={dpi}|mode={media_mode.metadata_value}"
     metadata = ParsedMetadata(
         parsing_libraries=[", ".join(lib_parts)],
         total_parsed_text_length=total_length,
