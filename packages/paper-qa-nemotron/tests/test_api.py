@@ -79,56 +79,49 @@ class TestNemotronParseBBox:
             (20.0, 20.0, 180.0, 80.0)
         )
 
-    def test_iou_identical_boxes(self) -> None:
-        bbox1 = NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6)
-        bbox2 = NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6)
-        assert bbox1.iou(bbox2) == pytest.approx(1.0)
+    @pytest.mark.parametrize(
+        ("bbox1_coords", "bbox2_coords", "expected_iou"),
+        [
+            # Identical boxes -> IoU = 1.0
+            ((0.1, 0.5, 0.2, 0.6), (0.1, 0.5, 0.2, 0.6), 1.0),
+            # No overlap -> IoU = 0.0
+            ((0.0, 0.2, 0.0, 0.2), (0.5, 0.7, 0.5, 0.7), 0.0),
+            # Partial overlap (50% horizontal) -> IoU = 1/3
+            ((0.0, 0.4, 0.0, 0.4), (0.2, 0.6, 0.0, 0.4), 1 / 3),
+        ],
+        ids=["identical", "no_overlap", "partial_overlap"],
+    )
+    def test_iou(
+        self,
+        bbox1_coords: tuple[float, float, float, float],
+        bbox2_coords: tuple[float, float, float, float],
+        expected_iou: float,
+    ) -> None:
+        bbox1 = NemotronParseBBox.from_coordinates(bbox1_coords)
+        bbox2 = NemotronParseBBox.from_coordinates(bbox2_coords)
+        assert bbox1.iou(bbox2) == pytest.approx(expected_iou)
 
-    def test_iou_no_overlap(self) -> None:
-        bbox1 = NemotronParseBBox(xmin=0.0, xmax=0.2, ymin=0.0, ymax=0.2)
-        bbox2 = NemotronParseBBox(xmin=0.5, xmax=0.7, ymin=0.5, ymax=0.7)
-        assert bbox1.iou(bbox2) == pytest.approx(0.0)
-
-    def test_iou_partial_overlap(self) -> None:
-        # Two boxes with 50% horizontal overlap
-        bbox1 = NemotronParseBBox(xmin=0.0, xmax=0.4, ymin=0.0, ymax=0.4)
-        bbox2 = NemotronParseBBox(xmin=0.2, xmax=0.6, ymin=0.0, ymax=0.4)
-        # Intersection: 0.2 * 0.4 = 0.08
-        # Union: 0.16 + 0.16 - 0.08 = 0.24
-        # IoU: 0.08 / 0.24 = 1/3
-        assert bbox1.iou(bbox2) == pytest.approx(1 / 3)
-
-    def test_iou_high_overlap(self) -> None:
-        # Two boxes with very high overlap (simulating detection_only refinement)
-        bbox1 = NemotronParseBBox(xmin=0.10, xmax=0.90, ymin=0.20, ymax=0.80)
-        bbox2 = NemotronParseBBox(xmin=0.11, xmax=0.89, ymin=0.21, ymax=0.79)
-        # Should be high IoU (> 0.90)
-        assert bbox1.iou(bbox2) > 0.90
-
-    def test_union_creates_superset(self) -> None:
-        bbox1 = NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6)
-        bbox2 = NemotronParseBBox(xmin=0.3, xmax=0.7, ymin=0.1, ymax=0.5)
+    def test_union(self) -> None:
+        # Test superset creation with different boxes
+        bbox1 = NemotronParseBBox.from_coordinates((0.1, 0.5, 0.2, 0.6))
+        bbox2 = NemotronParseBBox.from_coordinates((0.3, 0.7, 0.1, 0.5))
         union = bbox1.union(bbox2)
-        # Union should be the smallest box containing both
-        assert union.xmin == 0.1  # min of 0.1, 0.3
-        assert union.xmax == 0.7  # max of 0.5, 0.7
-        assert union.ymin == 0.1  # min of 0.2, 0.1
-        assert union.ymax == 0.6  # max of 0.6, 0.5
+        assert (union.xmin, union.xmax, union.ymin, union.ymax) == (0.1, 0.7, 0.1, 0.6)
 
-    def test_union_identical_boxes(self) -> None:
-        bbox1 = NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6)
-        bbox2 = NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6)
-        union = bbox1.union(bbox2)
-        assert union == bbox1
+        # Test identical boxes return same bbox
+        bbox3 = NemotronParseBBox.from_coordinates((0.1, 0.5, 0.2, 0.6))
+        assert bbox1.union(bbox3) == bbox1
 
 
 class TestMergeWithDetection:
-    def test_merge_empty_detection(self) -> None:
+    def test_merge_empty_inputs(self) -> None:
+        """Test edge cases with empty markdown or detection results."""
+        sample_bbox = NemotronParseBBox.from_coordinates((0.1, 0.5, 0.2, 0.6))
+
+        # Empty detection -> returns markdown as-is
         markdown_results = [
             NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6),
-                type=NemotronParseClassification.TEXT,
-                text="Sample text",
+                bbox=sample_bbox, type=NemotronParseClassification.TEXT, text="Sample"
             )
         ]
         merged = NemotronParseMarkdownBBox.merge_with_detection(
@@ -136,49 +129,22 @@ class TestMergeWithDetection:
         )
         assert merged == markdown_results
 
-    def test_merge_no_matching_type(self) -> None:
-        markdown_results = [
-            NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6),
-                type=NemotronParseClassification.TEXT,
-                text="Sample text",
-            )
-        ]
+        # Empty markdown -> detection included with text=None
         detection_results = [
             NemotronParseAnnotatedBBox(
-                bbox=NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6),
-                type=NemotronParseClassification.TABLE,  # Different type
+                bbox=sample_bbox, type=NemotronParseClassification.TEXT
             )
         ]
         merged = NemotronParseMarkdownBBox.merge_with_detection(
-            markdown_results, detection_results, iou_threshold=0.975
+            [], detection_results, iou_threshold=0.975
         )
-        assert merged[0].bbox == markdown_results[0].bbox
+        assert len(merged) == 1
+        assert merged[0].bbox == sample_bbox
+        assert merged[0].text is None
 
-    def test_merge_below_threshold(self) -> None:
-        markdown_results = [
-            NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6),
-                type=NemotronParseClassification.TEXT,
-                text="Sample text",
-            )
-        ]
-        detection_results = [
-            NemotronParseAnnotatedBBox(
-                bbox=NemotronParseBBox(xmin=0.3, xmax=0.7, ymin=0.4, ymax=0.8),
-                type=NemotronParseClassification.TEXT,
-            )
-        ]
-        merged = NemotronParseMarkdownBBox.merge_with_detection(
-            markdown_results, detection_results, iou_threshold=0.975
-        )
-        # IoU is low, should keep original bbox
-        assert merged[0].bbox == markdown_results[0].bbox
-
-    def test_merge_above_threshold(self) -> None:
-        markdown_bbox = NemotronParseBBox(xmin=0.10, xmax=0.90, ymin=0.20, ymax=0.80)
-        detection_bbox = NemotronParseBBox(xmin=0.10, xmax=0.90, ymin=0.20, ymax=0.80)
-
+    def test_merge_unmatched_detection(self) -> None:
+        """Test that unmatched detections are added (different location, type, or low IoU)."""
+        markdown_bbox = NemotronParseBBox.from_coordinates((0.1, 0.5, 0.2, 0.6))
         markdown_results = [
             NemotronParseMarkdownBBox(
                 bbox=markdown_bbox,
@@ -186,81 +152,88 @@ class TestMergeWithDetection:
                 text="Sample text",
             )
         ]
-        detection_results = [
-            NemotronParseAnnotatedBBox(
-                bbox=detection_bbox, type=NemotronParseClassification.TEXT
-            )
-        ]
-        merged = NemotronParseMarkdownBBox.merge_with_detection(
-            markdown_results, detection_results, iou_threshold=0.975
+
+        # Different location (no overlap)
+        detection_far = NemotronParseAnnotatedBBox(
+            bbox=NemotronParseBBox.from_coordinates((0.6, 0.9, 0.7, 0.95)),
+            type=NemotronParseClassification.PICTURE,
         )
-        # IoU is 1.0, superset bbox equals both (identical boxes)
-        assert merged[0].bbox == markdown_bbox.union(detection_bbox)
+        merged = NemotronParseMarkdownBBox.merge_with_detection(
+            markdown_results, [detection_far], iou_threshold=0.975
+        )
+        assert len(merged) == 2
         assert merged[0].text == "Sample text"
+        assert merged[1].bbox == detection_far.bbox
+        assert merged[1].text is None
 
-    def test_merge_creates_superset_bbox(self) -> None:
-        # Markdown bbox is slightly smaller on one side
-        markdown_bbox = NemotronParseBBox(xmin=0.11, xmax=0.90, ymin=0.20, ymax=0.80)
-        # Detection bbox is slightly larger on one side
-        detection_bbox = NemotronParseBBox(xmin=0.10, xmax=0.89, ymin=0.20, ymax=0.80)
+        # Same bbox but different type
+        detection_wrong_type = NemotronParseAnnotatedBBox(
+            bbox=markdown_bbox, type=NemotronParseClassification.TABLE
+        )
+        merged = NemotronParseMarkdownBBox.merge_with_detection(
+            markdown_results, [detection_wrong_type], iou_threshold=0.975
+        )
+        assert len(merged) == 2
+        assert merged[1].type == NemotronParseClassification.TABLE
+        assert merged[1].text is None
+
+        # Same type but IoU below threshold
+        detection_low_iou = NemotronParseAnnotatedBBox(
+            bbox=NemotronParseBBox.from_coordinates((0.3, 0.7, 0.4, 0.8)),
+            type=NemotronParseClassification.TEXT,
+        )
+        merged = NemotronParseMarkdownBBox.merge_with_detection(
+            markdown_results, [detection_low_iou], iou_threshold=0.975
+        )
+        assert len(merged) == 2
+        assert merged[0].bbox == markdown_bbox  # Original preserved
+        assert merged[1].text is None  # Unmatched detection
+
+    def test_merge_matched_detection(self) -> None:
+        """Test successful merging: superset bbox, text preserved."""
+        # Slightly different bboxes that should merge
+        markdown_bbox = NemotronParseBBox.from_coordinates((0.11, 0.90, 0.20, 0.80))
+        detection_bbox = NemotronParseBBox.from_coordinates((0.10, 0.89, 0.20, 0.80))
+        assert markdown_bbox.iou(detection_bbox) > 0.95  # Verify high IoU
 
         markdown_results = [
             NemotronParseMarkdownBBox(
                 bbox=markdown_bbox,
-                type=NemotronParseClassification.TEXT,
-                text="Sample text",
+                type=NemotronParseClassification.TABLE,
+                text="| col1 | col2 |\n| a | b |",
             )
         ]
         detection_results = [
             NemotronParseAnnotatedBBox(
-                bbox=detection_bbox, type=NemotronParseClassification.TEXT
+                bbox=detection_bbox, type=NemotronParseClassification.TABLE
             )
         ]
-        # Verify IoU is above threshold
-        assert markdown_bbox.iou(detection_bbox) > 0.95
 
         merged = NemotronParseMarkdownBBox.merge_with_detection(
             markdown_results, detection_results, iou_threshold=0.95
         )
-        # Should create superset containing both bboxes
-        expected_bbox = NemotronParseBBox(xmin=0.10, xmax=0.90, ymin=0.20, ymax=0.80)
-        assert merged[0].bbox == expected_bbox
-        assert merged[0].text == "Sample text"
-
-    def test_merge_preserves_text(self) -> None:
-        markdown_results = [
-            NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6),
-                type=NemotronParseClassification.TABLE,
-                text="| col1 | col2 |\n|------|------|\n| a | b |",
-            )
-        ]
-        detection_results = [
-            NemotronParseAnnotatedBBox(
-                bbox=NemotronParseBBox(xmin=0.1, xmax=0.5, ymin=0.2, ymax=0.6),
-                type=NemotronParseClassification.TABLE,
-            )
-        ]
-        merged = NemotronParseMarkdownBBox.merge_with_detection(
-            markdown_results, detection_results, iou_threshold=0.975
+        assert len(merged) == 1
+        # Superset bbox contains both
+        assert merged[0].bbox == NemotronParseBBox.from_coordinates(
+            (0.10, 0.90, 0.20, 0.80)
         )
-        # Text should be preserved from markdown_results
-        assert merged[0].text == "| col1 | col2 |\n|------|------|\n| a | b |"
+        # Text preserved from markdown
+        assert merged[0].text == "| col1 | col2 |\n| a | b |"
 
     def test_merge_multiple_items(self) -> None:
         markdown_results = [
             NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.0, xmax=0.4, ymin=0.0, ymax=0.3),
+                bbox=NemotronParseBBox.from_coordinates((0.0, 0.4, 0.0, 0.3)),
                 type=NemotronParseClassification.TITLE,
                 text="Title",
             ),
             NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.0, xmax=0.9, ymin=0.35, ymax=0.65),
+                bbox=NemotronParseBBox.from_coordinates((0.0, 0.9, 0.35, 0.65)),
                 type=NemotronParseClassification.TEXT,
                 text="Body text",
             ),
             NemotronParseMarkdownBBox(
-                bbox=NemotronParseBBox(xmin=0.2, xmax=0.8, ymin=0.7, ymax=0.95),
+                bbox=NemotronParseBBox.from_coordinates((0.2, 0.8, 0.7, 0.95)),
                 type=NemotronParseClassification.TABLE,
                 text="Table content",
             ),
@@ -268,12 +241,12 @@ class TestMergeWithDetection:
         # Detection results: only provide refinement for TEXT and TABLE
         detection_results = [
             NemotronParseAnnotatedBBox(
-                bbox=NemotronParseBBox(xmin=0.0, xmax=0.9, ymin=0.35, ymax=0.65),
+                bbox=NemotronParseBBox.from_coordinates((0.0, 0.9, 0.35, 0.65)),
                 type=NemotronParseClassification.TEXT,
             ),
             # TABLE bbox with very high IoU (near identical)
             NemotronParseAnnotatedBBox(
-                bbox=NemotronParseBBox(xmin=0.2, xmax=0.8, ymin=0.7, ymax=0.95),
+                bbox=NemotronParseBBox.from_coordinates((0.2, 0.8, 0.7, 0.95)),
                 type=NemotronParseClassification.TABLE,
             ),
         ]

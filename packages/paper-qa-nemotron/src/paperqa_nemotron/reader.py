@@ -21,6 +21,7 @@ from paperqa_nemotron.api import (
     NemotronBBoxError,
     NemotronLengthError,
     NemotronParseClassification,
+    NemotronParseMarkdown,
     NemotronParseMarkdownBBox,
     _call_nvidia_api,
     _call_sagemaker_api,
@@ -78,6 +79,7 @@ async def parse_pdf_to_pages(
     api_params: Mapping[str, Any] | None = None,
     concurrency: int | asyncio.Semaphore | None = 128,
     border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
+    iou_merge_threshold: float | None = 0.9,
     **_: Any,
 ) -> ParsedText:
     """Parse a PDF using Nvidia's nemotron-parse VLM.
@@ -102,6 +104,11 @@ async def parse_pdf_to_pages(
         border: Border size (pixels) to add on all sides.
             If a two-tuple it's the x border and y border,
             otherwise both x and y borders are symmetric.
+        iou_merge_threshold: IoU threshold for merging bboxes from markdown_bbox
+            with detection_only results. When set, both tools are called concurrently
+            and bboxes are merged if IoU exceeds this threshold.
+            Note that this doubles the amount of API calls made.
+            Set to None to disable detection_only merging.
         **_: Thrown away kwargs.
 
     Returns:
@@ -131,7 +138,7 @@ async def parse_pdf_to_pages(
         else:
             start_page, end_page = page_range[0] - 1, page_range[1]
 
-        async def process_page(
+        async def process_page(  # noqa: PLR0912
             i: int,
         ) -> tuple[str, str | tuple[str, list[ParsedMedia]]]:
             """Process a page and return its one-indexed page number and content."""
@@ -164,9 +171,28 @@ async def parse_pdf_to_pages(
                 tool_name = "markdown_no_bbox"
 
             try:
-                response = await call_fn(
-                    image=image_for_api, tool_name=tool_name, **api_params
-                )
+                # When using markdown_bbox with IoU merging, call both tools in parallel
+                response: list[NemotronParseMarkdownBBox] | list[NemotronParseMarkdown]
+                if tool_name == "markdown_bbox" and iou_merge_threshold is not None:
+                    markdown_response, detection_response = await asyncio.gather(
+                        call_fn(
+                            image=image_for_api, tool_name="markdown_bbox", **api_params
+                        ),
+                        call_fn(
+                            image=image_for_api,
+                            tool_name="detection_only",
+                            **api_params,
+                        ),
+                    )
+                    response = NemotronParseMarkdownBBox.merge_with_detection(
+                        markdown_response,
+                        detection_response,
+                        iou_threshold=iou_merge_threshold,
+                    )
+                else:
+                    response = await call_fn(
+                        image=image_for_api, tool_name=tool_name, **api_params
+                    )
             except RetryError as model_err:
                 if isinstance(
                     model_err.last_attempt._exception,
@@ -190,7 +216,7 @@ async def parse_pdf_to_pages(
             # corrections such as sorting by bounding box are hard because of edge cases
             # such as two-column PDFs (where 'vertical then horizontal' ordering
             # is not a valid sorting heuristic)
-            text = "\n\n".join(item.text for item in response)
+            text = "\n\n".join(item.text or "" for item in response)  # noqa: FURB143
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The text in page {i} of {page_count} was {len(text)} chars"

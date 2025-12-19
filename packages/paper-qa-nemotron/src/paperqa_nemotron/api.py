@@ -22,6 +22,7 @@ from typing import (
     Self,
     TypeAlias,
     assert_never,
+    cast,
     overload,
 )
 
@@ -237,7 +238,11 @@ class NemotronParseMarkdown(BaseModel):
 
 
 class NemotronParseMarkdownBBox(NemotronParseAnnotatedBBox, NemotronParseMarkdown):
-    """Payload for 'markdown_bbox' tool."""
+    """Payload for 'markdown_bbox' tool, or merges with results from detection_only."""
+
+    text: str | None = Field(  # type: ignore[assignment]
+        description="Markdown text, or None if from detection_only without text."
+    )
 
     @classmethod
     def merge_with_detection(
@@ -248,32 +253,32 @@ class NemotronParseMarkdownBBox(NemotronParseAnnotatedBBox, NemotronParseMarkdow
     ) -> "list[NemotronParseMarkdownBBox]":
         """Merge markdown_bbox and detection_only results using IoU-based matching.
 
-        For each markdown_bbox result, find the detection_only result with the
-        highest IoU. If the IoU is above the threshold, create a superset bbox
-        that contains both the markdown and detection bounding boxes.
-
         Args:
-            markdown_results: Results from the markdown_bbox tool (bbox + type + text).
-            detection_results: Results from the detection_only tool (bbox + type only).
-            iou_threshold: Minimum IoU to consider a match.
+            markdown_results: markdown_bbox tool results.
+            detection_results: detection_only tool results.
+            iou_threshold: Minimum IoU (inclusive) to consider a match.
 
         Returns:
-            Merged results with text from markdown_bbox and potentially updated bboxes
-            as a superset of both markdown and detection bboxes when IoU exceeds
-            the threshold.
+            Merged results. Text comes from markdown_bbox. Bounding boxes are a superset of:
+            1. Bounding boxes from markdown_bbox without an analog in detection_only.
+            2. Bounding boxes from detection_only without an analog in markdown_bbox.
+            3. Merged bounding boxes from both tools where IoU is at or above the threshold.
         """
         merged: list[NemotronParseMarkdownBBox] = []
+        matched_detection_indices: set[int] = set()
         for md_result in markdown_results:
             best_iou = 0.0
             best_detection: NemotronParseAnnotatedBBox | None = None
+            best_detection_idx: int | None = None
 
-            for detection_result in detection_results:
+            for idx, detection_result in enumerate(detection_results):
                 if detection_result.type != md_result.type:
                     continue  # Only consider matching types
                 iou = md_result.bbox.iou(detection_result.bbox)
                 if iou > best_iou:
                     best_iou = iou
                     best_detection = detection_result
+                    best_detection_idx = idx
 
             if best_detection is not None and best_iou >= iou_threshold:
                 # Create superset bbox containing both markdown and detection bboxes
@@ -284,8 +289,20 @@ class NemotronParseMarkdownBBox(NemotronParseAnnotatedBBox, NemotronParseMarkdow
                         text=md_result.text,
                     )
                 )
+                matched_detection_indices.add(cast(int, best_detection_idx))
             else:
                 merged.append(md_result)
+
+        # Add unmatched detection results without text
+        for idx, detection_result in enumerate(detection_results):
+            if idx not in matched_detection_indices:
+                merged.append(
+                    cls(
+                        bbox=detection_result.bbox,
+                        type=detection_result.type,
+                        text=None,
+                    )
+                )
 
         return merged
 
