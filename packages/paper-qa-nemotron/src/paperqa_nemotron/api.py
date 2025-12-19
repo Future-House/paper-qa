@@ -15,7 +15,15 @@ import json
 import logging
 import os
 from enum import StrEnum, unique
-from typing import TYPE_CHECKING, Annotated, Literal, TypeAlias, assert_never, overload
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Literal,
+    Self,
+    TypeAlias,
+    assert_never,
+    overload,
+)
 
 import litellm
 from aviary.core import Message, ToolCall
@@ -136,6 +144,44 @@ class NemotronParseBBox(BaseModel):
             self.ymax * height,
         )
 
+    def iou(self, other: "NemotronParseBBox") -> float:
+        """Calculate the Intersection over Union (IoU) with another bounding box.
+
+        Args:
+            other: The other bounding box to compare with.
+
+        Returns:
+            IoU score in range [0, 1], where 1 means perfect overlap.
+        """
+        # Calculate intersection coordinates
+        inter_xmin = max(self.xmin, other.xmin)
+        inter_ymin = max(self.ymin, other.ymin)
+        inter_xmax = min(self.xmax, other.xmax)
+        inter_ymax = min(self.ymax, other.ymax)
+
+        # Calculate intersection area (0 if no overlap) and then the union area
+        intersection = max(0, inter_xmax - inter_xmin) * max(0, inter_ymax - inter_ymin)
+        self_area = (self.xmax - self.xmin) * (self.ymax - self.ymin)
+        other_area = (other.xmax - other.xmin) * (other.ymax - other.ymin)
+        union = self_area + other_area - intersection
+        return intersection / union if union > 0 else 0.0
+
+    def union(self, other: "NemotronParseBBox") -> Self:
+        """Create a superset bounding box that contains both bounding boxes.
+
+        Args:
+            other: The other bounding box to merge with.
+
+        Returns:
+            A new bounding box that is a "superset" box containing both inputs.
+        """
+        return type(self)(
+            xmin=min(self.xmin, other.xmin),
+            ymin=min(self.ymin, other.ymin),
+            xmax=max(self.xmax, other.xmax),
+            ymax=max(self.ymax, other.ymax),
+        )
+
 
 @unique
 class NemotronParseClassification(StrEnum):
@@ -185,6 +231,56 @@ class NemotronParseMarkdown(BaseModel):
 
 class NemotronParseMarkdownBBox(NemotronParseAnnotatedBBox, NemotronParseMarkdown):
     """Payload for 'markdown_bbox' tool."""
+
+    @classmethod
+    def merge_with_detection(
+        cls,
+        markdown_results: "list[NemotronParseMarkdownBBox]",
+        detection_results: list[NemotronParseAnnotatedBBox],
+        iou_threshold: float,
+    ) -> "list[NemotronParseMarkdownBBox]":
+        """Merge markdown_bbox and detection_only results using IoU-based matching.
+
+        For each markdown_bbox result, find the detection_only result with the
+        highest IoU. If the IoU is above the threshold, create a superset bbox
+        that contains both the markdown and detection bounding boxes.
+
+        Args:
+            markdown_results: Results from the markdown_bbox tool (bbox + type + text).
+            detection_results: Results from the detection_only tool (bbox + type only).
+            iou_threshold: Minimum IoU to consider a match.
+
+        Returns:
+            Merged results with text from markdown_bbox and potentially updated bboxes
+            as a superset of both markdown and detection bboxes when IoU exceeds
+            the threshold.
+        """
+        merged: list[NemotronParseMarkdownBBox] = []
+        for md_result in markdown_results:
+            best_iou = 0.0
+            best_detection: NemotronParseAnnotatedBBox | None = None
+
+            for detection_result in detection_results:
+                if detection_result.type != md_result.type:
+                    continue  # Only consider matching types
+                iou = md_result.bbox.iou(detection_result.bbox)
+                if iou > best_iou:
+                    best_iou = iou
+                    best_detection = detection_result
+
+            if best_detection is not None and best_iou >= iou_threshold:
+                # Create superset bbox containing both markdown and detection bboxes
+                merged.append(
+                    cls(
+                        bbox=md_result.bbox.union(best_detection.bbox),
+                        type=md_result.type,
+                        text=md_result.text,
+                    )
+                )
+            else:
+                merged.append(md_result)
+
+        return merged
 
 
 MatrixNemotronParseAnnotatedBBox = TypeAdapter(list[list[NemotronParseAnnotatedBBox]])
