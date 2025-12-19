@@ -134,6 +134,13 @@ class NemotronParseBBox(BaseModel):
         AfterValidator(validate_min_less_than_max),
     ]
 
+    @classmethod
+    def from_coordinates(
+        cls, coords: tuple[float, float, float, float]
+    ) -> "NemotronParseBBox":
+        """Create a bbox from a (xmin, xmax, ymin, ymax) tuple."""
+        return cls(xmin=coords[0], xmax=coords[1], ymin=coords[2], ymax=coords[3])
+
     def to_page_coordinates(
         self, height: float, width: float
     ) -> tuple[float, float, float, float]:
