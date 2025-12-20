@@ -96,6 +96,7 @@ jobs:
   test-src:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.11, 3.13] # Our min and max supported Python versions
     steps:
@@ -116,6 +117,7 @@ jobs:
   test-packages:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version: [3.12, 3.13] # Our min and max supported Python versions, skipping 3.11 to avoid https://github.com/BerriAI/litellm/issues/16518
     steps:
