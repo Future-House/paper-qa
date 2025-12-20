@@ -12,6 +12,7 @@ from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import ImpossibleParsingError, get_citation_ids
 
 from paperqa_pypdf import parse_pdf_to_pages
+from paperqa_pypdf.reader import MediaMode
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
@@ -313,3 +314,33 @@ def test_clustering() -> None:
     assert len(p2_small_cluster[1]) >= len(
         p2_default_cluster[1]
     ), "Small tolerance should cluster less aggressively"
+
+
+class TestMediaMode:
+
+    def test_same_member_is_equal(self) -> None:
+        assert MediaMode.INDIVIDUAL == MediaMode.INDIVIDUAL
+        assert MediaMode.INDIVIDUAL_CLUSTERING == MediaMode.INDIVIDUAL_CLUSTERING
+        assert MediaMode.FULL_PAGE == MediaMode.FULL_PAGE
+        assert MediaMode.NONE == MediaMode.NONE
+
+    def test_individual_with_and_without_clustering(self) -> None:
+        assert MediaMode.INDIVIDUAL is not MediaMode.INDIVIDUAL_CLUSTERING
+        assert MediaMode.INDIVIDUAL != MediaMode.INDIVIDUAL_CLUSTERING
+        assert MediaMode.INDIVIDUAL_CLUSTERING != MediaMode.INDIVIDUAL
+
+        assert (
+            MediaMode.INDIVIDUAL.metadata_value
+            == MediaMode.INDIVIDUAL_CLUSTERING.metadata_value
+            == "individual"
+        )
+        assert (
+            str(MediaMode.INDIVIDUAL)  # noqa: FURB123
+            == str(MediaMode.INDIVIDUAL_CLUSTERING)  # noqa: FURB123
+            == "individual"
+        )
+
+    def test_different_members_different_values_are_not_equal(self) -> None:
+        assert MediaMode.NONE != MediaMode.FULL_PAGE
+        assert MediaMode.FULL_PAGE != MediaMode.INDIVIDUAL
+        assert MediaMode.NONE != MediaMode.INDIVIDUAL_CLUSTERING
