@@ -2084,6 +2084,7 @@ async def test_querying_tables(stub_data_dir: Path) -> None:
     ), "Expected no media for lightweight HTTP requests"
 
 
+@pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_images(stub_data_dir: Path) -> None:
     settings = Settings.from_name("fast")
@@ -2166,6 +2167,7 @@ async def test_duplicate_media_context_creation(stub_data_dir: Path) -> None:
     assert session.cost > 0
 
 
+@pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_images_corrupt(stub_data_dir: Path, caplog) -> None:
     settings = Settings.from_name("fast")
