@@ -2117,7 +2117,7 @@ async def test_images(stub_data_dir: Path) -> None:
             for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
         )
         >= 2
-    ), "Expected at least two neighbors to be matched"
+    ), f"Expected at least two neighbors to be matched in answer {session.answer!r}"
     assert session.cost > 0
     contexts_used = [
         c
@@ -2163,7 +2163,7 @@ async def test_duplicate_media_context_creation(stub_data_dir: Path) -> None:
             for district in ("The Avenues", "Golden Gate", "Civic Center", "Haight")
         )
         >= 2
-    ), "Expected at least two neighbors to be matched"
+    ), f"Expected at least two neighbors to be matched in answer {session.answer!r}"
     assert session.cost > 0
 
 
