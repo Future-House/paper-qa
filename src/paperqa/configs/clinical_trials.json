@@ -15,7 +15,9 @@
   },
   "parsing": {
     "use_doc_details": true,
-    "chunk_size": 9000,
-    "overlap": 750
+    "reader_config": {
+      "chunk_chars": 9000,
+      "overlap": 750
+    }
   }
 }
