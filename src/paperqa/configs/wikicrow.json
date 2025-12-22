@@ -20,13 +20,14 @@
     "answer_filter_extra_background": false
   },
   "parsing": {
-    "chunk_size": 7000,
     "use_doc_details": true,
-    "overlap": 1750,
+    "reader_config": {
+      "chunk_chars": 7000,
+      "overlap": 1750
+    },
     "citation_prompt": "Provide the citation for the following text in MLA Format. Do not write an introductory sentence. If reporting date accessed, the current year is 2024\n\n{text}\n\nCitation:",
     "structured_citation_prompt": "Extract the title, authors, and doi as a JSON from this MLA citation. If any field can not be found, return it as null. Use title, authors, and doi as keys, author's value should be a list of authors. {citation}\n\nCitation JSON:",
-    "disable_doc_valid_check": false,
-    "chunking_algorithm": "simple_overlap"
+    "disable_doc_valid_check": false
   },
   "prompts": {
     "summary": "Summarize the excerpt below to help answer a question.\n\nExcerpt from {citation}\n\n----\n\n{text}\n\n----\n\nQuestion: {question}\n\nDo not directly answer the question, instead summarize to give evidence to help answer the question. Stay detailed; report specific numbers, equations, or direct quotes (marked with quotation marks). Reply \"Not applicable\" if the excerpt is irrelevant. At the end of your response, provide an integer score from 1-10 on a newline indicating relevance to question. Do not explain your score.\n\nRelevant Information Summary ({summary_length}):",

@@ -30,7 +30,9 @@
     "return_paper_metadata": false
   },
   "parsing": {
-    "chunk_size": 3000000,
-    "use_doc_details": false
+    "use_doc_details": false,
+    "reader_config": {
+      "chunk_chars": 3000000
+    }
   }
 }

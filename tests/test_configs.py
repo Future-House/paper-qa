@@ -1,3 +1,4 @@
+import importlib.resources
 import os
 import pathlib
 from unittest.mock import patch
@@ -6,6 +7,7 @@ import pytest
 from pydantic import ValidationError
 from pytest_subtests import SubTests
 
+import paperqa.configs
 from paperqa.prompts import citation_prompt
 from paperqa.settings import (
     AgentSettings,
@@ -205,3 +207,15 @@ def test_citation_prompt_current_year():
         f"Citation prompt should contain '{expected_year_text}' but got:"
         f" {citation_prompt}"
     )
+
+
+def test_validity_of_bundled_configs(subtests: SubTests) -> None:
+    for config_file in [
+        f
+        for f in importlib.resources.files(paperqa.configs).iterdir()
+        if f.name.endswith(".json")
+    ]:
+        config_name = config_file.name.removesuffix(".json")
+        with subtests.test(msg=config_name):
+            settings = get_settings(config_name)
+            assert isinstance(settings, Settings)

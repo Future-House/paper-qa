@@ -6,7 +6,9 @@
   },
   "parsing": {
     "use_doc_details": true,
-    "chunk_size": 7000,
-    "overlap": 250
+    "reader_config": {
+      "chunk_chars": 7000,
+      "overlap": 250
+    }
   }
 }
