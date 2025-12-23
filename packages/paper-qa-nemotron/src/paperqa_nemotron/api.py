@@ -63,10 +63,14 @@ NVIDIA_API_NEMOTRON_PARSE_RATE_LIMIT = (
 
 class NemotronLengthError(ValueError):
     r"""
-    Error for nemotron-parse rejecting an input with 'length' finish reason.
+    Error for nemotron-parse running out of context, indicated by the 'length' finish reason.
 
-    This can happen if nemotron-parse starts babbling '\\n' a bunch
-    at lower DPI, but a re-request can skirt this error.
+    This 'length' finish reason comes from the Nvidia NIM wrapping
+    nemotron-parse version 1.1 when the model starts babbling (e.g. repeating '\\n').
+    It's been seen with the markdown_bbox tool on large figures.
+    Retrying is a possible method to skirt this error, but it's a bad idea
+    as a 'length' finish reason means nemotron-parse ran out of context,
+    and retrying until success just provides a flawed output.
     """
 
 
@@ -346,7 +350,7 @@ async def _call_nvidia_api(
 
 
 @retry(
-    retry=retry_if_exception_type((NemotronLengthError, NemotronBBoxError)),
+    retry=retry_if_exception_type(NemotronBBoxError),
     stop=stop_after_attempt(3),
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
@@ -419,18 +423,13 @@ async def _call_nvidia_api(
             f"Didn't yet handle choices shape of model response {response}."
         )
     if response.choices[0].finish_reason == "length":
-        # Unfortunately Nvidia API will give a 'length' error even if the response
-        # is fine. It's unclear if this is an API bug or a model bug,
-        # but for now let's ignore this
-        cached_exc = NemotronLengthError(
+        raise NemotronLengthError(
             f"Model response {response} indicates the input"
             f" image of shape {image.shape} is too large or the model started babbling.",
             response.choices[0],  # Include if callers want
         )
-    else:
-        cached_exc = None
     if (
-        response.choices[0].finish_reason not in {"tool_calls", "length"}
+        response.choices[0].finish_reason != "tool_calls"
         or response.choices[0].message.tool_calls is None
         or len(response.choices[0].message.tool_calls) != 1
     ):
@@ -449,12 +448,6 @@ async def _call_nvidia_api(
         else:
             assert_never(tool_name)
     except ValidationError as exc:
-        if cached_exc is not None:
-            if exc.__cause__ is not None:
-                raise NotImplementedError(
-                    "Didn't handle if response validation already had a cause."
-                ) from exc
-            exc.__cause__ = cached_exc
         raise NemotronBBoxError(
             f"nemotron-parse response {args_json} has invalid bounding box."
         ) from exc
@@ -495,7 +488,7 @@ async def _call_sagemaker_api(
 
 
 @retry(
-    retry=retry_if_exception_type((NemotronLengthError, NemotronBBoxError)),
+    retry=retry_if_exception_type(NemotronBBoxError),
     stop=stop_after_attempt(3),
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
