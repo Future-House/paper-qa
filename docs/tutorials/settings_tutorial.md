@@ -146,12 +146,8 @@ settings = Settings(
     temperature=0.1,
     batch_size=1,
     verbosity=1,
-    manifest_file=None,
-    paper_directory=pathlib.Path.cwd().joinpath("papers"),
-    index_directory=pathlib.Path.cwd().joinpath("papers/index"),
     answer=AnswerSettings(
         evidence_k=10,
-        evidence_detailed_citations=True,
         evidence_retrieval=True,
         evidence_summary_length="about 100 words",
         evidence_skip_summary=False,
@@ -161,8 +157,7 @@ settings = Settings(
         max_concurrent_requests=10,
     ),
     parsing=ParsingSettings(
-        chunk_size=5000,
-        overlap=250,
+        reader_config={"chunk_chars": 5000, "overlap": 250},
         citation_prompt=citation_prompt,
         structured_citation_prompt=structured_citation_prompt,
     ),
@@ -199,6 +194,7 @@ settings = Settings(
         search_count=8,
         index=IndexSettings(
             paper_directory=pathlib.Path.cwd().joinpath("papers"),
+            manifest_file=None,
             index_directory=pathlib.Path.cwd().joinpath("papers/index"),
         ),
     ),
@@ -270,6 +266,7 @@ settings.agent = AgentSettings(
     },
     index=IndexSettings(
         paper_directory=pathlib.Path.cwd().joinpath("papers"),
+        manifest_file=None,
         index_directory=pathlib.Path.cwd().joinpath("papers/index"),
     ),
 )
@@ -280,9 +277,11 @@ response = ask(
 ```
 
 <!-- #region -->
-Now the agent is able to use `Anthropic` models only and although we don't have a valid `OPENAI_API_KEY`, the question is answered because the agent will not use `OpenAI` models. See that we also changed the `embedding` because it was using `text-embedding-3-small` by default, which is a `OpenAI` model. `Paperqa` implements a few embedding models. Please refer to the [documentation](https://github.com/Future-House/paper-qa?tab=readme-ov-file#embedding-model) for more information.
-
-Notice that we redefined `settings.agent.paper_directory` and `settings.agent.index` settings. `Paperqa` actually uses the setting from `settings.agent`. However, for convenience, we implemented an alias in `settings.paper_directory` and `settings.index_directory`.
+Now the agent is able to use `Anthropic` models only and although we don't have a valid `OPENAI_API_KEY`,
+the question is answered because the agent will not use `OpenAI` models.
+See that we also changed the `embedding` because it was using `text-embedding-3-small` by default,
+which is a `OpenAI` model. `Paperqa` implements a few embedding models.
+Please refer to the [documentation](https://github.com/Future-House/paper-qa?tab=readme-ov-file#embedding-model) for more information.
 
 In addition, notice that this is a very verbose example for the sake of clarity. We could have just set only the llms names and used default settings for the rest:
 
@@ -302,6 +301,7 @@ settings.agent = AgentSettings(
     agent_llm_config=llm_anthropic_config,
     index=IndexSettings(
         paper_directory=pathlib.Path.cwd().joinpath("papers"),
+        manifest_file=None,
         index_directory=pathlib.Path.cwd().joinpath("papers/index"),
     ),
 )

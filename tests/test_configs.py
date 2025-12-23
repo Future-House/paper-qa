@@ -1,10 +1,11 @@
 import importlib.resources
 import os
 import pathlib
+import re
 from unittest.mock import patch
 
 import pytest
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 from pytest_subtests import SubTests
 
 import paperqa.configs
@@ -20,6 +21,7 @@ from paperqa.settings import (
 )
 from paperqa.types import Doc, DocDetails
 from paperqa.utils import get_year
+from tests.conftest import TESTS_DIR
 
 
 def test_prompt_settings_validation() -> None:
@@ -219,3 +221,48 @@ def test_validity_of_bundled_configs(subtests: SubTests) -> None:
         with subtests.test(msg=config_name):
             settings = get_settings(config_name)
             assert isinstance(settings, Settings)
+
+
+def test_readme_settings_cheatsheet_accuracy(subtests: SubTests) -> None:
+    readme_path = TESTS_DIR.parent / "README.md"
+
+    # Extract the Markdown table in the Settings Cheatsheet section
+    *_, after_header = readme_path.read_text().partition("## Settings Cheatsheet")
+    cheatsheet_match = re.match(r"\s*\|.*?\n\|[-| ]+\n((?:\|.*\n)+)", after_header)
+    assert cheatsheet_match, "Expected to find Settings Cheatsheet"
+    setting_paths: list[str] = [
+        row.split("|")[1].strip().strip("`")
+        for row in cheatsheet_match.group(1).strip().split("\n")
+    ]
+    assert setting_paths, "No settings found in the cheatsheet table"
+    assert len(setting_paths) == len(set(setting_paths)), "Expected unique settings"
+
+    # Check settings in the cheatsheet are present in Settings
+    settings = Settings()
+    for setting_path in setting_paths:
+        with subtests.test(msg=setting_path):
+            # Navigate the dotted path (e.g., "answer.evidence_k" -> settings.answer.evidence_k)
+            obj = settings
+            for part in setting_path.split("."):
+                assert hasattr(obj, part), (
+                    f"Setting path '{setting_path}' does not exist: "
+                    f"'{part}' not found on {type(obj).__name__}"
+                )
+                obj = getattr(obj, part)
+
+    # Also check the reverse, that all settings are documented
+    def get_leaf_field_paths(model: type[BaseModel], prefix: str = "") -> set[str]:
+        paths: set[str] = set()
+        for name, field_info in model.model_fields.items():
+            path = f"{prefix}.{name}" if prefix else name
+            if isinstance(field_info.annotation, type) and issubclass(
+                field_info.annotation, BaseModel
+            ):
+                # Field is a nested model
+                paths |= get_leaf_field_paths(field_info.annotation, path)
+            else:
+                paths.add(path)
+        return paths
+
+    undocumented = get_leaf_field_paths(Settings) - set(setting_paths)
+    assert not undocumented, "Settings fields are missing from the cheatsheet"

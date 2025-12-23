@@ -256,12 +256,12 @@ class ParsingSettings(BaseModel):
     )
     citation_prompt: str = Field(
         default=citation_prompt,
-        description="Prompt that tries to create citation from peeking one page.",
+        description="Prompt that tries to create citation from peeking one chunk.",
     )
     structured_citation_prompt: str = Field(
         default=structured_citation_prompt,
         description=(
-            "Prompt that tries to creates a citation in JSON from peeking one page."
+            "Prompt that tries to creates a citation in JSON from peeking one chunk."
         ),
     )
     disable_doc_valid_check: bool = Field(
