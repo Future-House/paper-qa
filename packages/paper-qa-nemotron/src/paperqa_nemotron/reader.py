@@ -3,6 +3,7 @@
 import asyncio
 import io
 import json
+import logging
 import os
 from collections.abc import Mapping
 from contextlib import closing
@@ -26,6 +27,8 @@ from paperqa_nemotron.api import (
     _call_nvidia_api,
     _call_sagemaker_api,
 )
+
+logger = logging.getLogger(__name__)
 
 WHITE_RGB = (255, 255, 255)
 # On DOI 10.1016/j.neuron.2011.12.023, 36-px was an insufficient border,
@@ -199,14 +202,22 @@ async def parse_pdf_to_pages(
                         # Crop original image at bbox (without border)
                         region_pil = rendered_page_pil.crop(original_bbox)
                         # Use markdown_no_bbox to get text for this region
-                        text = "\n\n".join(
-                            item.text
-                            for item in await call_fn(
-                                image=np.array(region_pil),
-                                tool_name="markdown_no_bbox",
-                                **api_params,
+                        # abandoning the text if we're still hitting a length error
+                        try:
+                            text: str | None = "\n\n".join(
+                                item.text
+                                for item in await call_fn(
+                                    image=np.array(region_pil),
+                                    tool_name="markdown_no_bbox",
+                                    **api_params,
+                                )
                             )
-                        )
+                        except NemotronLengthError:
+                            logger.warning(
+                                "Suppressed NemotronLengthError during markdown_no_bbox"
+                                f" fallback for {detection.type} bbox on page {i + 1} of {path!r}.",
+                            )
+                            text = None
                         return NemotronParseMarkdownBBox(
                             bbox=detection.bbox, type=detection.type, text=text
                         )
@@ -215,8 +226,7 @@ async def parse_pdf_to_pages(
                         *(extract_text(d) for d in detection_results)
                     )
             except NemotronLengthError as length_err:
-                # This length failure could come from the
-                # detection_only or markdown_no_bbox tools
+                # This length failure is from the detection_only tool
                 raise RuntimeError(
                     f"Failed to attain a valid response for page {i}"
                     f" of PDF at path {path!r}"
@@ -245,7 +255,7 @@ async def parse_pdf_to_pages(
             # corrections such as sorting by bounding box are hard because of edge cases
             # such as two-column PDFs (where 'vertical then horizontal' ordering
             # is not a valid sorting heuristic)
-            text = "\n\n".join(item.text for item in response)
+            text = "\n\n".join(item.text or "" for item in response)  # noqa: FURB143
             if page_size_limit and len(text) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The text in page {i} of {page_count} was {len(text)} chars"
