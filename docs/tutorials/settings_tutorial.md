@@ -151,7 +151,6 @@ settings = Settings(
     index_directory=pathlib.Path.cwd().joinpath("papers/index"),
     answer=AnswerSettings(
         evidence_k=10,
-        evidence_detailed_citations=True,
         evidence_retrieval=True,
         evidence_summary_length="about 100 words",
         evidence_skip_summary=False,
