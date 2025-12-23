@@ -3,6 +3,7 @@
 import asyncio
 import io
 import json
+import logging
 import os
 from collections.abc import Mapping
 from contextlib import closing
@@ -20,12 +21,14 @@ from paperqa_nemotron.api import (
     CLASSIFICATIONS_WITH_MEDIA,
     NemotronBBoxError,
     NemotronLengthError,
+    NemotronParseAnnotatedBBox,
     NemotronParseClassification,
-    NemotronParseMarkdown,
     NemotronParseMarkdownBBox,
     _call_nvidia_api,
     _call_sagemaker_api,
 )
+
+logger = logging.getLogger(__name__)
 
 WHITE_RGB = (255, 255, 255)
 # On DOI 10.1016/j.neuron.2011.12.023, 36-px was an insufficient border,
@@ -79,7 +82,6 @@ async def parse_pdf_to_pages(
     api_params: Mapping[str, Any] | None = None,
     concurrency: int | asyncio.Semaphore | None = 128,
     border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
-    iou_merge_threshold: float | None = 0.9,
     **_: Any,
 ) -> ParsedText:
     """Parse a PDF using Nvidia's nemotron-parse VLM.
@@ -104,11 +106,6 @@ async def parse_pdf_to_pages(
         border: Border size (pixels) to add on all sides.
             If a two-tuple it's the x border and y border,
             otherwise both x and y borders are symmetric.
-        iou_merge_threshold: IoU threshold for merging bboxes from markdown_bbox
-            with detection_only results. When set, both tools are called concurrently
-            and bboxes are merged if IoU exceeds this threshold.
-            Note that this doubles the amount of API calls made.
-            Set to None to disable detection_only merging.
         **_: Thrown away kwargs.
 
     Returns:
@@ -171,33 +168,75 @@ async def parse_pdf_to_pages(
                 tool_name = "markdown_no_bbox"
 
             try:
-                # When using markdown_bbox with IoU merging, call both tools in parallel
-                response: list[NemotronParseMarkdownBBox] | list[NemotronParseMarkdown]
-                if tool_name == "markdown_bbox" and iou_merge_threshold is not None:
-                    markdown_response, detection_response = await asyncio.gather(
-                        call_fn(
-                            image=image_for_api, tool_name="markdown_bbox", **api_params
-                        ),
-                        call_fn(
-                            image=image_for_api,
-                            tool_name="detection_only",
-                            **api_params,
-                        ),
-                    )
-                    response = NemotronParseMarkdownBBox.merge_with_detection(
-                        markdown_response,
-                        detection_response,
-                        iou_threshold=iou_merge_threshold,
-                    )
-                else:
+                try:
                     response = await call_fn(
                         image=image_for_api, tool_name=tool_name, **api_params
                     )
+                except NemotronLengthError:
+                    if tool_name != "markdown_bbox":
+                        raise
+                    # Fallback to detection_only + markdown_no_bbox to reinvent
+                    # markdown_bbox, bypassing its length error
+                    detection_results = await call_fn(
+                        image=image_for_api, tool_name="detection_only", **api_params
+                    )
+
+                    async def extract_text(
+                        detection: NemotronParseAnnotatedBBox,
+                    ) -> NemotronParseMarkdownBBox:
+                        # Convert bbox from normalized [0, 1] to padded image pixel coordinates
+                        padded_bbox = detection.bbox.to_page_coordinates(
+                            rendered_page_padded_pil.height,
+                            rendered_page_padded_pil.width,
+                        )
+                        original_bbox = (
+                            # xmin, ymin
+                            # pylint: disable-next=possibly-used-before-assignment
+                            max(0, padded_bbox[0] - offset_x),
+                            # pylint: disable-next=possibly-used-before-assignment
+                            max(0, padded_bbox[1] - offset_y),
+                            # xmax, ymax
+                            min(rendered_page_pil.width, padded_bbox[2] - offset_x),
+                            min(rendered_page_pil.height, padded_bbox[3] - offset_y),
+                        )
+                        # Crop original image at bbox (without border)
+                        region_pil = rendered_page_pil.crop(original_bbox)
+                        # Use markdown_no_bbox to get text for this region
+                        # abandoning the text if we're still hitting a length error
+                        try:
+                            text: str | None = "\n\n".join(
+                                item.text
+                                for item in await call_fn(
+                                    image=np.array(region_pil),
+                                    tool_name="markdown_no_bbox",
+                                    **api_params,
+                                )
+                            )
+                        except NemotronLengthError:
+                            logger.warning(
+                                "Suppressed NemotronLengthError during markdown_no_bbox"
+                                f" fallback for {detection.type} bbox on page {i + 1} of {path!r}.",
+                            )
+                            text = None
+                        return NemotronParseMarkdownBBox(
+                            bbox=detection.bbox, type=detection.type, text=text
+                        )
+
+                    response = await asyncio.gather(
+                        *(extract_text(d) for d in detection_results)
+                    )
+            except NemotronLengthError as length_err:
+                # This length failure is from the detection_only tool
+                raise RuntimeError(
+                    f"Failed to attain a valid response for page {i}"
+                    f" of PDF at path {path!r}"
+                    f" due to NemotronLengthError."
+                    " Perhaps try tweaking parameters such as"
+                    f" increasing DPI {dpi} or increasing API parameter's"
+                    f" temperature {api_params.get('temperature')}."
+                ) from length_err
             except RetryError as model_err:
-                if isinstance(
-                    model_err.last_attempt._exception,
-                    NemotronLengthError | NemotronBBoxError,
-                ):
+                if isinstance(model_err.last_attempt._exception, NemotronBBoxError):
                     # Nice-ify nemotron-parse failures to speed debugging
                     raise RuntimeError(  # noqa: TRY004
                         f"Failed to attain a valid response for page {i}"
@@ -259,9 +298,7 @@ async def parse_pdf_to_pages(
                     # clamp it here as we're ditching the padding
                     original_bbox = (
                         # xmin, ymin
-                        # pylint: disable-next=possibly-used-before-assignment
                         max(0, padded_bbox[0] - offset_x),
-                        # pylint: disable-next=possibly-used-before-assignment
                         max(0, padded_bbox[1] - offset_y),
                         # xmax, ymax
                         min(rendered_page_pil.width, padded_bbox[2] - offset_x),
