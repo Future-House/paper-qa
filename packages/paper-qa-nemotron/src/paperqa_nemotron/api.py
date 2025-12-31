@@ -43,6 +43,7 @@ from tenacity import (
     retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
+    wait_random,
 )
 
 try:
@@ -356,8 +357,8 @@ async def _call_nvidia_api(
 )
 @retry(
     retry=retry_if_exception_type(TimeoutError),  # Hitting rate limits
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT),
+    stop=stop_after_attempt(6),
+    wait=wait_random(0, 15) + wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT),
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 async def _call_nvidia_api(

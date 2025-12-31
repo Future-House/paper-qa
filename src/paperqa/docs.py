@@ -9,6 +9,7 @@ import tempfile
 import urllib.request
 import warnings
 from collections.abc import Callable, Sequence
+from copy import deepcopy
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -300,15 +301,31 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             multimodal_kwargs["multimodal_enricher"] = (
                 all_settings.make_media_enricher()
             )
-        texts, metadata = await read_doc(
-            path,
-            doc,
-            page_size_limit=parse_config.page_size_limit,
-            parse_pdf=parse_config.parse_pdf,
-            include_metadata=True,
-            **multimodal_kwargs,
-            **parse_config.reader_config,
-        )
+        try:
+            texts, metadata = await read_doc(
+                path,
+                doc,
+                page_size_limit=parse_config.page_size_limit,
+                parse_pdf=parse_config.parse_pdf,
+                include_metadata=True,
+                **multimodal_kwargs,
+                **parse_config.reader_config,
+            )
+        except RuntimeError as exc:
+            reader_config2 = deepcopy(parse_config.reader_config)
+            reader_config2["api_params"]["temperature"] = 0.4
+            try:
+                texts, metadata = await read_doc(
+                    path,
+                    doc,
+                    page_size_limit=parse_config.page_size_limit,
+                    parse_pdf=parse_config.parse_pdf,
+                    include_metadata=True,
+                    **multimodal_kwargs,
+                    **reader_config2,
+                )
+            except RuntimeError as exc2:
+                _ = 0
         # loose check to see if document was loaded
         if metadata.name != "image" and (
             not texts

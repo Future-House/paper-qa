@@ -1583,7 +1583,7 @@ class TestTextQATaskDataset:
                     "chunk_chars": 3000,
                     "overlap": 250,
                     "dpi": 300,
-                    "api_params": {"temperature": 0.05},
+                    "api_params": {"temperature": 0.2},
                     # "full_page": True,
                 },
                 # enrichment_prompt=full_page_enrichment_prompt_template,
@@ -1629,6 +1629,17 @@ class TestTextQATaskDataset:
             )
 
         envs = [make_individual_env(i) for i in range(len(dataset))]
+        envs = [
+            e
+            for e in envs
+            # if e._session_id == UUID("b9ba0817-f8c1-4817-8293-c71aa0d6efec")
+            # if e._session_id == UUID("8466d7e7-83df-4f60-8047-404f85bde80d")
+            # if e._session_id == UUID("b82632fa-35a5-4cad-9983-dca0baf2c06b")
+            # if e._session_id == UUID("ab91fb6b-01b5-405b-89b3-c4e1d207b166")
+            # if e._session_id == UUID("2a0dfde6-4520-4291-a67d-8a6f6ef8686d")
+            # if e._session_id == UUID("b05cebb6-c848-491c-b5d6-57516eed751f")
+            if e._session_id == UUID("7180413b-62e4-4999-af2a-5cfe5062d885")
+        ]
         # Filter out envs not in the sampled subset
         # envs = [e for e in envs if e.sources[0] in self.SAMPLED_SUBSET_OF_FIGQA1_DOIS]
         # envs = [envs[i] for i in range(5, 12)]
@@ -1734,7 +1745,7 @@ class TestTextQATaskDataset:
             }
             for fr, means, env, _ in results
         }
-        with open(f"records-individual-mm-enrichment-{reader}.json", "w") as f:
+        with open(f"records-individual-mm-enrichment-{reader}2.json", "w") as f:
             json.dump(qid_to_record, f, indent=2)
 
     # @pytest.mark.skip(reason="Manually run benchmark")

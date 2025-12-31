@@ -34,7 +34,10 @@ WHITE_RGB = (255, 255, 255)
 # On DOI 10.1016/j.neuron.2011.12.023, 36-px was an insufficient border,
 # then on DOI 10.1111/jnc.13398, 42-px was an insufficient border,
 # then on DOI 10.1016/j.neuron.2011.12.023 (again), 56-px was an insufficient border,
-# all with temperature of 0 and DPI 300
+# all with temperature of 0 and DPI 300.
+# Then on DOI 10.1111/jnc.13740, 60-px was an insufficient border
+# with temperature of 0.05 and DPI 300
+# DEFAULT_BORDER_SIZE = 84  # pixels
 DEFAULT_BORDER_SIZE = 60  # pixels
 
 
