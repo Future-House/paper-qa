@@ -53,8 +53,8 @@ def clean_invalid_unicode(text: str, repl: str = REPLACEMENT_CHAR) -> str:
 
     Handles the following characters:
     - Null bytes (\\x00): Invalid in UTF-8 encoded databases.
-    - Orphaned surrogates (U+D800 to U+DFFF): Only pairs of surrogates are valid
-      for UTF-16 supplementary characters.
+    - Orphaned surrogates (U+D800 to U+DFFF): Reserved for UTF-16 encoding and
+      should not appear in Unicode strings.
     """
     return INVALID_UNICODE_CHARS.sub(repl, text)
 
