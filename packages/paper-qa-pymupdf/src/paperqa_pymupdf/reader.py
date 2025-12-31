@@ -41,8 +41,14 @@ PYMUPDF_PIXMAP_ATTRS = {
 # This garbage led to `asyncpg==0.30.0` with a PostgreSQL 15 DB throwing:
 # > asyncpg.exceptions.CharacterNotInRepertoireError:
 # > invalid byte sequence for encoding "UTF8": 0x00
+# On 12/30/2025 with pymupdf==1.26.7, a `pymupdf.table.Table.to_markdown` call on
+# https://arxiv.org/pdf/1711.07566's page 3's Figure 2a's mesh and pixels example
+# outputs an orphaned low surrogate (U+DC3C), which is interpreted as an
+# incomplete UTF-16 surrogate pair downstream and causes:
+# > UnicodeEncodeError: 'utf-8' codec can't encode character '\udc3c'
+# > in position 46888: surrogates not allowed
 # Thus, this regex exists to deny table markdown exports containing invalid chars
-_INVALID_MD_CHARS = re.compile(r"\x00")
+_INVALID_MD_CHARS = re.compile(r"[\x00\uD800-\uDFFF]")
 
 
 def parse_pdf_to_pages(  # noqa: PLR0912

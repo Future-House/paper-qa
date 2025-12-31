@@ -286,6 +286,30 @@ def test_table_parsing() -> None:
         )
 
 
+def test_table_parsing_orphaned_surrogate() -> None:
+    # Simulate orphaned low surrogate (U+DC3C) in table markdown output
+    surrogate_md = f"|Col1|Col2|\n|---|---|\n|valid|{0xDC3C:c}data|"
+
+    filepath = STUB_DATA_DIR / "influence.pdf"
+    with patch.object(
+        pymupdf.table.Table, "to_markdown", return_value=surrogate_md
+    ) as mock_to_markdown:
+        # Page 23 has a table, so reading just that page speeds the test up
+        parsed_text = parse_pdf_to_pages(filepath, page_range=23)
+
+    mock_to_markdown.assert_called_once()
+    assert isinstance(parsed_text.content, dict)
+    all_tables = [
+        m
+        for pagenum_media in parsed_text.content.values()
+        if isinstance(pagenum_media, tuple)
+        for m in pagenum_media[1]
+        if m.info["type"] == "table"
+    ]
+    assert len(all_tables) == 1, "Expected a table to be parsed"
+    assert all_tables[0].text is None, "Expected surrogate char to be filtered"
+
+
 def test_equation_parsing() -> None:
     parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
     assert isinstance(parsed_text.content, dict)
