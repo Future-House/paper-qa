@@ -10,7 +10,7 @@ import pytest
 from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs, Settings
 from paperqa.readers import PDFParserFn, chunk_pdf
-from paperqa.utils import ImpossibleParsingError, get_citation_ids
+from paperqa.utils import REPLACEMENT_CHAR, ImpossibleParsingError, get_citation_ids
 
 from paperqa_pymupdf import parse_pdf_to_pages
 
@@ -263,7 +263,9 @@ def test_table_parsing() -> None:
         sum(len(tables) for tables in all_tables.values()) >= 2
     ), "Expected a few tables to be parsed for assertions to work"
     zeroth_media, *_ = next(iter(all_tables.values()))
-    assert zeroth_media.text is None, "Expected null byte to be filtered"
+    assert zeroth_media.text
+    assert "\x00" not in zeroth_media.text, "Expected no null byte"
+    assert REPLACEMENT_CHAR in zeroth_media.text, "Expected replacement char(s)"
     try:
         # Seen with pymupdf==1.26.6
         assert zeroth_raw_table_text == (
@@ -288,7 +290,8 @@ def test_table_parsing() -> None:
 
 def test_table_parsing_orphaned_surrogate() -> None:
     # Simulate orphaned low surrogate (U+DC3C) in table markdown output
-    surrogate_md = f"|Col1|Col2|\n|---|---|\n|valid|{0xDC3C:c}data|"
+    surrogate_char = chr(0xDC3C)
+    surrogate_md = f"|Col1|Col2|\n|---|---|\n|valid|{surrogate_char}data|"
 
     filepath = STUB_DATA_DIR / "influence.pdf"
     with patch.object(
@@ -307,7 +310,11 @@ def test_table_parsing_orphaned_surrogate() -> None:
         if m.info["type"] == "table"
     ]
     assert len(all_tables) == 1, "Expected a table to be parsed"
-    assert all_tables[0].text is None, "Expected surrogate char to be filtered"
+    table_text = all_tables[0].text
+    assert table_text
+    assert surrogate_char not in table_text, "Expected no surrogate chars"
+    assert REPLACEMENT_CHAR in table_text, "Expected replacement char(s)"
+    assert "data" in table_text, "Expected other text to be preserved"
 
 
 def test_equation_parsing() -> None:
