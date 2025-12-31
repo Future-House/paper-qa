@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, cast
 import pypdf
 import pypdf.errors
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
-from paperqa.utils import ImpossibleParsingError
+from paperqa.utils import ImpossibleParsingError, clean_invalid_unicode
 
 from .utils import cluster_bboxes
 
@@ -142,7 +142,14 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             for i, page in enumerate(
                 pdf_reader.pages[start_page:end_page], start=start_page
             ):
-                text = page.extract_text()
+                # On 12/30/2025 with pypdf==6.4.2, a `PageObject.extract_text` call on
+                # https://arxiv.org/pdf/1711.07566's page 3's Figure 2a's rasterization
+                # example outputs an orphaned low surrogate (U+DC63), which is
+                # interpreted as an incomplete UTF-16 surrogate pair downstream and causes:
+                # > UnicodeEncodeError: 'utf-8' codec can't encode character '\udc63'
+                # > in position 17404: surrogates not allowed
+                # Thus, the extracted text is cleaned
+                text = clean_invalid_unicode(page.extract_text())
                 if page_size_limit and len(text) > page_size_limit:
                     raise ImpossibleParsingError(
                         f"The text in page {i} of {len(pdf_reader.pages)} was {len(text)} chars"

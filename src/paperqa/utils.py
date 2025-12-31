@@ -43,6 +43,22 @@ class ImpossibleParsingError(Exception):
     LOG_METHOD_NAME: ClassVar[str] = "warning"
 
 
+# UTF-8 encoding-related failures can be caught using this regex
+INVALID_UNICODE_CHARS = re.compile(r"[\x00\uD800-\uDFFF]")
+REPLACEMENT_CHAR = "\ufffd"  # �
+
+
+def clean_invalid_unicode(text: str, repl: str = REPLACEMENT_CHAR) -> str:
+    r"""Clean invalid Unicode chars by replacing them with the replacement character.
+
+    Handles the following characters:
+    - Null bytes (\\x00): Invalid in UTF-8 encoded databases.
+    - Orphaned surrogates (U+D800 to U+DFFF): Reserved for UTF-16 encoding and
+      should not appear in Unicode strings.
+    """
+    return INVALID_UNICODE_CHARS.sub(repl, text)
+
+
 def name_in_text(name: str, text: str) -> bool:
     sname = name.strip()
     pattern = rf"\b({re.escape(sname)})\b(?!\w)"

@@ -4,12 +4,13 @@ import re
 from collections.abc import Sequence
 from pathlib import Path
 from typing import cast
+from unittest.mock import patch
 
 import pytest
 from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs
 from paperqa.readers import PDFParserFn, chunk_pdf
-from paperqa.utils import ImpossibleParsingError, get_citation_ids
+from paperqa.utils import REPLACEMENT_CHAR, ImpossibleParsingError, get_citation_ids
 
 from paperqa_pypdf import parse_pdf_to_pages
 from paperqa_pypdf.reader import MediaMode
@@ -244,6 +245,25 @@ def test_table_parsing() -> None:
     assert (
         sum(len(tables) for tables in all_tables.values()) >= 2
     ), "Expected a few tables to be parsed"
+
+
+def test_table_parsing_orphaned_surrogate() -> None:
+    # Simulate orphaned low surrogate (U+DC63) in extracted text
+    surrogate_char = chr(0xDC63)
+    text_with_surrogate = f"Normal text {surrogate_char} more text"
+
+    filepath = STUB_DATA_DIR / "paper.pdf"
+    with patch("pypdf.PageObject.extract_text", return_value=text_with_surrogate):
+        # Reading just page one without media speeds the test up
+        parsed_text = parse_pdf_to_pages(filepath, page_range=1, parse_media=False)
+
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    page_text = parsed_text.content["1"]
+    assert isinstance(page_text, str)
+    assert surrogate_char not in page_text, "Expected no surrogate chars"
+    assert REPLACEMENT_CHAR in page_text, "Expected replacement char(s)"
+    assert "Normal text" in page_text, "Expected other text to be preserved"
 
 
 def test_media_deduplication() -> None:

@@ -1,10 +1,9 @@
 import json
 import os
-import re
 
 import pymupdf
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
-from paperqa.utils import ImpossibleParsingError
+from paperqa.utils import ImpossibleParsingError, clean_invalid_unicode
 from pydantic import JsonValue
 
 
@@ -35,20 +34,6 @@ PYMUPDF_PIXMAP_ATTRS = {
     "y",
     "yres",
 }
-
-# On 9/14/2025, a `pymupdf.table.Table.to_markdown` stripped call returned:
-# '|Col1|Col2|Col3|Col4|Col5|Col6|Col7|Col8|\n|---|---|---|---|---|---|---|---|\n||\x02\x03<br>|\x04\x05\x06\x07\x08<br> <br>|\x07\x08\x08<br>\n\x08<br>\x0e\x0f<br>\x17\x18\x18\x08<br>|\x02<br>\x0c\x10<br>\x11<br>\x19\r\x02\x1a\x00\x01\x02\x03<br>|\x11<br>\x12\x06\x05<br>\x0e\x13\x14\x15<br>\x04\x05\x06\x07<br>|\x05\x08<br>\x0c\x10<br>\x12\x06\x05<br>\x0e\x16\x13<br>|\x05\x08<br>\x0c\x10<br>\x12\x06\x05<br>\x0e\x16\x13<br>|'  # noqa: E501, W505
-# This garbage led to `asyncpg==0.30.0` with a PostgreSQL 15 DB throwing:
-# > asyncpg.exceptions.CharacterNotInRepertoireError:
-# > invalid byte sequence for encoding "UTF8": 0x00
-# On 12/30/2025 with pymupdf==1.26.7, a `pymupdf.table.Table.to_markdown` call on
-# https://arxiv.org/pdf/1711.07566's page 3's Figure 2a's mesh and pixels example
-# outputs an orphaned low surrogate (U+DC3C), which is interpreted as an
-# incomplete UTF-16 surrogate pair downstream and causes:
-# > UnicodeEncodeError: 'utf-8' codec can't encode character '\udc3c'
-# > in position 46888: surrogates not allowed
-# Thus, this regex exists to deny table markdown exports containing invalid chars
-_INVALID_MD_CHARS = re.compile(r"[\x00\uD800-\uDFFF]")
 
 
 def parse_pdf_to_pages(  # noqa: PLR0912
@@ -190,15 +175,24 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         # Add page number after info_hashable so differing pages
                         # don't break the cache key
                         media_metadata["page_num"] = i + 1
-                        raw_md = table.to_markdown().strip()
                         media.append(
                             ParsedMedia(
                                 index=table_i,
                                 data=pix.tobytes(),
-                                # If the markdown contains invalid control characters
-                                # that'd trigger encoding errors later, drop the markdown
+                                # On 9/14/2025, a `pymupdf.table.Table.to_markdown` stripped call returned:
+                                # '|Col1|Col2|Col3|Col4|Col5|Col6|Col7|Col8|\n|---|---|---|---|---|---|---|---|\n||\x02\x03<br>|\x04\x05\x06\x07\x08<br> <br>|\x07\x08\x08<br>\n\x08<br>\x0e\x0f<br>\x17\x18\x18\x08<br>|\x02<br>\x0c\x10<br>\x11<br>\x19\r\x02\x1a\x00\x01\x02\x03<br>|\x11<br>\x12\x06\x05<br>\x0e\x13\x14\x15<br>\x04\x05\x06\x07<br>|\x05\x08<br>\x0c\x10<br>\x12\x06\x05<br>\x0e\x16\x13<br>|\x05\x08<br>\x0c\x10<br>\x12\x06\x05<br>\x0e\x16\x13<br>|'  # noqa: E501, W505
+                                # This garbage led to `asyncpg==0.30.0` with a PostgreSQL 15 DB throwing:
+                                # > asyncpg.exceptions.CharacterNotInRepertoireError:
+                                # > invalid byte sequence for encoding "UTF8": 0x00
+                                # On 12/30/2025 with pymupdf==1.26.7, a `pymupdf.table.Table.to_markdown` call on
+                                # https://arxiv.org/pdf/1711.07566's page 3's Figure 2a's mesh and pixels example
+                                # outputs an orphaned low surrogate (U+DC3C), which is interpreted as an
+                                # incomplete UTF-16 surrogate pair downstream and causes:
+                                # > UnicodeEncodeError: 'utf-8' codec can't encode character '\udc3c'
+                                # > in position 46888: surrogates not allowed
+                                # Thus, the extracted markdown is cleaned
                                 text=(
-                                    None if _INVALID_MD_CHARS.search(raw_md) else raw_md
+                                    clean_invalid_unicode(table.to_markdown().strip())
                                 ),
                                 info=media_metadata,
                             )
