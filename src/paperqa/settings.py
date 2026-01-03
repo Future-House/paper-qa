@@ -8,6 +8,7 @@ import warnings
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from enum import IntEnum, StrEnum
+from functools import partial
 from itertools import starmap
 from pydoc import locate
 from typing import (
@@ -321,6 +322,7 @@ class ParsingSettings(BaseModel):
             and hasattr(self.parse_pdf, "__module__")
             and hasattr(self.parse_pdf, "__name__")
             and self.parse_pdf.__name__ != "<lambda>"
+            and not isinstance(self.parse_pdf, partial)
         ):
             # If going to JSON, and we can get a FQN, do so for JSON compliance
             data["parse_pdf"] = f"{self.parse_pdf.__module__}.{self.parse_pdf.__name__}"
