@@ -10,7 +10,7 @@ import unicodedata
 from collections import Counter
 from collections.abc import Awaitable, Callable, Collection, Iterable, Iterator, Mapping
 from datetime import datetime
-from functools import reduce
+from functools import partial, reduce
 from http import HTTPStatus
 from pathlib import Path
 from typing import Any, BinaryIO, ClassVar, TypeVar
@@ -686,3 +686,31 @@ def parse_enrichment_irrelevance(enrichment: str) -> tuple[bool, str]:
         return False, enrichment.strip()
     no_label_enrichment = enrichment[label_match.end() :] if label_match else enrichment
     return is_irrelevant, no_label_enrichment.strip()
+
+
+def get_stable_str(fn: Callable, for_hash: bool = False) -> str:
+    """
+    Get a stable string from a function, for serialization (default) or hashing.
+
+    It avoids common pitfalls such as:
+    - All lambda functions having the same name '<lambda>'.
+    - IDs in normal string representation of functions breaking cache keys.
+    """
+    if (
+        hasattr(fn, "__module__")
+        and hasattr(fn, "__name__")
+        and fn.__name__ != "<lambda>"
+        and not isinstance(fn, partial)
+    ):
+        # Named function: use fully qualified name
+        return f"{fn.__module__}.{fn.__name__}"
+    if not for_hash:
+        raise ValueError(
+            f"Cannot form serialization-safe string representation for {fn}."
+        )
+    # Fallback to lower-quality hash name
+    # NOTE: we could look into `fn.__code__`, but as `fn.__code__.co_code`
+    # is not stable across Python minor versions,
+    # this unfortunately makes the cache key incompatible across Python versions,
+    # which is too brittle
+    return type(fn).__name__
