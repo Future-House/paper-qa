@@ -320,6 +320,7 @@ class ParsingSettings(BaseModel):
             info.mode == "json"
             and hasattr(self.parse_pdf, "__module__")
             and hasattr(self.parse_pdf, "__name__")
+            and self.parse_pdf.__name__ != "<lambda>"
         ):
             # If going to JSON, and we can get a FQN, do so for JSON compliance
             data["parse_pdf"] = f"{self.parse_pdf.__module__}.{self.parse_pdf.__name__}"
