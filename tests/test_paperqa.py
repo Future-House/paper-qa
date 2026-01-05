@@ -13,6 +13,7 @@ import sys
 from collections.abc import AsyncIterable, Sequence
 from copy import deepcopy
 from datetime import datetime, timedelta
+from functools import partial
 from io import BytesIO
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
@@ -3291,6 +3292,12 @@ async def test_timeout_resilience() -> None:
     assert not llm_results
 
 
+TEST_STUB_LAMBDA = lambda: 1  # noqa: E731
+
+
+TEST_STUB_PARTIAL = partial(pymupdf_parse_pdf_to_pages, kwarg=2)
+
+
 def test_parse_pdf_string_resolution() -> None:
     # Test with a valid string FQN
     pymupdf_str = Settings(
@@ -3314,7 +3321,7 @@ def test_parse_pdf_string_resolution() -> None:
     )
     assert "parse_pdf" not in pypdf_str.model_dump()["parsing"]
 
-    # Test directly passing a parser
+    # Test directly passing a normal parser
     pymupdf_fn = Settings(parsing=ParsingSettings(parse_pdf=pymupdf_parse_pdf_to_pages))
     assert pymupdf_fn.parsing.parse_pdf == pymupdf_parse_pdf_to_pages
     assert (
@@ -3322,6 +3329,18 @@ def test_parse_pdf_string_resolution() -> None:
         == "paperqa_pymupdf.reader.parse_pdf_to_pages"
     )
     assert "parse_pdf" not in pymupdf_fn.model_dump()["parsing"]
+
+    # Test directly passing a lambda parser
+    lambda_fn = Settings(parsing=ParsingSettings(parse_pdf=TEST_STUB_LAMBDA))
+    assert lambda_fn.parsing.parse_pdf == TEST_STUB_LAMBDA
+    assert "parse_pdf" not in lambda_fn.model_dump(mode="json")["parsing"]
+    assert "parse_pdf" not in lambda_fn.model_dump()["parsing"]
+
+    # Test directly passing a functools partial parser
+    partial_fn = Settings(parsing=ParsingSettings(parse_pdf=TEST_STUB_PARTIAL))
+    assert partial_fn.parsing.parse_pdf == TEST_STUB_PARTIAL
+    assert "parse_pdf" not in partial_fn.model_dump(mode="json")["parsing"]
+    assert "parse_pdf" not in partial_fn.model_dump()["parsing"]
 
     # Test a nonexistent FQN
     with pytest.raises(ValueError, match="Failed to locate"):

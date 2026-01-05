@@ -7,6 +7,7 @@ import re
 import warnings
 from collections import defaultdict
 from collections.abc import Awaitable, Callable, Mapping, Sequence
+from contextlib import suppress
 from enum import IntEnum, StrEnum
 from itertools import starmap
 from pydoc import locate
@@ -74,7 +75,12 @@ from paperqa.prompts import (
 )
 from paperqa.readers import PDFParserFn
 from paperqa.types import Context, ParsedMedia, ParsedText
-from paperqa.utils import hexdigest, parse_enrichment_irrelevance, pqa_directory
+from paperqa.utils import (
+    get_stable_str,
+    hexdigest,
+    parse_enrichment_irrelevance,
+    pqa_directory,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -316,13 +322,10 @@ class ParsingSettings(BaseModel):
         if isinstance(self.parse_pdf, str):
             # Already JSON-compliant, so let's un-exclude
             data["parse_pdf"] = self.parse_pdf
-        elif (
-            info.mode == "json"
-            and hasattr(self.parse_pdf, "__module__")
-            and hasattr(self.parse_pdf, "__name__")
-        ):
+        elif info.mode == "json":
             # If going to JSON, and we can get a FQN, do so for JSON compliance
-            data["parse_pdf"] = f"{self.parse_pdf.__module__}.{self.parse_pdf.__name__}"
+            with suppress(ValueError):  # Suppress when not serialization-safe
+                data["parse_pdf"] = get_stable_str(self.parse_pdf)
         return data
 
     doc_filters: Sequence[Mapping[str, Any]] | None = Field(
@@ -852,7 +855,7 @@ class Settings(BaseSettings):
             first_segment,
             str(self.agent.index.use_absolute_paper_directory),
             self.embedding,
-            str(self.parsing.parse_pdf),  # Don't use __name__ as lambda wouldn't differ
+            get_stable_str(self.parsing.parse_pdf, for_hash=True),
             str(self.parsing.reader_config["chunk_chars"]),
             str(self.parsing.reader_config["overlap"]),
             str(self.parsing.reader_config.get("full_page", False)),
