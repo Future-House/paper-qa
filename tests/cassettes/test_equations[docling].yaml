@@ -9,6 +9,90 @@ interactions:
         connection:
           - keep-alive
         host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=SF+Districts+in+the+style+of+Andy+Warhol,+with+Math&rows=1
+    response:
+      body:
+        string: !!binary |
+          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
+          oyorPFix72DRlOVms/kPmibI64kPAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "1847"
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 05 Jan 2026 19:41:57 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit:
+          - "150"
+        x-rate-limit-interval:
+          - 1s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
           - api.semanticscholar.org
         user-agent:
           - python-httpx/0.28.1
@@ -29,114 +113,30 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 14 Nov 2025 22:44:55 GMT
+          - Mon, 05 Jan 2026 19:41:58 GMT
         Via:
-          - 1.1 fc95fb7eb9ce6765a3022c75128a880c.cloudfront.net (CloudFront)
+          - 1.1 1fd3242984ceacb561c135f27536c5da.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - oWP5EQtiCSSBEu346LfLBy5OMl4bNb3mqXi8EG9tnHzVgwEBsx7PdA==
+          - lRgFbPLfHGQbZYg7uAzY312Ovq25CLgcfq720AKUOBkB-ouED8HrxA==
         X-Amz-Cf-Pop:
-          - LAX54-P10
+          - SFO53-P10
         X-Cache:
           - Error from cloudfront
         x-amz-apigw-id:
-          - UDiUNGK7vHcEQ0g=
+          - WugQ7FrZvHcEgzQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "34"
         x-amzn-Remapped-Date:
-          - Fri, 14 Nov 2025 22:44:55 GMT
+          - Mon, 05 Jan 2026 19:41:58 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - ca25ad4c-179c-4837-85e3-3c06048003ba
+          - 4495ec60-2461-4e4c-9817-7eb3245e94c8
       status:
         code: 404
         message: Not Found
-  - request:
-      body: null
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=SF+Districts+in+the+style+of+Andy+Warhol,+with+Math&rows=1
-    response:
-      body:
-        string: !!binary |
-          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
-          VGWFByv2HSyastxsNv8BW+KwRokPAAA=
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "1847"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 14 Nov 2025 22:44:56 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
-      status:
-        code: 200
-        message: OK
   - request:
       body: null
       headers:
@@ -147,14 +147,14 @@ interactions:
         Connection:
           - keep-alive
         X-Amzn-Trace-Id:
-          - c72cd4e3-fa7b-404a-b2b1-8448bf9fa43a
+          - 9c419b46-5dbf-4d54-8fc7-ce2ebaa875d9
         user-agent:
-          - unknown/None; hf_hub/0.36.0; python/3.13.5; torch/2.9.0
+          - unknown/None; hf_hub/0.36.0; python/3.13.5; torch/2.9.1
       method: GET
       uri: https://huggingface.co/api/models/docling-project/docling-layout-heron/revision/main
     response:
       body:
-        string: '{"_id":"67fe52e0b3a9473353b72227","id":"docling-project/docling-layout-heron","private":false,"tags":["safetensors","rt_detr_v2","arxiv:2408.09869","arxiv:2407.17140","license:apache-2.0","region:us"],"downloads":343876,"likes":21,"modelId":"docling-project/docling-layout-heron","author":"docling-project","sha":"bdb7099d742220552d703932cc0ce0a26a7a8da8","lastModified":"2025-07-02T10:40:24.000Z","gated":false,"disabled":false,"model-index":null,"config":{"architectures":["RTDetrV2ForObjectDetection"],"model_type":"rt_detr_v2"},"cardData":{"license":"apache-2.0"},"siblings":[{"rfilename":".gitattributes"},{"rfilename":"README.md"},{"rfilename":"config.json"},{"rfilename":"model.safetensors"},{"rfilename":"preprocessor_config.json"}],"spaces":["thinkPy/Docling-Layout-Analysis"],"createdAt":"2025-04-15T12:36:48.000Z","safetensors":{"parameters":{"F32":42889979},"total":42889979},"usedStorage":514976988}'
+        string: '{"_id":"67fe52e0b3a9473353b72227","id":"docling-project/docling-layout-heron","private":false,"tags":["safetensors","rt_detr_v2","arxiv:2509.11720","arxiv:2408.09869","license:apache-2.0","region:us"],"downloads":681238,"likes":25,"modelId":"docling-project/docling-layout-heron","author":"docling-project","sha":"54100edecdceb65a9d8204d2478ac4cc8d4ca68b","lastModified":"2026-01-05T13:52:29.000Z","gated":false,"disabled":false,"model-index":null,"config":{"architectures":["RTDetrV2ForObjectDetection"],"model_type":"rt_detr_v2"},"cardData":{"license":"apache-2.0"},"siblings":[{"rfilename":".gitattributes"},{"rfilename":"README.md"},{"rfilename":"config.json"},{"rfilename":"docling_heron_400.png"},{"rfilename":"model.safetensors"},{"rfilename":"preprocessor_config.json"}],"spaces":["thinkPy/Docling-Layout-Analysis"],"createdAt":"2025-04-15T12:36:48.000Z","safetensors":{"parameters":{"F32":42889979},"total":42889979},"usedStorage":514976988}'
       headers:
         Access-Control-Allow-Origin:
           - https://huggingface.co
@@ -165,15 +165,15 @@ interactions:
         Connection:
           - keep-alive
         Content-Length:
-          - "912"
+          - "950"
         Content-Type:
           - application/json; charset=utf-8
         Date:
-          - Fri, 14 Nov 2025 22:44:56 GMT
+          - Mon, 05 Jan 2026 19:41:58 GMT
         ETag:
-          - W/"390-kWZKbRTYamdJ9VY7Xi/tWfnGeEs"
+          - W/"3b6-6euCfaFhDEaAsdvBiOOQ9lanlAI"
         RateLimit:
-          - '"api";r=2997;t=223'
+          - '"api";r=2997;t=101'
         RateLimit-Policy:
           - '"fixed window";"api";q=3000;w=300'
         Referrer-Policy:
@@ -181,17 +181,17 @@ interactions:
         Vary:
           - Origin
         Via:
-          - 1.1 a5a2ffbe419e59df71fc95b5cdadd302.cloudfront.net (CloudFront)
+          - 1.1 f7597cc90ba7218b20a85a0785996e1c.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - ROIZgsnzWCtYV-76LyfZ1kmevEGXCowOlIlFWcBYD16LkgkCRsjkSQ==
+          - jAbEn5FdfKGtpiBKnfg2NDoAdlVsAIE71_LEQXA1qMmzatU68jD9Kg==
         X-Amz-Cf-Pop:
-          - LAX54-P2
+          - SFO5-P1
         X-Cache:
           - Miss from cloudfront
         X-Powered-By:
           - huggingface-moon
         X-Request-Id:
-          - Root=1-6917b0e8-129b369e3be34cd47cf6388e;c72cd4e3-fa7b-404a-b2b1-8448bf9fa43a
+          - Root=1-695c1406-1e433045790abd7b0d85197a;9c419b46-5dbf-4d54-8fc7-ce2ebaa875d9
         cross-origin-opener-policy:
           - same-origin
       status:
@@ -207,14 +207,14 @@ interactions:
         Connection:
           - keep-alive
         X-Amzn-Trace-Id:
-          - 11e7b1e9-6a0b-42eb-a8e8-3a19ac1c177a
+          - d89a67c6-9ae7-4af9-bf43-711868fafc52
         user-agent:
-          - unknown/None; hf_hub/0.36.0; python/3.13.5; torch/2.9.0
+          - unknown/None; hf_hub/0.36.0; python/3.13.5; torch/2.9.1
       method: GET
       uri: https://huggingface.co/api/models/docling-project/docling-models/revision/v2.3.0
     response:
       body:
-        string: '{"_id":"6683f1e3bd6e5421c747a05f","id":"docling-project/docling-models","private":false,"library_name":"transformers","tags":["transformers","arxiv:2408.09869","arxiv:2206.01062","doi:10.57967/hf/3036","license:cdla-permissive-2.0","endpoints_compatible","region:us"],"downloads":503447,"likes":182,"modelId":"docling-project/docling-models","author":"docling-project","sha":"fc0f2d45e2218ea24bce5045f58a389aed16dc23","lastModified":"2025-07-23T11:23:06.000Z","gated":false,"disabled":false,"model-index":null,"config":{},"cardData":{"license":"cdla-permissive-2.0"},"transformersInfo":{"auto_model":"AutoModel"},"siblings":[{"rfilename":".gitattributes"},{"rfilename":".gitignore"},{"rfilename":"README.md"},{"rfilename":"config.json"},{"rfilename":"model_artifacts/tableformer/accurate/tableformer_accurate.safetensors"},{"rfilename":"model_artifacts/tableformer/accurate/tm_config.json"},{"rfilename":"model_artifacts/tableformer/fast/tableformer_fast.safetensors"},{"rfilename":"model_artifacts/tableformer/fast/tm_config.json"}],"spaces":[],"createdAt":"2024-07-02T12:26:11.000Z","usedStorage":2364186086}'
+        string: '{"_id":"6683f1e3bd6e5421c747a05f","id":"docling-project/docling-models","private":false,"library_name":"transformers","tags":["transformers","arxiv:2408.09869","arxiv:2206.01062","doi:10.57967/hf/3036","license:cdla-permissive-2.0","endpoints_compatible","region:us"],"downloads":775664,"likes":188,"modelId":"docling-project/docling-models","author":"docling-project","sha":"fc0f2d45e2218ea24bce5045f58a389aed16dc23","lastModified":"2025-07-23T11:23:06.000Z","gated":false,"disabled":false,"model-index":null,"config":{},"cardData":{"license":"cdla-permissive-2.0"},"transformersInfo":{"auto_model":"AutoModel"},"siblings":[{"rfilename":".gitattributes"},{"rfilename":".gitignore"},{"rfilename":"README.md"},{"rfilename":"config.json"},{"rfilename":"model_artifacts/tableformer/accurate/tableformer_accurate.safetensors"},{"rfilename":"model_artifacts/tableformer/accurate/tm_config.json"},{"rfilename":"model_artifacts/tableformer/fast/tableformer_fast.safetensors"},{"rfilename":"model_artifacts/tableformer/fast/tm_config.json"}],"spaces":[],"createdAt":"2024-07-02T12:26:11.000Z","usedStorage":2364186086}'
       headers:
         Access-Control-Allow-Origin:
           - https://huggingface.co
@@ -229,11 +229,11 @@ interactions:
         Content-Type:
           - application/json; charset=utf-8
         Date:
-          - Fri, 14 Nov 2025 22:44:57 GMT
+          - Mon, 05 Jan 2026 19:41:59 GMT
         ETag:
-          - W/"456-LaI6WT1ZO9HkItggz/2rkK/1fGI"
+          - W/"456-MLI1fZKdq9Geq/XMgULdWdKGlh8"
         RateLimit:
-          - '"api";r=2996;t=222'
+          - '"api";r=2996;t=100'
         RateLimit-Policy:
           - '"fixed window";"api";q=3000;w=300'
         Referrer-Policy:
@@ -241,17 +241,17 @@ interactions:
         Vary:
           - Origin
         Via:
-          - 1.1 a5a2ffbe419e59df71fc95b5cdadd302.cloudfront.net (CloudFront)
+          - 1.1 5e3db235184770510999a272e515dfbc.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - Til_vuEc0-vdFRpK0ajT3Mskte7Ngi_krr_y8HWSUVBHv5R3k-Ua_w==
+          - 0deBIyvUwiPrC56S445_CfTKusoovLJ_w6aZKwdsavSwvcbaRfwbuw==
         X-Amz-Cf-Pop:
-          - LAX54-P2
+          - SFO5-P1
         X-Cache:
           - Miss from cloudfront
         X-Powered-By:
           - huggingface-moon
         X-Request-Id:
-          - Root=1-6917b0e9-0a6e2f584aaa015403bf2c9a;11e7b1e9-6a0b-42eb-a8e8-3a19ac1c177a
+          - Root=1-695c1407-1f46cd8e3b305318001fcaf4;d89a67c6-9ae7-4af9-bf43-711868fafc52
         cross-origin-opener-policy:
           - same-origin
       status:
