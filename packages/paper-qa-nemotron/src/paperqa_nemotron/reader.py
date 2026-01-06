@@ -166,6 +166,7 @@ async def parse_pdf_to_pages(
             else:
                 image_for_api = rendered_page.to_numpy()
                 tool_name = "markdown_no_bbox"
+            del rendered_page  # Free pdfium bitmap memory
 
             try:
                 try:
