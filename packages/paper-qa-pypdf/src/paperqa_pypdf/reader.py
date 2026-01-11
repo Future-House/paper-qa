@@ -179,6 +179,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         f"bitmap_{a}": getattr(pdfium_rendered_page, a)
                         for a in PDFIUM_BITMAP_ATTRS
                     }
+                    del pdfium_rendered_page  # Free pdfium bitmap memory
                     media_metadata["info_hashable"] = json.dumps(
                         media_metadata, sort_keys=True
                     )
@@ -237,6 +238,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             "width": pix.width,
                             "height": pix.height,
                         }
+                        del pix  # Free pdfium bitmap memory
                         media_metadata["info_hashable"] = json.dumps(
                             {
                                 k: (
@@ -287,6 +289,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             "width": pix.width,
                             "height": pix.height,
                         }
+                        del pix  # Free pdfium bitmap memory
                         table_metadata["info_hashable"] = json.dumps(
                             {
                                 k: (

@@ -166,6 +166,7 @@ async def parse_pdf_to_pages(
             else:
                 image_for_api = rendered_page.to_numpy()
                 tool_name = "markdown_no_bbox"
+            del rendered_page  # Free pdfium bitmap memory
 
             try:
                 try:
@@ -247,6 +248,8 @@ async def parse_pdf_to_pages(
                         f" temperature {api_params.get('temperature')}."
                     ) from model_err
                 raise
+            del image_for_api  # Free up memory as API call is done
+
             # Per https://docs.nvidia.com/nim/vision-language-models/1.5.0/examples/nemotron-parse/overview.html#nemotron-parse-overview
             # > It outputs text in reading order.
             # So according to that, we can just strictly join here.
@@ -313,6 +316,7 @@ async def parse_pdf_to_pages(
                         "width": region_pix.width,
                         "height": region_pix.height,
                     }
+                    del region_pix  # Free cropped image memory
                     media_metadata["info_hashable"] = json.dumps(
                         {
                             k: (
