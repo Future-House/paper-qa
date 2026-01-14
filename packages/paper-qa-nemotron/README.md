@@ -17,7 +17,9 @@ For more info on nemotron-parse, check out:
 - Technical blog:
   <https://developer.nvidia.com/blog/turn-complex-documents-into-usable-data-with-vlm-nvidia-nemotron-parse-1-1/>
 - Hugging Face weights: <https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1>
-- Model card: <https://build.nvidia.com/nvidia/nemotron-parse/modelcard>
+- NIM and model card: <https://build.nvidia.com/nvidia/nemotron-parse>
+  - Support matrix:
+    <https://docs.nvidia.com/nim/vision-language-models/1.5.0/support-matrix.html#nemotron-parse>
 - API docs:
   <https://docs.nvidia.com/nim/vision-language-models/1.5.0/examples/nemotron-parse/overview.html#nemotron-parse-overview>
 - Cookbook:
