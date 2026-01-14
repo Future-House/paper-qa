@@ -12,16 +12,20 @@ PDF reading code backed by
 
 For more info on nemotron-parse, check out:
 
-<!-- pyml disable-num-lines 9 line-length -->
+<!-- pyml disable-num-lines 11 line-length -->
 
 - Technical blog:
   <https://developer.nvidia.com/blog/turn-complex-documents-into-usable-data-with-vlm-nvidia-nemotron-parse-1-1/>
 - Hugging Face weights: <https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1>
-- Model card: <https://build.nvidia.com/nvidia/nemotron-parse/modelcard>
+- NIM and model card: <https://build.nvidia.com/nvidia/nemotron-parse>
+  - Support matrix:
+    <https://docs.nvidia.com/nim/vision-language-models/1.5.0/support-matrix.html#nemotron-parse>
 - API docs:
   <https://docs.nvidia.com/nim/vision-language-models/1.5.0/examples/nemotron-parse/overview.html#nemotron-parse-overview>
 - Cookbook:
   <https://github.com/NVIDIA-NeMo/Nemotron/blob/main/usage-cookbook/Nemotron-Parse-v1.1/build_general_usage_cookbook.ipynb>
+- NGC catalog:
+  <https://catalog.ngc.nvidia.com/orgs/nim/teams/nvidia/containers/nemotron-parse>
 - AWS Marketplace:
   <https://aws.amazon.com/marketplace/pp/prodview-ny2ngku2i4ge6>
 
