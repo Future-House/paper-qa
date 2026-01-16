@@ -574,7 +574,9 @@ class ParsedMedia(BaseModel):
         bytes,
         PlainSerializer(bytes_to_string),
         BeforeValidator(lambda x: x if isinstance(x, bytes) else string_to_bytes(x)),
-    ] = Field(description="Raw image, ideally directly savable to a PNG image.")
+    ] = Field(
+        min_length=1, description="Raw image, ideally directly savable to a PNG image."
+    )
     text: str | None = Field(
         default=None,
         description=(
