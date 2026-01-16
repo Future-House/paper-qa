@@ -1663,6 +1663,11 @@ def test_media_to_image_url(subtests: SubTests) -> None:
         assert "image/png" in url
 
 
+def test_parsed_media_empty_data_raises() -> None:
+    with pytest.raises(ValidationError, match="at least 1 byte"):
+        ParsedMedia(index=0, data=b"")
+
+
 @pytest.mark.asyncio
 async def test_image_aggregation(stub_data_dir: Path) -> None:
     png_path = stub_data_dir / "sf_districts.png"
