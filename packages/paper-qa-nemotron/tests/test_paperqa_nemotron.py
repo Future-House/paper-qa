@@ -17,7 +17,12 @@ from tenacity import Future, RetryError
 
 from paperqa_nemotron import parse_pdf_to_pages
 from paperqa_nemotron.api import NemotronBBoxError, NemotronLengthError
-from paperqa_nemotron.reader import pad_image_with_border
+from paperqa_nemotron.reader import (
+    NEMOTRON_PARSE_TARGET_HEIGHT,
+    NEMOTRON_PARSE_TARGET_WIDTH,
+    fit_image_to_target_aspect_ratio,
+    pad_image_with_border,
+)
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
@@ -379,6 +384,76 @@ def test_pad_image_with_border(subtests: pytest.Subtests) -> None:
         assert padded.mode == "L"
         assert padded.width == grayscale_image.width + 60 * 2
         assert padded.height == grayscale_image.height + 60 * 2
+
+
+def test_fit_image_to_target_aspect_ratio(subtests: pytest.Subtests) -> None:
+    target_ratio = NEMOTRON_PARSE_TARGET_WIDTH / NEMOTRON_PARSE_TARGET_HEIGHT
+
+    with subtests.test(msg="large-image-no-scale"):
+        # Image larger than target dims → no scaling, only aspect ratio adjustment
+        large_image = Image.new(  # US letter paper size
+            "RGB", (2550, 3300), (128, 128, 128)
+        )
+        result, scale, offset_x, offset_y = fit_image_to_target_aspect_ratio(
+            large_image
+        )
+        assert result.mode == "RGB"
+        assert scale == 1.0, "Large image should not be scaled"
+        assert (
+            abs(result.width / result.height - target_ratio) < 0.01
+        ), "Result should have target ratio"
+        assert result.width >= large_image.width
+        assert result.height >= large_image.height
+        assert offset_x == (result.width - int(large_image.width * scale)) // 2
+        assert offset_y == (result.height - int(large_image.height * scale)) // 2
+
+    with subtests.test(msg="small-image-scales-up"):
+        # Image smaller than target dims → scales up
+        small_image = Image.new("RGB", (800, 1000), (128, 128, 128))
+        result, scale, offset_x, offset_y = fit_image_to_target_aspect_ratio(
+            small_image
+        )
+        assert result.mode == "RGB"
+        assert scale > 1.0, "Small image should be scaled up"
+        assert (
+            abs(result.width / result.height - target_ratio) < 0.01
+        ), "Result should have target ratio"
+        assert offset_x == (result.width - int(small_image.width * scale)) // 2
+        assert offset_y == (result.height - int(small_image.height * scale)) // 2
+
+    with subtests.test(msg="already-correct-ratio"):
+        # Image already has target ratio → should just be scaled/padded appropriately
+        ratio_image = Image.new(
+            "RGB",
+            (NEMOTRON_PARSE_TARGET_WIDTH, NEMOTRON_PARSE_TARGET_HEIGHT),
+            (128, 128, 128),
+        )
+        result, scale, offset_x, offset_y = fit_image_to_target_aspect_ratio(
+            ratio_image
+        )
+        assert result.mode == "RGB"
+        assert scale == 1.0
+        assert abs(result.width / result.height - target_ratio) < 0.01
+        assert offset_x == 0
+        assert offset_y == 0
+
+    with subtests.test(msg="wide-image"):
+        # Wide image (landscape) → should be placed on portrait canvas
+        wide_image = Image.new("RGB", (3000, 2000), (128, 128, 128))
+        result, scale, offset_x, offset_y = fit_image_to_target_aspect_ratio(wide_image)
+        assert result.mode == "RGB"
+        assert abs(result.width / result.height - target_ratio) < 0.01
+        assert offset_x == (result.width - int(wide_image.width * scale)) // 2
+        assert offset_y == (result.height - int(wide_image.height * scale)) // 2
+
+    with subtests.test(msg="preserves-mode"):
+        # Ensure image mode is preserved
+        rgba_image = Image.new("RGBA", (2000, 3000), (100, 100, 100, 255))
+        result, scale, offset_x, offset_y = fit_image_to_target_aspect_ratio(rgba_image)
+        assert result.mode == "RGBA"
+        assert scale == 1.0
+        assert offset_x == (result.width - int(rgba_image.width * scale)) // 2
+        assert offset_y == (result.height - int(rgba_image.height * scale)) // 2
 
 
 @pytest.mark.asyncio
