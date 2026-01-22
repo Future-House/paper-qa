@@ -56,7 +56,7 @@ async def test_parse_pdf_to_pages(api_params_base: dict[str, Any]) -> None:
     # between Abstract and Introduction
     matches = re.findall(
         r"(?:###? 1 Introduction[\n]+)?We introduce Pa ?S[as],"
-        r" an advanced Paper Search agent powered by large language models\.",
+        r" an advanced (?:\*\*)?Paper Search(?:\*\*)? agent powered by large language models\.",
         p1_text,
     )
     assert len(matches) == 1, f"Parsing failed to handle abstract in {p1_text}."
