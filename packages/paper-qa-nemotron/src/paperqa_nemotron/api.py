@@ -11,6 +11,7 @@ For more info on nemotron-parse, check out:
 """
 
 import contextlib
+import http
 import json
 import logging
 import os
@@ -40,6 +41,7 @@ from pydantic import (
 from tenacity import (
     before_sleep_log,
     retry,
+    retry_if_exception,
     retry_if_exception_type,
     stop_after_attempt,
     wait_exponential,
@@ -316,6 +318,13 @@ VectorNemotronParseMarkdown = TypeAdapter(list[NemotronParseMarkdown])
 MatrixNemotronParseMarkdownBBox = TypeAdapter(list[list[NemotronParseMarkdownBBox]])
 
 
+def _is_litellm_timeout_with_408(exc: BaseException) -> bool:
+    return (
+        isinstance(exc, litellm.exceptions.Timeout)
+        and exc.status_code == http.HTTPStatus.REQUEST_TIMEOUT
+    )
+
+
 @overload
 async def _call_nvidia_api(
     image: "np.ndarray",
@@ -355,7 +364,10 @@ async def _call_nvidia_api(
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 @retry(
-    retry=retry_if_exception_type(TimeoutError),  # Hitting rate limits
+    retry=(
+        retry_if_exception_type(TimeoutError)  # Hitting rate limits
+        | retry_if_exception(_is_litellm_timeout_with_408)  # Inference timeout
+    ),
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT),
     before_sleep=before_sleep_log(logger, logging.WARNING),
