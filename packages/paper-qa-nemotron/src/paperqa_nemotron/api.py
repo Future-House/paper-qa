@@ -364,12 +364,14 @@ async def _call_nvidia_api(
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 @retry(
-    retry=(
-        retry_if_exception_type(TimeoutError)  # Hitting rate limits
-        | retry_if_exception(_is_litellm_timeout_with_408)  # Inference timeout
-    ),
+    retry=retry_if_exception_type(TimeoutError),  # Hitting rate limits
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT),
+    before_sleep=before_sleep_log(logger, logging.WARNING),
+)
+@retry(
+    retry=retry_if_exception(_is_litellm_timeout_with_408),  # Inference timeout
+    stop=stop_after_attempt(3),
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 async def _call_nvidia_api(
