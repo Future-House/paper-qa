@@ -146,6 +146,35 @@ async def parse_pdf_to_pages(
         else:
             start_page, end_page = page_range[0] - 1, page_range[1]
 
+        async def call_failover(
+            page_num: int, cause_exc: BaseException
+        ) -> tuple[str, str | tuple[str, list[ParsedMedia]]]:
+            logger.warning(
+                f"Falling back to failover parser {failover_parser} for page {page_num}"
+                f" of {path!r} due to {type(cause_exc).__name__}."
+            )
+            fallback_parsed_text = cast(PDFParserFn, failover_parser)(
+                path,
+                page_size_limit=page_size_limit,
+                page_range=page_num,
+                parse_media=parse_media,
+                full_page=full_page,
+                dpi=dpi,
+                api_params=api_params,
+                concurrency=concurrency,
+                border=border,
+                **kwargs,
+            )
+            if isinstance(fallback_parsed_text, Awaitable):
+                fallback_parsed_text = await fallback_parsed_text
+            if not isinstance(fallback_parsed_text.content, dict):
+                raise NotImplementedError(
+                    f"Didn't yet handle the fallback parser {failover_parser}"
+                    " not giving dictionary content, got"
+                    f" {type(fallback_parsed_text.content).__name__}."
+                ) from cause_exc
+            return str(page_num), fallback_parsed_text.content[str(page_num)]
+
         async def process_page(  # noqa: PLR0912
             i: int,
         ) -> tuple[str, str | tuple[str, list[ParsedMedia]]]:
@@ -240,32 +269,7 @@ async def parse_pdf_to_pages(
             except NemotronLengthError as length_err:
                 # This length failure is from the detection_only tool
                 if failover_parser is not None:
-                    page_num = i + 1  # 1-indexed
-                    logger.warning(
-                        f"Falling back to parser {failover_parser} for page {page_num}"
-                        f" of {path!r} due to {type(length_err).__name__}."
-                    )
-                    fallback_parsed_text = failover_parser(
-                        path,
-                        page_size_limit=page_size_limit,
-                        page_range=page_num,
-                        parse_media=parse_media,
-                        full_page=full_page,
-                        dpi=dpi,
-                        api_params=api_params,
-                        concurrency=concurrency,
-                        border=border,
-                        **kwargs,
-                    )
-                    if isinstance(fallback_parsed_text, Awaitable):
-                        fallback_parsed_text = await fallback_parsed_text
-                    if not isinstance(fallback_parsed_text.content, dict):
-                        raise NotImplementedError(
-                            f"Didn't yet handle the fallback parser {failover_parser}"
-                            " not giving dictionary content, got"
-                            f" {type(fallback_parsed_text.content).__name__}."
-                        ) from model_err
-                    return str(page_num), fallback_content[str(page_num)]
+                    return await call_failover(page_num=i + 1, cause_exc=length_err)
                 raise RuntimeError(
                     f"Failed to attain a valid response for page {i}"
                     f" of PDF at path {path!r}"
@@ -282,28 +286,7 @@ async def parse_pdf_to_pages(
                     )
                     and failover_parser is not None
                 ):
-                    page_num = i + 1  # 1-indexed
-                    logger.warning(
-                        f"Falling back to failover parser for page {page_num} of"
-                        f" {path!r} due to {type(inner_exc).__name__}."
-                    )
-                    fallback_parsed_text = failover_parser(
-                        path,
-                        page_size_limit=page_size_limit,
-                        page_range=page_num,
-                        parse_media=parse_media,
-                        full_page=full_page,
-                        dpi=dpi,
-                    )
-                    if isinstance(fallback_parsed_text, Awaitable):
-                        fallback_parsed_text = await fallback_parsed_text
-                    if not isinstance(fallback_parsed_text.content, dict):
-                        raise NotImplementedError(
-                            f"Didn't yet handle the fallback parser {failover_parser}"
-                            " not giving dictionary content, got"
-                            f" {type(fallback_parsed_text.content).__name__}."
-                        ) from model_err
-                    return str(page_num), fallback_parsed_text.content[str(page_num)]
+                    return await call_failover(page_num=i + 1, cause_exc=inner_exc)
                 if isinstance(inner_exc, NemotronBBoxError):
                     # Nice-ify nemotron-parse failures to speed debugging
                     raise RuntimeError(  # noqa: TRY004
