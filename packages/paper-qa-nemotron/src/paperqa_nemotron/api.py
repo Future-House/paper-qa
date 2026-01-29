@@ -322,7 +322,7 @@ MatrixNemotronParseMarkdownBBox = TypeAdapter(list[list[NemotronParseMarkdownBBo
 
 def _is_litellm_timeout_with_408(exc: BaseException) -> bool:
     return (
-        isinstance(exc, litellm.exceptions.Timeout)
+        isinstance(exc, litellm.Timeout)
         and exc.status_code == http.HTTPStatus.REQUEST_TIMEOUT
     )
 
