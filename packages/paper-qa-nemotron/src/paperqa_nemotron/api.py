@@ -438,7 +438,7 @@ async def _call_nvidia_api(
         )
     if response.choices[0].finish_reason == "length":
         raise NemotronLengthError(
-            f"Model response {response} indicates the input"
+            f"Model response {response} from tool {tool_name!r} indicates the input"
             f" image of shape {image.shape} is too large or the model started babbling.",
             response.choices[0],  # Include if callers want
         )
@@ -463,7 +463,8 @@ async def _call_nvidia_api(
             assert_never(tool_name)
     except ValidationError as exc:
         raise NemotronBBoxError(
-            f"nemotron-parse response {args_json} has invalid bounding box."
+            f"nemotron-parse response {args_json} from tool {tool_name!r}"
+            " has invalid bounding box."
         ) from exc
     return response
 
@@ -576,7 +577,7 @@ async def _call_sagemaker_api(
         )
     if response.choices[0].finish_reason == "length":
         raise NemotronLengthError(
-            f"Model response {response} indicates the input"
+            f"Model response {response} from tool {tool_name!r} indicates the input"
             f" image of shape {image.shape} is too large or the model started babbling.",
             response.choices[0],  # Include if callers want
         )
@@ -601,6 +602,7 @@ async def _call_sagemaker_api(
             assert_never(tool_name)
     except ValidationError as exc:
         raise NemotronBBoxError(
-            f"nemotron-parse response {args_json} has invalid bounding box."
+            f"nemotron-parse response {args_json} from tool {tool_name!r}"
+            " has invalid bounding box."
         ) from exc
     return response
