@@ -5,13 +5,16 @@ import io
 import json
 import logging
 import os
-from collections.abc import Mapping
+from collections.abc import Awaitable, Mapping
 from contextlib import closing
 from typing import Any, Literal, cast
 
+import litellm
 import numpy as np
 import pypdfium2 as pdfium
 from lmi.utils import gather_with_concurrency
+from paperqa.readers import PDFParserFn
+from paperqa.settings import ParsingSettings
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError
 from PIL import Image
@@ -82,7 +85,8 @@ async def parse_pdf_to_pages(
     api_params: Mapping[str, Any] | None = None,
     concurrency: int | asyncio.Semaphore | None = 128,
     border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
-    **_: Any,
+    failover_parser: str | PDFParserFn | None = None,
+    **kwargs: Any,
 ) -> ParsedText:
     """Parse a PDF using Nvidia's nemotron-parse VLM.
 
@@ -106,11 +110,18 @@ async def parse_pdf_to_pages(
         border: Border size (pixels) to add on all sides.
             If a two-tuple it's the x border and y border,
             otherwise both x and y borders are symmetric.
-        **_: Thrown away kwargs.
+        failover_parser: Optional PDF parser to use when nemotron-parse fails on a
+            given page. Can be a callable or an importable fully qualified name.
+            Any metadata from the failover reader is not used (as of now).
+        **kwargs: Keyword arguments passed to the failover parser, if specified.
+            Otherwise they are thrown away.
 
     Returns:
         ParsedText with parsed content and metadata.
     """
+    if failover_parser is not None:
+        failover_parser = ParsingSettings._resolve_parse_pdf(failover_parser)
+
     try:
         pdf_doc = pdfium.PdfDocument(path)
     except pdfium.PdfiumError as exc:
@@ -134,6 +145,35 @@ async def parse_pdf_to_pages(
             start_page, end_page = page_range - 1, page_range
         else:
             start_page, end_page = page_range[0] - 1, page_range[1]
+
+        async def call_failover(
+            page_num: int, cause_exc: BaseException
+        ) -> tuple[str, str | tuple[str, list[ParsedMedia]]]:
+            logger.warning(
+                f"Falling back to failover parser {failover_parser} for page {page_num}"
+                f" of {path!r} due to {type(cause_exc).__name__}."
+            )
+            fallback_parsed_text = cast(PDFParserFn, failover_parser)(
+                path,
+                page_size_limit=page_size_limit,
+                page_range=page_num,
+                parse_media=parse_media,
+                full_page=full_page,
+                dpi=dpi,
+                api_params=api_params,
+                concurrency=concurrency,
+                border=border,
+                **kwargs,
+            )
+            if isinstance(fallback_parsed_text, Awaitable):
+                fallback_parsed_text = await fallback_parsed_text
+            if not isinstance(fallback_parsed_text.content, dict):
+                raise NotImplementedError(
+                    f"Didn't yet handle the fallback parser {failover_parser}"
+                    " not giving dictionary content, got"
+                    f" {type(fallback_parsed_text.content).__name__}."
+                ) from cause_exc
+            return str(page_num), fallback_parsed_text.content[str(page_num)]
 
         async def process_page(  # noqa: PLR0912
             i: int,
@@ -228,6 +268,8 @@ async def parse_pdf_to_pages(
                     )
             except NemotronLengthError as length_err:
                 # This length failure is from the detection_only tool
+                if failover_parser is not None:
+                    return await call_failover(page_num=i + 1, cause_exc=length_err)
                 raise RuntimeError(
                     f"Failed to attain a valid response for page {i}"
                     f" of PDF at path {path!r}"
@@ -237,12 +279,20 @@ async def parse_pdf_to_pages(
                     f" temperature {api_params.get('temperature')}."
                 ) from length_err
             except RetryError as model_err:
-                if isinstance(model_err.last_attempt._exception, NemotronBBoxError):
+                inner_exc = model_err.last_attempt._exception
+                if (
+                    isinstance(
+                        inner_exc, (NemotronBBoxError, TimeoutError, litellm.Timeout)
+                    )
+                    and failover_parser is not None
+                ):
+                    return await call_failover(page_num=i + 1, cause_exc=inner_exc)
+                if isinstance(inner_exc, NemotronBBoxError):
                     # Nice-ify nemotron-parse failures to speed debugging
                     raise RuntimeError(  # noqa: TRY004
                         f"Failed to attain a valid response for page {i}"
                         f" of PDF at path {path!r}"
-                        f" due to {type(model_err.last_attempt._exception).__name__}."
+                        f" due to {type(inner_exc).__name__}."
                         " Perhaps try tweaking parameters such as"
                         f" increasing DPI {dpi} or increasing API parameter's"
                         f" temperature {api_params.get('temperature')}."
