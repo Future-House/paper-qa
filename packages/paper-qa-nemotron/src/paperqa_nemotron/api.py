@@ -26,6 +26,7 @@ from typing import (
     cast,
     overload,
 )
+from unittest.mock import patch
 
 import litellm
 from aviary.core import Message, ToolCall
@@ -332,11 +333,20 @@ _NVIDIA_API_RETRY_WAIT = wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_
 
 
 def _wait_exponential_for_nvidia_api_retry(retry_state: RetryCallState) -> float:
-    """Only apply exponential backoff for rate limit failure mode."""
+    """Only apply exponential backoff for rate limit failure mode.
+
+    Uses a Nvidia API rate limit-specific counter so backoff is based on consecutive
+    rate limit failures, not overall attempt number.
+    """
     if retry_state.outcome is not None and isinstance(
         retry_state.outcome.exception(), TimeoutError
     ):
-        return _NVIDIA_API_RETRY_WAIT(retry_state)
+        # Track TimeoutError (Nvidia API rate limit) count separately
+        timeout_count: int = getattr(retry_state, "_timeout_error_count", 0) + 1
+        retry_state._timeout_error_count = timeout_count  # type: ignore[attr-defined]
+        # Temporarily override attempt_number for wait_exponential calculation
+        with patch.object(retry_state, "attempt_number", timeout_count):
+            return _NVIDIA_API_RETRY_WAIT(retry_state)
     return 0
 
 
