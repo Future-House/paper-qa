@@ -3,15 +3,20 @@ import json
 import re
 from pathlib import Path
 from typing import Any, cast
+from unittest.mock import MagicMock, patch
 
+import litellm
 import pytest
 from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs, Settings
 from paperqa.readers import PDFParserFn, chunk_pdf
+from paperqa.types import ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError, get_citation_ids
 from PIL import Image
+from tenacity import Future, RetryError
 
 from paperqa_nemotron import parse_pdf_to_pages
+from paperqa_nemotron.api import NemotronBBoxError, NemotronLengthError
 from paperqa_nemotron.reader import pad_image_with_border
 
 REPO_ROOT = Path(__file__).parents[3]
@@ -437,3 +442,58 @@ async def test_media_enrichment_filters_irrelevant() -> None:
         and "wikimedia" in m.info["enriched_description"].lower()
     ]
     assert len(wikimedia_media_after) <= 1, "Expected most Wikimedia logos to be gone"
+
+
+def _wrap_into_retry_error(exception: Exception) -> RetryError:
+    future: Future = Future(attempt_number=3)
+    future.set_exception(exception)
+    return RetryError(future)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "error",
+    [
+        pytest.param(
+            NemotronLengthError("Mocked length error"), id="nemotron-length-error"
+        ),
+        pytest.param(
+            _wrap_into_retry_error(NemotronBBoxError("Mocked bbox error")),
+            id="nemotron-bbox-error",
+        ),
+        pytest.param(
+            _wrap_into_retry_error(TimeoutError("Mocked 429")), id="timeout-error"
+        ),
+        pytest.param(
+            _wrap_into_retry_error(litellm.Timeout("Mocked API timeout", "model", 0)),
+            id="litellm-timeout",
+        ),
+    ],
+)
+async def test_failover_on_error(error: Exception) -> None:
+    failover_text = "Failover text"
+    mock_failover_reader = MagicMock(
+        return_value=ParsedText(
+            content={"1": (failover_text, [])},
+            metadata=ParsedMetadata(
+                parsing_libraries=["stub"], total_parsed_text_length=len(failover_text)
+            ),
+        )
+    )
+
+    with patch("paperqa_nemotron.reader._call_nvidia_api", side_effect=error):
+        parsed_text = await parse_pdf_to_pages(
+            STUB_DATA_DIR / "paper.pdf",
+            page_range=1,
+            failover_parser=mock_failover_reader,
+            parse_media=False,
+        )
+    mock_failover_reader.assert_called_once()
+    assert mock_failover_reader.mock_calls[-1].kwargs["page_range"] == 1
+    assert not mock_failover_reader.mock_calls[-1].kwargs["parse_media"]
+    assert (
+        "failover_parser" not in mock_failover_reader.mock_calls[-1].kwargs
+    ), "Expecting to not propagate the failover"
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    assert parsed_text.content["1"] == (failover_text, [])
