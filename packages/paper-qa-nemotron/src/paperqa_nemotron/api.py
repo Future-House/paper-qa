@@ -26,6 +26,7 @@ from typing import (
     cast,
     overload,
 )
+from unittest.mock import patch
 
 import litellm
 from aviary.core import Message, ToolCall
@@ -39,8 +40,10 @@ from pydantic import (
     ValidationInfo,
 )
 from tenacity import (
+    RetryCallState,
     before_sleep_log,
     retry,
+    retry_any,
     retry_if_exception,
     retry_if_exception_type,
     stop_after_attempt,
@@ -320,9 +323,31 @@ MatrixNemotronParseMarkdownBBox = TypeAdapter(list[list[NemotronParseMarkdownBBo
 
 def _is_litellm_timeout_with_408(exc: BaseException) -> bool:
     return (
-        isinstance(exc, litellm.exceptions.Timeout)
+        isinstance(exc, litellm.Timeout)
         and exc.status_code == http.HTTPStatus.REQUEST_TIMEOUT
     )
+
+
+# Exponential backoff for when hitting rate limits on Nvidia's API
+_NVIDIA_API_RETRY_WAIT = wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT)
+
+
+def _wait_exponential_for_nvidia_api_retry(retry_state: RetryCallState) -> float:
+    """Only apply exponential backoff for rate limit failure mode.
+
+    Uses a Nvidia API rate limit-specific counter so backoff is based on consecutive
+    rate limit failures, not overall attempt number.
+    """
+    if retry_state.outcome is not None and isinstance(
+        retry_state.outcome.exception(), TimeoutError
+    ):
+        # Track TimeoutError (Nvidia API rate limit) count separately
+        timeout_count: int = getattr(retry_state, "_timeout_error_count", 0) + 1
+        retry_state._timeout_error_count = timeout_count  # type: ignore[attr-defined]
+        # Temporarily override attempt_number for wait_exponential calculation
+        with patch.object(retry_state, "attempt_number", timeout_count):
+            return _NVIDIA_API_RETRY_WAIT(retry_state)
+    return 0
 
 
 @overload
@@ -359,19 +384,13 @@ async def _call_nvidia_api(
 
 
 @retry(
-    retry=retry_if_exception_type(NemotronBBoxError),
+    retry=retry_any(
+        retry_if_exception_type(NemotronBBoxError),
+        retry_if_exception_type(TimeoutError),  # Hitting rate limits
+        retry_if_exception(_is_litellm_timeout_with_408),  # Inference timeout
+    ),
     stop=stop_after_attempt(3),
-    before_sleep=before_sleep_log(logger, logging.WARNING),
-)
-@retry(
-    retry=retry_if_exception_type(TimeoutError),  # Hitting rate limits
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=2, min=GLOBAL_RATE_LIMITER_TIMEOUT),
-    before_sleep=before_sleep_log(logger, logging.WARNING),
-)
-@retry(
-    retry=retry_if_exception(_is_litellm_timeout_with_408),  # Inference timeout
-    stop=stop_after_attempt(3),
+    wait=_wait_exponential_for_nvidia_api_retry,
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 async def _call_nvidia_api(

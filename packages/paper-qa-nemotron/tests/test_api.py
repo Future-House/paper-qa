@@ -1,9 +1,12 @@
+import http
 from pathlib import Path
 
+import litellm
 import numpy as np
 import pypdfium2 as pdfium
 import pytest
 from pydantic import ValidationError
+from tenacity import Future, RetryCallState
 
 from paperqa_nemotron.api import (
     NemotronParseAnnotatedBBox,
@@ -13,6 +16,7 @@ from paperqa_nemotron.api import (
     NemotronParseMarkdownBBox,
     _call_nvidia_api,
     _call_sagemaker_api,
+    _wait_exponential_for_nvidia_api_retry,
 )
 
 REPO_ROOT = Path(__file__).parents[3]
@@ -268,6 +272,44 @@ class TestMergeWithDetection:
             detection_results[1].bbox
         )
         assert merged[2].text == "Table content"
+
+
+@pytest.mark.parametrize(
+    ("exc", "expected_backoff"),
+    [
+        pytest.param(TimeoutError(), True, id="TimeoutError-has-backoff"),
+        pytest.param(
+            litellm.Timeout(
+                message="Request timed out",
+                model="stub",
+                llm_provider=litellm.LlmProviders.CUSTOM,
+                exception_status_code=http.HTTPStatus.REQUEST_TIMEOUT,
+            ),
+            False,
+            id="litellm-Timeout-no-backoff",
+        ),
+    ],
+)
+def test_wait_exponential_for_nvidia_api_retry(
+    exc: BaseException, expected_backoff: bool
+) -> None:
+    """Test we properly handle exponential backoff for Nvidia API."""
+    retry_state = RetryCallState(
+        retry_object=None,  # type: ignore[arg-type]
+        fn=None,
+        args=(),
+        kwargs={},
+    )
+    retry_state.outcome = Future.construct(
+        attempt_number=1, value=exc, has_exception=True
+    )
+    retry_state.attempt_number = 1
+
+    wait_time = _wait_exponential_for_nvidia_api_retry(retry_state)
+    if expected_backoff:
+        assert wait_time > 0
+    else:
+        assert wait_time == 0
 
 
 @pytest.fixture(name="pdf_page_np")
