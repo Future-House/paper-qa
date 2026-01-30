@@ -98,6 +98,9 @@ JUFO_PORTAL_DOWNLOAD_QUALITY_URL = (
     "&col=lang_code2&col=Year_Start&col=Year_End&col=isScientific&col=isProfessional"
     "&col=isGeneral&col=Type_fi&col=Type_sv&col=Type_en&col=Jufo_History"
 )
+# Sometime in between 8/25/2025 and 1/27/2026, JUFO seemingly started using level 4
+# for undefined journal quality. So let's map 4 to be our undefined
+JUFO_LEVEL_ALIASES = {4: DocDetails.UNDEFINED_JOURNAL_QUALITY}
 
 
 async def download_file(
@@ -176,14 +179,12 @@ async def process_csv(
     records: dict[tuple[str, int], tuple[str, int]] = {}
     with progress:
         for row in csv.DictReader(lines):
-            data = (
-                row["Name"],
-                (
-                    int(row["Level"])
-                    if str(row.get("Level", "")).isdigit()
-                    else DocDetails.UNDEFINED_JOURNAL_QUALITY
-                ),
+            level = (
+                int(row["Level"])
+                if str(row.get("Level", "")).isdigit()
+                else DocDetails.UNDEFINED_JOURNAL_QUALITY
             )
+            data = (row["Name"], JUFO_LEVEL_ALIASES.get(level, level))
             records[data[0].lower(), data[1]] = data
             progress.update(task_id, advance=1)
     for row_override in override_allowlist or []:
