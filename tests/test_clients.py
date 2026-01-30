@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import csv
 import logging
 import os
 import re
@@ -21,10 +22,13 @@ from paperqa.clients import (
     SemanticScholarProvider,
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
-from paperqa.clients.journal_quality import JournalQualityPostProcessor
+from paperqa.clients.journal_quality import (
+    DEFAULT_JOURNAL_QUALITY_CSV_PATH,
+    JournalQualityPostProcessor,
+)
 from paperqa.clients.openalex import OpenAlexProvider, reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
-from paperqa.types import DocDetails
+from paperqa.types import SOURCE_QUALITY_MESSAGES, DocDetails
 
 # Use to avoid flaky tests every time citation count changes
 CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
@@ -829,3 +833,18 @@ async def test_does_openalex_work(
             ), "Year should not be populated because we set fields"
         else:
             assert not openalex_details, "Should have failed"
+
+
+def test_journal_quality_csv_values_are_valid() -> None:
+    valid_quality_values = set(SOURCE_QUALITY_MESSAGES.keys()) | {
+        DocDetails.UNDEFINED_JOURNAL_QUALITY
+    }
+
+    with DEFAULT_JOURNAL_QUALITY_CSV_PATH.open(encoding="utf-8") as f:
+        invalid_values: list[tuple[str, int]] = []
+        for row in csv.DictReader(f):
+            quality = int(row["quality"])
+            if quality not in valid_quality_values:
+                invalid_values.append((row["clean_name"], quality))
+
+    assert not invalid_values
