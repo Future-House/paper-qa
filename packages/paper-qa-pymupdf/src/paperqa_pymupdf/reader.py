@@ -38,6 +38,17 @@ PYMUPDF_PIXMAP_ATTRS = {
 }
 
 
+def resolve_page_range(
+    page_range: int | tuple[int, int] | None, page_count: int
+) -> range:
+    """Convert a 1-indexed page_range into a 0-indexed range object."""
+    if page_range is None:
+        return range(page_count)
+    if isinstance(page_range, int):
+        return range(page_range - 1, page_range)
+    return range(page_range[0] - 1, page_range[1])
+
+
 def _extract_page_text(
     file: pymupdf.Document,
     page_num: int,
@@ -123,7 +134,7 @@ def _parse_single_page_screenshot(
     return page_num, text, media
 
 
-def parse_pdf_to_pages(  # noqa: PLR0912
+def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     page_range: int | tuple[int, int] | None = None,
@@ -165,19 +176,12 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         else (image_cluster_tolerance, image_cluster_tolerance)
     )
 
-    with pymupdf.open(path) as file:
-        content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
-        total_length = count_media = 0
-
-        # Determine page range (convert from 1-indexed to 0-indexed)
-        if page_range is None:
-            page_iter = range(file.page_count)
-        elif isinstance(page_range, int):
-            page_iter = range(page_range - 1, page_range)
-        else:
-            page_iter = range(page_range[0] - 1, page_range[1])
+    content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
+    total_length = count_media = 0
 
     if full_page and parse_media:  # Capture the entire page as one image
+        with pymupdf.open(path) as file:
+            page_iter = resolve_page_range(page_range, file.page_count)
         path_str = str(path)
         args = [
             (path_str, i, dpi, page_size_limit, use_block_parsing) for i in page_iter
@@ -193,7 +197,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             count_media += len(media)
     else:
         with pymupdf.open(path) as file:
-            for i in page_iter:
+            for i in resolve_page_range(page_range, file.page_count):
                 page, text = _extract_page_text(
                     file, i, path, use_block_parsing, page_size_limit
                 )
