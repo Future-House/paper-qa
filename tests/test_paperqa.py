@@ -3402,7 +3402,7 @@ async def test_parse_office_doc(stub_data_dir: Path, filename: str, query: str) 
 
     settings = Settings(
         llm="gemini/gemini-2.5-flash",
-        embedding="gemini/text-embedding-004",
+        embedding="gemini/gemini-embedding-001",
         summary_llm="gemini/gemini-2.5-flash",
         agent={"agent_llm": "gemini/gemini-2.5-flash"},
         parsing=ParsingSettings(use_doc_details=False),
