@@ -37,6 +37,64 @@ PYMUPDF_PIXMAP_ATTRS = {
 }
 
 
+def _extract_page_text(
+    file: pymupdf.Document,
+    page_num: int,
+    path: str | os.PathLike,
+    use_block_parsing: bool,
+    page_size_limit: int | None = None,
+) -> tuple[pymupdf.Page, str]:
+    """Load a PDF page and extract its text.
+
+    Args:
+        file: An open (assumed) PyMuPDF document.
+        page_num: Zero-indexed page number to load.
+        path: Path to the PDF file (used in error messages).
+        use_block_parsing: If True, extract text block-wise,
+            preserving the order of text blocks as they appear in the PDF.
+        page_size_limit: Optional character limit for a single page's text.
+
+    Returns:
+        A two-tuple of loaded PyMuPDF page and extracted text.
+
+    Raises:
+        ImpossibleParsingError: If the page cannot be loaded or its text
+            exceeds page_size_limit.
+    """
+    try:
+        page = file.load_page(page_num)
+    except pymupdf.mupdf.FzErrorFormat as exc:
+        raise ImpossibleParsingError(
+            f"Page loading via {pymupdf.__name__} failed on page {page_num} of"
+            f" {file.page_count} for the PDF at path {path}, likely this PDF"
+            " file is corrupt."
+        ) from exc
+
+    if use_block_parsing:
+        # NOTE: this block-based parsing appears to be better, but until
+        # fully validated on 1+ benchmarks, it's considered experimental
+
+        # Extract text blocks from the page
+        # Note: sort=False is important to preserve the order of text blocks
+        # as they appear in the PDF
+        blocks = page.get_text("blocks", sort=False)
+
+        # Concatenate text blocks into a single string
+        text = "\n".join(
+            block[BLOCK_TEXT_INDEX] for block in blocks if len(block) > BLOCK_TEXT_INDEX
+        )
+    else:
+        text = page.get_text("text", sort=True)
+
+    if page_size_limit and len(text) > page_size_limit:
+        raise ImpossibleParsingError(
+            f"The text in page {page_num} of {file.page_count} was {len(text)}"
+            f" chars long, which exceeds the {page_size_limit} char limit for"
+            f" the PDF at path {path}."
+        )
+    return page, text
+
+
 def _parse_single_page_screenshot(
     path: str,
     page_num: int,
@@ -49,32 +107,9 @@ def _parse_single_page_screenshot(
     NOTE: must be top-level for pickling.
     """
     with pymupdf.open(path) as file:
-        try:
-            page = file.load_page(page_num)
-        except pymupdf.mupdf.FzErrorFormat as exc:
-            raise ImpossibleParsingError(
-                f"Page loading via {pymupdf.__name__} failed on page {page_num} of"
-                f" {file.page_count} for the PDF at path {path}, likely this PDF"
-                " file is corrupt."
-            ) from exc
-
-        if use_block_parsing:
-            blocks = page.get_text("blocks", sort=False)
-            text = "\n".join(
-                block[BLOCK_TEXT_INDEX]
-                for block in blocks
-                if len(block) > BLOCK_TEXT_INDEX
-            )
-        else:
-            text = page.get_text("text", sort=True)
-
-        if page_size_limit and len(text) > page_size_limit:
-            raise ImpossibleParsingError(
-                f"The text in page {page_num} of {file.page_count} was {len(text)}"
-                f" chars long, which exceeds the {page_size_limit} char limit for"
-                f" the PDF at path {path}."
-            )
-
+        page, text = _extract_page_text(
+            file, page_num, path, use_block_parsing, page_size_limit
+        )
         pix = page.get_pixmap(dpi=dpi)
         media_metadata: dict[str, JsonValue] = {"type": "screenshot"} | {
             a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
@@ -87,7 +122,7 @@ def _parse_single_page_screenshot(
     return page_num, text, media
 
 
-def parse_pdf_to_pages(  # noqa: PLR0912
+def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     page_range: int | tuple[int, int] | None = None,
@@ -155,39 +190,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     else:
         with pymupdf.open(path) as file:
             for i in page_iter:
-                try:
-                    page = file.load_page(i)
-                except pymupdf.mupdf.FzErrorFormat as exc:
-                    raise ImpossibleParsingError(
-                        f"Page loading via {pymupdf.__name__} failed on page {i} of"
-                        f" {file.page_count} for the PDF at path {path}, likely this"
-                        " PDF file is corrupt."
-                    ) from exc
-
-                if use_block_parsing:
-                    # NOTE: this block-based parsing appears to be better, but until
-                    # fully validated on 1+ benchmarks, it's considered experimental
-
-                    # Extract text blocks from the page
-                    # Note: sort=False is important to preserve the order of text
-                    # blocks as they appear in the PDF
-                    blocks = page.get_text("blocks", sort=False)
-
-                    # Concatenate text blocks into a single string
-                    text = "\n".join(
-                        block[BLOCK_TEXT_INDEX]
-                        for block in blocks
-                        if len(block) > BLOCK_TEXT_INDEX
-                    )
-                else:
-                    text = page.get_text("text", sort=True)
-
-                if page_size_limit and len(text) > page_size_limit:
-                    raise ImpossibleParsingError(
-                        f"The text in page {i} of {file.page_count} was {len(text)}"
-                        f" chars long, which exceeds the {page_size_limit} char limit"
-                        f" for the PDF at path {path}."
-                    )
+                page, text = _extract_page_text(
+                    file, i, path, use_block_parsing, page_size_limit
+                )
                 media = []
                 if parse_media:
                     # Capture drawings/figures
