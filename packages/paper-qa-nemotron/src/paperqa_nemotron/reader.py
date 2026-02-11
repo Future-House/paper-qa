@@ -40,6 +40,12 @@ WHITE_RGB = (255, 255, 255)
 # all with temperature of 0 and DPI 300
 DEFAULT_BORDER_SIZE = 60  # pixels
 
+# Nemotron-parse's native input dimensions, see:
+# https://docs.nvidia.com/nim/vision-language-models/latest/examples/nemotron-parse/overview.html
+# https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/main/preprocessor_config.json
+NEMOTRON_PARSE_TARGET_WIDTH = 1648
+NEMOTRON_PARSE_TARGET_HEIGHT = 2048
+
 
 def pad_image_with_border(
     image: "Image.Image",
@@ -75,6 +81,66 @@ def pad_image_with_border(
     return canvas, border_x, border_y
 
 
+def fit_image_to_target_aspect_ratio(
+    image: "Image.Image",
+    target_w: int = NEMOTRON_PARSE_TARGET_WIDTH,
+    target_h: int = NEMOTRON_PARSE_TARGET_HEIGHT,
+    pad_color: float | tuple[float, ...] | str = WHITE_RGB,
+    resample: "Image.Resampling" = Image.Resampling.LANCZOS,
+) -> "tuple[Image.Image, float, int, int]":
+    """Scale up and center the image onto the smallest possible canvas with nemotron-parse's aspect ratio.
+
+    Began from preprocess_image_like_eclair:
+    https://github.com/xinyu-dev/nemotron-parse-prod-hf/blob/9535a08f560e90c11f700d08c2870c40defa8aab/Step_2_Extract.ipynb
+
+    Args:
+        image: Input image.
+        target_w: Minimum output width, and width component of output aspect ratio.
+        target_h: Minimum output height, and height component of output aspect ratio.
+        pad_color: Color to use for canvas padding.
+        resample: Resampling filter to use when scaling up.
+
+    Returns:
+        Four-tuple of:
+        - Image on canvas with target aspect ratio
+        - Scale factor applied (1.0 if no scaling)
+        - X offset (px) where scaled image starts on canvas.
+        - Y offset (px) where scaled image starts on canvas.
+    """
+    original_width, original_height = image.size
+    target_aspect_ratio = target_w / target_h
+
+    # Scale up small images to at least target dimensions
+    scale = max(target_w / original_width, target_h / original_height, 1.0)
+    scaled_image = (
+        image.resize(
+            (int(original_width * scale), int(original_height * scale)), resample
+        )
+        if scale > 1.0
+        else image
+    )
+    scaled_width, scaled_height = scaled_image.size
+
+    # Calculate smallest canvas with target aspect ratio that fits the scaled image
+    if scaled_width / scaled_height > target_aspect_ratio:
+        # Image is wider than target ratio: match width, extend height
+        canvas_width = scaled_width
+        canvas_height = int(scaled_width / target_aspect_ratio)
+    else:
+        # Image is taller than target ratio: match height, extend width
+        canvas_height = scaled_height
+        canvas_width = int(scaled_height * target_aspect_ratio)
+
+    # Create canvas and center the scaled image
+    canvas = Image.new(
+        scaled_image.mode, (canvas_width, canvas_height), pad_color  # type: ignore[arg-type]
+    )
+    center_offset_x = (canvas_width - scaled_width) // 2
+    center_offset_y = (canvas_height - scaled_height) // 2
+    canvas.paste(scaled_image, (center_offset_x, center_offset_y))
+    return canvas, scale, center_offset_x, center_offset_y
+
+
 async def parse_pdf_to_pages(
     path: str | os.PathLike,
     page_size_limit: int | None = None,
@@ -85,6 +151,7 @@ async def parse_pdf_to_pages(
     api_params: Mapping[str, Any] | None = None,
     concurrency: int | asyncio.Semaphore | None = 128,
     border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
+    optimize_aspect_ratio: bool = True,
     failover_parser: str | PDFParserFn | None = None,
     **kwargs: Any,
 ) -> ParsedText:
@@ -110,6 +177,8 @@ async def parse_pdf_to_pages(
         border: Border size (pixels) to add on all sides.
             If a two-tuple it's the x border and y border,
             otherwise both x and y borders are symmetric.
+        optimize_aspect_ratio: Flag (default is enabled) to preprocess images to the
+            aspect ratio used when training nemotron-parse before sending to the API.
         failover_parser: Optional PDF parser to use when nemotron-parse fails on a
             given page. Can be a callable or an importable fully qualified name.
             Any metadata from the failover reader is not used (as of now).
@@ -194,17 +263,34 @@ async def parse_pdf_to_pages(
 
             rendered_page = page.render(**render_kwargs)
             rendered_page_pil = rendered_page.to_pil()
+
+            # Initialize transformation tracking variables
+            aspect_scale = 1.0
+            aspect_offset_x = aspect_offset_y = 0
+            border_offset_x = border_offset_y = 0
             if parse_media and not full_page:  # If we need bounding boxes
+                if optimize_aspect_ratio:
+                    aspect_image, aspect_scale, aspect_offset_x, aspect_offset_y = (
+                        fit_image_to_target_aspect_ratio(rendered_page_pil)
+                    )
+                else:
+                    aspect_image = rendered_page_pil
                 # Apply white border padding to increase bounding box reliability
-                rendered_page_padded_pil, offset_x, offset_y = pad_image_with_border(
-                    rendered_page_pil, border
+                rendered_page_padded_pil, border_offset_x, border_offset_y = (
+                    pad_image_with_border(aspect_image, border)
                 )
                 image_for_api = np.array(rendered_page_padded_pil)
                 tool_name: Literal["markdown_bbox", "markdown_no_bbox"] = (
                     "markdown_bbox"
                 )
             else:
-                image_for_api = rendered_page.to_numpy()
+                if optimize_aspect_ratio:
+                    aspect_image, aspect_scale, aspect_offset_x, aspect_offset_y = (
+                        fit_image_to_target_aspect_ratio(rendered_page_pil)
+                    )
+                    image_for_api = np.array(aspect_image)
+                else:
+                    image_for_api = rendered_page.to_numpy()
                 tool_name = "markdown_no_bbox"
             del rendered_page  # Free pdfium bitmap memory
 
@@ -225,22 +311,38 @@ async def parse_pdf_to_pages(
                     async def extract_text(
                         detection: NemotronParseAnnotatedBBox,
                     ) -> NemotronParseMarkdownBBox:
-                        # Convert bbox from normalized [0, 1] to padded image pixel coordinates
-                        padded_bbox = detection.bbox.to_page_coordinates(
-                            rendered_page_padded_pil.height,
-                            rendered_page_padded_pil.width,
+                        # Convert bbox from normalized [0, 1] to padded image pixel
+                        # coordinates, then convert to original image coordinates by
+                        # removing offsets and scaling
+                        pad_xmin, pad_ymin, pad_xmax, pad_ymax = (
+                            detection.bbox.to_page_coordinates(
+                                rendered_page_padded_pil.height,
+                                rendered_page_padded_pil.width,
+                            )
                         )
                         original_bbox = (
-                            # xmin, ymin
-                            # pylint: disable-next=possibly-used-before-assignment
-                            max(0, padded_bbox[0] - offset_x),
-                            # pylint: disable-next=possibly-used-before-assignment
-                            max(0, padded_bbox[1] - offset_y),
-                            # xmax, ymax
-                            min(rendered_page_pil.width, padded_bbox[2] - offset_x),
-                            min(rendered_page_pil.height, padded_bbox[3] - offset_y),
+                            max(
+                                0,
+                                (pad_xmin - border_offset_x - aspect_offset_x)
+                                / aspect_scale,
+                            ),
+                            max(
+                                0,
+                                (pad_ymin - border_offset_y - aspect_offset_y)
+                                / aspect_scale,
+                            ),
+                            min(
+                                rendered_page_pil.width,
+                                (pad_xmax - border_offset_x - aspect_offset_x)
+                                / aspect_scale,
+                            ),
+                            min(
+                                rendered_page_pil.height,
+                                (pad_ymax - border_offset_y - aspect_offset_y)
+                                / aspect_scale,
+                            ),
                         )
-                        # Crop original image at bbox (without border)
+                        # Crop original image at bbox (without border or aspect ratio padding)
                         region_pil = rendered_page_pil.crop(original_bbox)
                         # Use markdown_no_bbox to get text for this region
                         # abandoning the text if we're still hitting a length error
@@ -342,20 +444,36 @@ async def parse_pdf_to_pages(
                     for item in cast(list[NemotronParseMarkdownBBox], response)
                     if item.type in CLASSIFICATIONS_WITH_MEDIA
                 ):
-                    # Convert bbox from normalized [0, 1] to padded image pixel coordinates
-                    padded_bbox = item.bbox.to_page_coordinates(
-                        rendered_page_padded_pil.height, rendered_page_padded_pil.width
+                    # Convert bbox from normalized [0, 1] to padded image pixel
+                    # coordinates, then convert to original image coordinates by
+                    # removing offsets and scaling
+                    pad_xmin, pad_ymin, pad_xmax, pad_ymax = (
+                        item.bbox.to_page_coordinates(
+                            rendered_page_padded_pil.height,
+                            rendered_page_padded_pil.width,
+                        )
                     )
-                    # Adjust bbox to account for padding offsets
-                    # Also if the bbox had extended into the padding zone,
-                    # clamp it here as we're ditching the padding
                     original_bbox = (
-                        # xmin, ymin
-                        max(0, padded_bbox[0] - offset_x),
-                        max(0, padded_bbox[1] - offset_y),
-                        # xmax, ymax
-                        min(rendered_page_pil.width, padded_bbox[2] - offset_x),
-                        min(rendered_page_pil.height, padded_bbox[3] - offset_y),
+                        max(
+                            0,
+                            (pad_xmin - border_offset_x - aspect_offset_x)
+                            / aspect_scale,
+                        ),
+                        max(
+                            0,
+                            (pad_ymin - border_offset_y - aspect_offset_y)
+                            / aspect_scale,
+                        ),
+                        min(
+                            rendered_page_pil.width,
+                            (pad_xmax - border_offset_x - aspect_offset_x)
+                            / aspect_scale,
+                        ),
+                        min(
+                            rendered_page_pil.height,
+                            (pad_ymax - border_offset_y - aspect_offset_y)
+                            / aspect_scale,
+                        ),
                     )
                     region_pix = rendered_page_pil.crop(original_bbox)
                     img_bytes = io.BytesIO()
