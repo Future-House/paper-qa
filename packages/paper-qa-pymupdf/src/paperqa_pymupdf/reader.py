@@ -1,5 +1,6 @@
 import json
 import os
+from multiprocessing import Pool
 
 import pymupdf
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
@@ -36,6 +37,56 @@ PYMUPDF_PIXMAP_ATTRS = {
 }
 
 
+def _parse_single_page_screenshot(
+    path: str,
+    page_num: int,
+    dpi: float | None,
+    page_size_limit: int | None,
+    use_block_parsing: bool,
+) -> tuple[int, str, list[ParsedMedia]]:
+    """Worker function for parallel full-page screenshot parsing.
+
+    NOTE: must be top-level for pickling.
+    """
+    with pymupdf.open(path) as file:
+        try:
+            page = file.load_page(page_num)
+        except pymupdf.mupdf.FzErrorFormat as exc:
+            raise ImpossibleParsingError(
+                f"Page loading via {pymupdf.__name__} failed on page {page_num} of"
+                f" {file.page_count} for the PDF at path {path}, likely this PDF"
+                " file is corrupt."
+            ) from exc
+
+        if use_block_parsing:
+            blocks = page.get_text("blocks", sort=False)
+            text = "\n".join(
+                block[BLOCK_TEXT_INDEX]
+                for block in blocks
+                if len(block) > BLOCK_TEXT_INDEX
+            )
+        else:
+            text = page.get_text("text", sort=True)
+
+        if page_size_limit and len(text) > page_size_limit:
+            raise ImpossibleParsingError(
+                f"The text in page {page_num} of {file.page_count} was {len(text)}"
+                f" chars long, which exceeds the {page_size_limit} char limit for"
+                f" the PDF at path {path}."
+            )
+
+        pix = page.get_pixmap(dpi=dpi)
+        media_metadata: dict[str, JsonValue] = {"type": "screenshot"} | {
+            a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
+        }
+        media_metadata["info_hashable"] = json.dumps(media_metadata, sort_keys=True)
+        # Add page number after info_hashable so differing pages
+        # don't break the cache key
+        media_metadata["page_num"] = page_num + 1
+        media = [ParsedMedia(index=0, data=pix.tobytes(), info=media_metadata)]
+    return page_num, text, media
+
+
 def parse_pdf_to_pages(  # noqa: PLR0912
     path: str | os.PathLike,
     page_size_limit: int | None = None,
@@ -45,6 +96,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     full_page: bool = False,
     image_cluster_tolerance: float | tuple[float, float] = 25,
     dpi: float | None = None,
+    num_workers: int = min(os.cpu_count() or 1, 4),
     **_,
 ) -> ParsedText:
     """Parse a PDF.
@@ -67,6 +119,8 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
             to parse only specific pages, where pages are one-indexed.
             Leaving as the default of None will parse all pages.
+        num_workers: Number of worker processes for parallel full-page screenshots,
+            default targets 4 processes.
         **_: Thrown away kwargs.
     """
     x_tol, y_tol = (
@@ -87,57 +141,55 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         else:
             page_iter = range(page_range[0] - 1, page_range[1])
 
-        for i in page_iter:
-            try:
-                page = file.load_page(i)
-            except pymupdf.mupdf.FzErrorFormat as exc:
-                raise ImpossibleParsingError(
-                    f"Page loading via {pymupdf.__name__} failed on page {i} of"
-                    f" {file.page_count} for the PDF at path {path}, likely this PDF"
-                    " file is corrupt."
-                ) from exc
+    if full_page and parse_media:  # Capture the entire page as one image
+        path_str = str(path)
+        args = [
+            (path_str, i, dpi, page_size_limit, use_block_parsing) for i in page_iter
+        ]
+        with Pool(num_workers) as pool:
+            results = pool.starmap(_parse_single_page_screenshot, args)
+        for page_num, text, media in results:
+            content[str(page_num + 1)] = text, media
+            total_length += len(text)
+            count_media += len(media)
+    else:
+        with pymupdf.open(path) as file:
+            for i in page_iter:
+                try:
+                    page = file.load_page(i)
+                except pymupdf.mupdf.FzErrorFormat as exc:
+                    raise ImpossibleParsingError(
+                        f"Page loading via {pymupdf.__name__} failed on page {i} of"
+                        f" {file.page_count} for the PDF at path {path}, likely this"
+                        " PDF file is corrupt."
+                    ) from exc
 
-            if use_block_parsing:
-                # NOTE: this block-based parsing appears to be better, but until
-                # fully validated on 1+ benchmarks, it's considered experimental
+                if use_block_parsing:
+                    # NOTE: this block-based parsing appears to be better, but until
+                    # fully validated on 1+ benchmarks, it's considered experimental
 
-                # Extract text blocks from the page
-                # Note: sort=False is important to preserve the order of text blocks
-                # as they appear in the PDF
-                blocks = page.get_text("blocks", sort=False)
+                    # Extract text blocks from the page
+                    # Note: sort=False is important to preserve the order of text
+                    # blocks as they appear in the PDF
+                    blocks = page.get_text("blocks", sort=False)
 
-                # Concatenate text blocks into a single string
-                text = "\n".join(
-                    block[BLOCK_TEXT_INDEX]
-                    for block in blocks
-                    if len(block) > BLOCK_TEXT_INDEX
-                )
-            else:
-                text = page.get_text("text", sort=True)
-
-            if page_size_limit and len(text) > page_size_limit:
-                raise ImpossibleParsingError(
-                    f"The text in page {i} of {file.page_count} was {len(text)} chars"
-                    f" long, which exceeds the {page_size_limit} char limit for the PDF"
-                    f" at path {path}."
-                )
-            media: list[ParsedMedia] = []
-            if parse_media:
-                if full_page:  # Capture the entire page as one image
-                    pix = page.get_pixmap(dpi=dpi)
-                    media_metadata: dict[str, JsonValue] = {"type": "screenshot"} | {
-                        a: getattr(pix, a) for a in PYMUPDF_PIXMAP_ATTRS
-                    }
-                    media_metadata["info_hashable"] = json.dumps(
-                        media_metadata, sort_keys=True
-                    )
-                    # Add page number after info_hashable so differing pages
-                    # don't break the cache key
-                    media_metadata["page_num"] = i + 1
-                    media.append(
-                        ParsedMedia(index=0, data=pix.tobytes(), info=media_metadata)
+                    # Concatenate text blocks into a single string
+                    text = "\n".join(
+                        block[BLOCK_TEXT_INDEX]
+                        for block in blocks
+                        if len(block) > BLOCK_TEXT_INDEX
                     )
                 else:
+                    text = page.get_text("text", sort=True)
+
+                if page_size_limit and len(text) > page_size_limit:
+                    raise ImpossibleParsingError(
+                        f"The text in page {i} of {file.page_count} was {len(text)}"
+                        f" chars long, which exceeds the {page_size_limit} char limit"
+                        f" for the PDF at path {path}."
+                    )
+                media = []
+                if parse_media:
                     # Capture drawings/figures
                     for box_i, box in enumerate(
                         page.cluster_drawings(
@@ -197,11 +249,11 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                                 info=media_metadata,
                             )
                         )
-                content[str(i + 1)] = text, media
-            else:
-                content[str(i + 1)] = text
-            total_length += len(text)
-            count_media += len(media)
+                    content[str(i + 1)] = text, media
+                else:
+                    content[str(i + 1)] = text
+                total_length += len(text)
+                count_media += len(media)
 
     multimodal_string = f"|multimodal|dpi={dpi}" + (
         "|mode=full-page"
