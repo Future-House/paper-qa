@@ -1,5 +1,6 @@
 import json
 import os
+from itertools import starmap
 from multiprocessing import Pool
 
 import pymupdf
@@ -122,7 +123,7 @@ def _parse_single_page_screenshot(
     return page_num, text, media
 
 
-def parse_pdf_to_pages(
+def parse_pdf_to_pages(  # noqa: PLR0912
     path: str | os.PathLike,
     page_size_limit: int | None = None,
     page_range: int | tuple[int, int] | None = None,
@@ -181,8 +182,11 @@ def parse_pdf_to_pages(
         args = [
             (path_str, i, dpi, page_size_limit, use_block_parsing) for i in page_iter
         ]
-        with Pool(num_workers) as pool:
-            results = pool.starmap(_parse_single_page_screenshot, args)
+        if num_workers > 1:
+            with Pool(num_workers) as pool:
+                results = pool.starmap(_parse_single_page_screenshot, args)
+        else:  # Avoid multiprocessing overhead when using just one process
+            results = list(starmap(_parse_single_page_screenshot, args))
         for page_num, text, media in results:
             content[str(page_num + 1)] = text, media
             total_length += len(text)
