@@ -30,6 +30,8 @@ jobs:
         if: always()
   lint:
     runs-on: ubuntu-latest
+    env:
+      UV_VENV_CLEAR: 1 # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
     strategy:
       matrix:
         python-version: [3.11] # Our min supported Python version
