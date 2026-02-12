@@ -115,6 +115,7 @@ def fixture_vcr_config() -> dict[str, Any]:
             ANTHROPIC_API_KEY_HEADER,
             "cookie",
         ],
+        "ignore_hosts": ["huggingface.co"],
         "record_mode": "once" if not IN_GITHUB_ACTIONS else "none",
         "allow_playback_repeats": True,
         "cassette_library_dir": str(CASSETTES_DIR),
