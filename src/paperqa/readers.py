@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import os
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Sequence
 from importlib.metadata import version
 from math import ceil
 from pathlib import Path
@@ -79,15 +79,19 @@ async def parse_image(
 
 
 def _make_chunk(
-    parsed_text: ParsedText, doc: Doc, text: str, lower_page: str, upper_page: str
+    parsed_text: ParsedText, doc: Doc, text: str, pages: Sequence[str]
 ) -> Text:
     media: list[ParsedMedia] = []
-    for pg_num in range(int(lower_page), int(upper_page) + 1):
-        pg_contents = cast(dict, parsed_text.content).get(str(pg_num))
+    seen_pages: set[str] = set()
+    for pg in pages:
+        if pg in seen_pages:
+            continue
+        seen_pages.add(pg)
+        pg_contents = cast(dict, parsed_text.content).get(pg)
         if isinstance(pg_contents, tuple):
             media.extend(pg_contents[1])
     # pretty formatting of pages (e.g. 1-3, 4, 5-7)
-    name = "-".join([lower_page, upper_page])
+    name = "-".join([pages[0], pages[-1]])
     return Text(text=text, name=f"{doc.docname} pages {name}", media=media, doc=doc)
 
 
@@ -119,16 +123,12 @@ def chunk_pdf(
         # into multiple chunks. Or it could be so short
         # that it needs to be combined with the next chunk.
         while len(split) > chunk_chars:
-            texts.append(
-                _make_chunk(parsed_text, doc, split[:chunk_chars], pages[0], pages[-1])
-            )
+            texts.append(_make_chunk(parsed_text, doc, split[:chunk_chars], pages))
             split = split[chunk_chars - overlap :]
             pages = [page_num]
 
     if len(split) > overlap or not texts:
-        texts.append(
-            _make_chunk(parsed_text, doc, split[:chunk_chars], pages[0], pages[-1])
-        )
+        texts.append(_make_chunk(parsed_text, doc, split[:chunk_chars], pages))
     return texts
 
 

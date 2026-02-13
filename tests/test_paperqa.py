@@ -2289,6 +2289,75 @@ def test_missing_page_doesnt_crash_us() -> None:
     assert text.text == "AC"
 
 
+def test_chunk_pdf_preserves_all_media_with_sparse_text() -> None:
+    content: dict[str, tuple[str, list[ParsedMedia]]] = {}
+    for pg in range(1, 11):
+        media = [
+            ParsedMedia(
+                index=0,
+                data=f"screenshot_page_{pg}".encode(),
+                info={"type": "screenshot", "page_num": pg},
+            )
+        ]
+        # Pages 5-7 have very little text (simulates figure-only pages)
+        content[str(pg)] = ("x" * (50 if 5 <= pg <= 7 else 2000), media)
+
+    parsed = ParsedText(
+        content=content,
+        metadata=ParsedMetadata(
+            parsing_libraries=["stub"],
+            total_parsed_text_length=sum(len(v[0]) for v in content.values()),
+        ),
+    )
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+    texts = chunk_pdf(parsed, doc, chunk_chars=3000, overlap=50)
+    found_pages: set[int] = {
+        cast(int, m.info["page_num"])
+        for t in texts
+        for m in t.media
+        if m.info.get("type") == "screenshot"
+    }
+    assert found_pages == set(
+        range(1, 11)
+    ), f"Expected all pages 1-10, but found {sorted(found_pages)}"
+
+
+def test_chunk_pdf_preserves_all_media_with_non_contiguous_pages() -> None:
+    """Test media survives chunking when parsed pages are non-contiguous."""
+    # Simulate a parser that skips pages 6-9 (e.g., supplementary material)
+    all_page_nums = [1, 2, 3, 4, 5, 10, 11, 12]
+    content: dict[str, tuple[str, list[ParsedMedia]]] = {}
+    for pg in all_page_nums:
+        media = [
+            ParsedMedia(
+                index=0,
+                data=f"screenshot_page_{pg}".encode(),
+                info={"type": "screenshot", "page_num": pg},
+            )
+        ]
+        # Each page has substantial text
+        content[str(pg)] = ("y" * 2000, media)
+
+    parsed = ParsedText(
+        content=content,
+        metadata=ParsedMetadata(
+            parsing_libraries=["stub"],
+            total_parsed_text_length=sum(len(v[0]) for v in content.values()),
+        ),
+    )
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+    texts = chunk_pdf(parsed, doc, chunk_chars=3000, overlap=50)
+    found_pages: set[int] = {
+        cast(int, m.info["page_num"])
+        for t in texts
+        for m in t.media
+        if m.info.get("type") == "screenshot"
+    }
+    assert found_pages == set(all_page_nums), (
+        f"Expected pages {sorted(all_page_nums)}, but found {sorted(found_pages)}"
+    )
+
+
 def test_zotero() -> None:
     from paperqa.contrib import ZoteroDB
 
