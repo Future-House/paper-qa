@@ -2353,9 +2353,9 @@ def test_chunk_pdf_preserves_all_media_with_non_contiguous_pages() -> None:
         for m in t.media
         if m.info.get("type") == "screenshot"
     }
-    assert found_pages == set(all_page_nums), (
-        f"Expected pages {sorted(all_page_nums)}, but found {sorted(found_pages)}"
-    )
+    assert found_pages == set(
+        all_page_nums
+    ), f"Expected pages {sorted(all_page_nums)}, but found {sorted(found_pages)}"
 
 
 def test_zotero() -> None:
