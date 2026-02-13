@@ -251,5 +251,13 @@ class DocMetadataClient:
             return provided_doc_details + doc_details
 
         # if we can't get metadata, just return the doc, but don't overwrite any fields
-        orig_fields = doc.model_dump() | {"fields_to_overwrite_from_metadata": set()}
+        overwrite_fields: set[str] = set()
+        if doc.dockey == doc.content_hash:
+            # This allows DocDetails validator on fields_to_overwrite_from_metadata
+            # to sync dockey with doc_id. Otherwise, dockey remains the raw
+            # content_hash and won't match the computed doc_id.
+            overwrite_fields.add("doc_id")
+        orig_fields = doc.model_dump() | {
+            "fields_to_overwrite_from_metadata": overwrite_fields
+        }
         return DocDetails(**(orig_fields | provided_fields))
