@@ -103,7 +103,9 @@ async def test_get_directory_index(
             results = await index.query(query="who is Frederick Bates?", min_score=5)
             assert results
             target_doc_path = (paper_dir / "bates.txt").absolute()
-            assert results[0].docs.keys() == {md5sum(target_doc_path)}, (
+            assert results[0].docs.keys() == {
+                compute_unique_doc_id(None, md5sum(target_doc_path))
+            }, (
                 f"Expected to find {target_doc_path.name!r}, got citations"
                 f" {[d.formatted_citation for d in results[0].docs.values()]}."
             )
