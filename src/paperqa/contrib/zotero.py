@@ -140,7 +140,8 @@ class ZoteroDB(zotero.Zotero):
         if not pdf_path.exists():
             pdf_path.parent.mkdir(parents=True, exist_ok=True)
             self.logger.info(f"|  Downloading PDF for: {_get_citation_key(item)}")
-            self.dump(pdf_key, pdf_path)
+            # Can remove str-cast after https://github.com/urschrei/pyzotero/issues/298
+            self.dump(pdf_key, str(pdf_path))
 
         return pdf_path
 
