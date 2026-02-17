@@ -3010,6 +3010,7 @@ dependencies = [
 dev = [
     { name = "fhlmi" },
     { name = "paper-qa" },
+    { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
@@ -3020,6 +3021,7 @@ requires-dist = [
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pymupdf", specifier = ">=1.24.12" },
+    { name = "pymupdf", marker = "extra == 'dev'", specifier = "<1.27" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
