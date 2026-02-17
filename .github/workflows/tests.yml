@@ -94,7 +94,7 @@ jobs:
       - run: uv sync
       - run: uv run pylint src packages
       - run: uv run refurb .
-      - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.1.1
+      - uses: suzuki-shunsuke/github-action-renovate-config-validator@v2.0.0
   test-src:
     runs-on: ubuntu-latest
     strategy:
