@@ -68,7 +68,13 @@ from paperqa.core import (
 )
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, summary_json_multimodal_system_prompt
 from paperqa.prompts import qa_prompt as default_qa_prompt
-from paperqa.readers import PDFParserFn, chunk_pdf, parse_image, read_doc
+from paperqa.readers import (
+    PDFParserFn,
+    chunk_pdf,
+    parse_image,
+    read_doc,
+    resolve_page_range,
+)
 from paperqa.settings import (
     AnswerSettings,
     AsyncContextSerializer,
@@ -1704,6 +1710,25 @@ async def test_fileio_reader_txt(stub_data_dir: Path) -> None:
     )
     session = await docs.aquery("What country was Frederick Bates born in?")
     assert "United States" in session.answer
+
+
+@pytest.mark.parametrize(
+    ("page_range", "page_count", "expected"),
+    [
+        pytest.param(None, 10, range(10), id="all-pages"),
+        pytest.param(3, 10, range(2, 3), id="single-page"),
+        pytest.param((2, 5), 10, range(1, 5), id="page-range-tuple"),
+        pytest.param(1, 10, range(1), id="first-page"),
+        pytest.param(15, 10, range(14, 10), id="single-page-exceeds-count"),
+        pytest.param(10, 10, range(9, 10), id="single-page-at-count"),
+        pytest.param((2, 15), 10, range(1, 10), id="tuple-end-exceeds-count"),
+        pytest.param((2, 10), 10, range(1, 10), id="tuple-end-at-count"),
+    ],
+)
+def test_resolve_page_range(
+    page_range: int | tuple[int, int] | None, page_count: int, expected: range
+) -> None:
+    assert resolve_page_range(page_range, page_count) == expected
 
 
 @pytest.mark.asyncio

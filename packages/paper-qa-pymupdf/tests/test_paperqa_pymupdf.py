@@ -185,8 +185,13 @@ def test_page_range() -> None:
     assert "page_range=(1,2)" in parsed_text_p1_2.metadata.name
 
     # NOTE: exceeds 15-page PDF length
-    with pytest.raises(ValueError, match="page not in document"):
-        parse_pdf_to_pages(filepath, page_range=(1, 20))
+    parsed_text_p1_20 = parse_pdf_to_pages(filepath, page_range=(1, 20))
+    assert isinstance(parsed_text_p1_20.content, dict)
+    assert list(parsed_text_p1_20.content) == [
+        str(i) for i in range(1, 15 + 1)
+    ], "Expected pages to be truncated to 15 or us to get blown up"
+    assert parsed_text_p1_20.metadata.name
+    assert "page_range=(1,20)" in parsed_text_p1_20.metadata.name
 
 
 def test_page_size_limit_denial() -> None:

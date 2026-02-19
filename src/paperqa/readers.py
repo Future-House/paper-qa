@@ -55,6 +55,17 @@ class AsyncPDFParserFn(Protocol):
 PDFParserFn: TypeAlias = SyncPDFParserFn | AsyncPDFParserFn
 
 
+def resolve_page_range(
+    page_range: int | tuple[int, int] | None, page_count: int
+) -> range:
+    """Convert a 1-indexed page_range into a 0-indexed range object."""
+    if page_range is None:
+        return range(page_count)
+    if isinstance(page_range, int):
+        return range(page_range - 1, min(page_range, page_count))
+    return range(page_range[0] - 1, min(page_range[1], page_count))
+
+
 async def parse_image(
     path: str | os.PathLike, validator: Callable[[bytes], Awaitable] | None = None, **_
 ) -> ParsedText:
