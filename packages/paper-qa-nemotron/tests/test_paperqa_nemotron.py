@@ -17,7 +17,7 @@ from tenacity import Future, RetryError
 
 from paperqa_nemotron import parse_pdf_to_pages
 from paperqa_nemotron.api import NemotronBBoxError, NemotronLengthError
-from paperqa_nemotron.reader import pad_image_with_border
+from paperqa_nemotron.reader import _render_page, pad_image_with_border
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
@@ -447,6 +447,36 @@ async def test_media_enrichment_filters_irrelevant() -> None:
         and "wikimedia" in m.info["enriched_description"].lower()
     ]
     assert len(wikimedia_media_after) <= 1, "Expected most Wikimedia logos to be gone"
+
+
+def test_render_page(subtests: pytest.Subtests) -> None:
+    filepath = str(STUB_DATA_DIR / "pasa.pdf")
+
+    with subtests.test(msg="no-bbox"):
+        page_num, image, pil_img, ph, pw, ox, oy = _render_page(
+            filepath, page_num=0, dpi=72, needs_bbox=False
+        )
+        assert page_num == 0
+        assert image.ndim == 3
+        assert pil_img.width > 0
+        assert pil_img.height > 0
+        assert ph == pw == ox == oy == 0
+
+    with subtests.test(msg="with-bbox"):
+        page_num, image, pil_img, ph, pw, ox, oy = _render_page(
+            filepath, page_num=0, dpi=72, border=60
+        )
+        assert page_num == 0
+        assert image.ndim == 3
+        assert ph == pil_img.height + 120
+        assert pw == pil_img.width + 120
+        assert ox == oy == 60
+
+    with (
+        subtests.test(msg="out-of-range"),
+        pytest.raises(ValueError, match="is outside"),
+    ):
+        _render_page(filepath, page_num=100, page_range=(1, 200))
 
 
 def _wrap_into_retry_error(exception: Exception) -> RetryError:
