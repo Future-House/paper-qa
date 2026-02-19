@@ -4,6 +4,7 @@ from itertools import starmap
 from multiprocessing import Pool
 
 import pymupdf
+from paperqa.readers import resolve_page_range
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError, clean_invalid_unicode
 from pydantic import JsonValue
@@ -36,17 +37,6 @@ PYMUPDF_PIXMAP_ATTRS = {
     "y",
     "yres",
 }
-
-
-def resolve_page_range(
-    page_range: int | tuple[int, int] | None, page_count: int
-) -> range:
-    """Convert a 1-indexed page_range into a 0-indexed range object."""
-    if page_range is None:
-        return range(page_count)
-    if isinstance(page_range, int):
-        return range(page_range - 1, page_range)
-    return range(page_range[0] - 1, page_range[1])
 
 
 def _extract_page_text(

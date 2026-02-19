@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 import pypdf
 import pypdf.errors
+from paperqa.readers import resolve_page_range
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError, clean_invalid_unicode
 
@@ -102,14 +103,6 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         pages: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
         total_length = count_media = 0
 
-        # Determine page range (convert from 1-indexed to 0-indexed)
-        if page_range is None:
-            start_page, end_page = 0, len(pdf_reader.pages)
-        elif isinstance(page_range, int):
-            start_page, end_page = page_range - 1, page_range
-        else:
-            start_page, end_page = page_range[0] - 1, page_range[1]
-
         match (parse_media, full_page, pdfplumber is not None):
             case (False, _, _):
                 media_mode = MediaMode.NONE
@@ -139,9 +132,8 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             plumber_context = nullcontext()
 
         with pdf_context, plumber_context:
-            for i, page in enumerate(
-                pdf_reader.pages[start_page:end_page], start=start_page
-            ):
+            for i in resolve_page_range(page_range, len(pdf_reader.pages)):
+                page = pdf_reader.pages[i]
                 # On 12/30/2025 with pypdf==6.4.2, a `PageObject.extract_text` call on
                 # https://arxiv.org/pdf/1711.07566's page 3's Figure 2a's rasterization
                 # example outputs an orphaned low surrogate (U+DC63), which is
