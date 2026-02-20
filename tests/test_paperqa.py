@@ -3,7 +3,6 @@ import contextlib
 import csv
 import io
 import json
-import os
 import pathlib
 import pickle
 import random
@@ -480,20 +479,181 @@ async def test_chain_completion(caplog) -> None:
         )
 
 
-@pytest.mark.skipif(os.environ.get("ANTHROPIC_API_KEY") is None, reason="No API key")
 @pytest.mark.asyncio
-async def test_anthropic_chain(stub_data_dir: Path) -> None:
-    anthropic_settings = Settings(llm=CommonLLMNames.ANTHROPIC_TEST.value)
+@pytest.mark.parametrize(
+    ("llm", "summary_llm", "embedding"),
+    [
+        pytest.param(
+            "anthropic/claude-sonnet-4-6",
+            "anthropic/claude-sonnet-4-6",
+            "text-embedding-3-small",
+            id="anthropic",
+        ),
+        pytest.param(
+            "gemini/gemini-2.5-flash",
+            "gemini/gemini-2.5-flash",
+            "gemini/gemini-embedding-001",
+            id="gemini",
+        ),
+        pytest.param(
+            "gpt-5-mini-2025-08-07",
+            "gpt-5-mini-2025-08-07",
+            "text-embedding-3-small",
+            id="openai",
+        ),
+    ],
+)
+async def test_model_chain(
+    stub_data_dir: Path, llm: str, summary_llm: str, embedding: str
+) -> None:
+    settings = Settings(llm=llm, summary_llm=summary_llm, embedding=embedding)
+    # Use sequential evidence calls so later caching assertions are reliable
+    settings.answer.max_concurrent_requests = 1
+    # Anthropic's Claude Sonnet prompt caching requires a minimum prefix of 2,048 tokens,
+    # so extend our prompt to surpass this threshold
+    settings.prompts.summary_json_system += (
+        "\n\n## Examples\n\n"
+        "Below are examples of how to produce your JSON response given an excerpt and"
+        " question. Note that the summary should capture specific details like numbers,"
+        " equations, or direct quotes, and the relevance_score should reflect how useful"
+        " the excerpt is for answering the question.\n\n"
+        "Example 1 (highly relevant excerpt):\n"
+        'Excerpt: "The Phase III randomized controlled trial (NCT04012345) enrolled'
+        " 500 patients across 30 clinical sites in North America and Europe between"
+        " January 2019 and December 2021. The primary endpoint was progression-free"
+        " survival (PFS) at 24 months, which showed a statistically significant"
+        " improvement in the treatment arm (HR 0.58, 95% CI 0.42-0.79, p<0.001)."
+        " Secondary endpoints included overall survival (OS), objective response rate"
+        " (ORR), and duration of response (DOR). The treatment was generally well"
+        " tolerated, with the most common adverse events being fatigue (32%),"
+        " nausea (28%), and neutropenia (18%). Grade 3-4 adverse events occurred"
+        " in 15% of patients in the treatment arm compared to 12% in the placebo arm."
+        " Subgroup analyses revealed consistent benefits across age groups, geographic"
+        " regions, and baseline disease characteristics, supporting the robustness"
+        " of the primary findings. The Data Safety Monitoring Board recommended"
+        " early termination of the trial based on the overwhelming efficacy observed"
+        ' at the planned interim analysis."\n'
+        'Question: "What were the primary endpoints of the clinical trial?"\n'
+        'Response: {{"summary": "The Phase III trial (NCT04012345) enrolled 500 patients'
+        " across 30 sites. The primary endpoint was progression-free survival (PFS) at"
+        " 24 months, showing significant improvement (HR 0.58, 95% CI 0.42-0.79,"
+        " p<0.001). Secondary endpoints included overall survival, objective response"
+        " rate, and duration of response. The DSMB recommended early termination due"
+        ' to overwhelming efficacy.", "relevance_score": 9}}\n\n'
+        "Example 2 (irrelevant excerpt):\n"
+        'Excerpt: "Photosynthesis is a biological process by which green plants and'
+        " certain other organisms convert light energy, usually from the sun, into"
+        " chemical energy in the form of glucose. This process involves the absorption"
+        " of carbon dioxide (CO2) from the atmosphere and water (H2O) from the soil,"
+        " releasing oxygen (O2) as a byproduct. The light-dependent reactions occur"
+        " in the thylakoid membranes of the chloroplasts, where chlorophyll absorbs"
+        " photons and uses their energy to split water molecules, generating ATP and"
+        " NADPH. These energy carriers then power the Calvin cycle in the stroma,"
+        " where CO2 is fixed into three-carbon sugars that are later assembled into"
+        " glucose and other organic molecules essential for plant growth and"
+        " development. The overall equation for photosynthesis can be summarized as"
+        " 6CO2 + 6H2O + light energy -> C6H12O6 + 6O2, representing one of the"
+        ' most important biochemical reactions on Earth."\n'
+        'Question: "How does quantum computing work?"\n'
+        'Response: {{"summary": "", "relevance_score": 0}}\n\n'
+        "Example 3 (partially relevant excerpt):\n"
+        'Excerpt: "The 2023 Global Climate Report indicated that the average global'
+        " temperature was 1.45 degrees Celsius above pre-industrial levels, making"
+        " it the warmest year on record. Sea levels rose by 3.4 mm per year over"
+        " the past decade, while Arctic sea ice extent continued to decline at a"
+        " rate of 13% per decade. The report also highlighted that atmospheric CO2"
+        " concentrations reached 421 ppm, the highest in at least 800,000 years."
+        " Notably, renewable energy sources accounted for 30% of global electricity"
+        " generation, with solar and wind power seeing the largest increases."
+        " Investment in clean energy technologies surpassed $1.7 trillion globally,"
+        " reflecting growing momentum in the transition away from fossil fuels."
+        " However, the report cautioned that current trajectories remain insufficient"
+        " to meet the Paris Agreement targets without substantially accelerated action"
+        ' across all sectors of the economy."\n'
+        'Question: "What is the current state of renewable energy adoption?"\n'
+        'Response: {{"summary": "Renewable energy sources accounted for 30% of'
+        " global electricity generation in 2023, with solar and wind power seeing"
+        " the largest increases. Investment in clean energy technologies surpassed"
+        " $1.7 trillion globally. However, current trajectories remain insufficient"
+        ' to meet Paris Agreement targets without accelerated action.",'
+        ' "relevance_score": 4}}\n\n'
+        "Example 4 (technical excerpt with equations):\n"
+        'Excerpt: "The transformer architecture introduced by Vaswani et al. (2017)'
+        " computes attention using the scaled dot-product mechanism defined as"
+        " Attention(Q,K,V) = softmax(QK^T / sqrt(d_k))V, where Q, K, and V represent"
+        " the query, key, and value matrices respectively, and d_k is the dimension"
+        " of the key vectors. Multi-head attention extends this by projecting Q, K,"
+        " and V into h different subspaces, computing attention in parallel, and"
+        " concatenating the results. The model uses positional encodings based on"
+        " sinusoidal functions: PE(pos,2i) = sin(pos/10000^(2i/d_model)) and"
+        " PE(pos,2i+1) = cos(pos/10000^(2i/d_model)). The original transformer"
+        " achieved a BLEU score of 28.4 on the WMT 2014 English-to-German translation"
+        " task, surpassing all previously published models by more than 2 BLEU points."
+        " Training was conducted on 8 NVIDIA P100 GPUs for 3.5 days, using the Adam"
+        ' optimizer with beta_1=0.9, beta_2=0.98, and epsilon=10^-9."\n'
+        'Question: "How is attention computed in transformer models?"\n'
+        'Response: {{"summary": "The transformer uses scaled dot-product attention:'
+        " Attention(Q,K,V) = softmax(QK^T / sqrt(d_k))V, where Q, K, V are query,"
+        " key, value matrices and d_k is the key dimension. Multi-head attention"
+        " projects into h subspaces and computes attention in parallel. Positional"
+        " encodings use sinusoidal functions. The original model achieved 28.4 BLEU"
+        ' on WMT 2014 English-to-German.", "relevance_score": 10}}\n\n'
+        "Example 5 (tangentially relevant excerpt):\n"
+        "Excerpt: \"The history of computing can be traced back to Charles Babbage's"
+        " Analytical Engine in 1837, which contained many features of modern computers"
+        " including an arithmetic logic unit, control flow through conditional branching"
+        " and loops, and integrated memory. Ada Lovelace wrote the first algorithm"
+        " intended for implementation on the Analytical Engine in 1843, making her"
+        " widely regarded as the first computer programmer. The development of"
+        " electronic computers in the 1940s, starting with machines like ENIAC and"
+        " Colossus, marked the beginning of the digital age. ENIAC could perform"
+        " 5,000 additions per second and occupied 1,800 square feet of floor space."
+        " The invention of the transistor in 1947 at Bell Labs by Bardeen, Brattain,"
+        " and Shockley revolutionized electronics, leading to smaller, faster, and"
+        " more reliable computing devices. Moore's observation in 1965 that the"
+        " number of transistors on integrated circuits doubled roughly every two"
+        " years guided the industry's roadmap for decades.\"\n"
+        'Question: "What are the key advances in quantum computing hardware?"\n'
+        'Response: {{"summary": "The excerpt discusses classical computing history'
+        " from Babbage's Analytical Engine (1837) through transistors (1947) and"
+        " Moore's Law (1965), but does not address quantum computing hardware.\","
+        ' "relevance_score": 1}}\n\n'
+        "Example 6 (relevant excerpt with mixed data):\n"
+        'Excerpt: "The longitudinal cohort study followed 12,500 participants aged'
+        " 45-75 over a median period of 8.3 years. Multivariate Cox regression"
+        " analysis identified several independent risk factors for cardiovascular"
+        " events: hypertension (HR 1.82, 95% CI 1.54-2.15), type 2 diabetes"
+        " (HR 1.67, 95% CI 1.38-2.02), current smoking (HR 2.14, 95% CI"
+        " 1.76-2.60), and LDL cholesterol above 160 mg/dL (HR 1.45, 95% CI"
+        " 1.19-1.77). Participants who engaged in at least 150 minutes of moderate"
+        " aerobic exercise per week had a significantly lower risk (HR 0.62, 95%"
+        " CI 0.51-0.75, p<0.001). The population-attributable fraction for"
+        " modifiable risk factors was estimated at 63.7%, suggesting that nearly"
+        " two-thirds of cardiovascular events could theoretically be prevented"
+        " through lifestyle modifications and appropriate medical management."
+        " Sensitivity analyses using competing risk models and multiple imputation"
+        ' for missing data yielded consistent results across all subgroups."\n'
+        'Question: "What are the modifiable risk factors for cardiovascular disease?"\n'
+        'Response: {{"summary": "A cohort study of 12,500 participants (median 8.3'
+        " years follow-up) identified modifiable risk factors: hypertension (HR 1.82),"
+        " type 2 diabetes (HR 1.67), smoking (HR 2.14), and high LDL cholesterol"
+        " (HR 1.45). Exercise of 150+ min/week was protective (HR 0.62, p<0.001)."
+        " The population-attributable fraction was 63.7%, indicating nearly two-thirds"
+        ' of events are theoretically preventable.", "relevance_score": 9}}\n\n'
+        "Now apply the same approach to the actual excerpt and question provided below."
+        " Remember to include specific numbers, statistics, and direct quotes when"
+        " available, and set relevance_score to 0 if the excerpt is not relevant.\n"
+    )
     outputs: list[str] = []
 
     def accum(x) -> None:
         outputs.append(x)
 
-    llm = anthropic_settings.get_llm()
+    llm_model = settings.get_llm()
     messages = [
         Message(content="The duck says"),
     ]
-    completion = await llm.call_single(
+    completion = await llm_model.call_single(
         messages=messages,
         callbacks=[accum],
     )
@@ -506,7 +666,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await llm.call_single(
+    completion = await llm_model.call_single(
         messages=messages,
     )
     assert completion.seconds_to_first_token == 0
@@ -518,12 +678,42 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "flag_day.html",
         "National Flag of Canada Day",
-        settings=anthropic_settings,
+        settings=settings,
     )
-    result = await docs.aget_evidence(
-        "What is the national flag of Canada?", settings=anthropic_settings
-    )
-    assert result.cost > 0
+    assert len(docs.texts) >= 2, "Test needs at least two chunks for caching assertions"
+
+    captured_results: list[LLMResult] = []
+    orig_call_single = LLMModel.call_single
+
+    async def spy_call_single(self, *args, **kwargs):
+        result = await orig_call_single(self, *args, **kwargs)
+        captured_results.append(result)
+        await asyncio.sleep(3)  # Encourage cache warm up between calls
+        return result
+
+    with patch.object(LLMModel, "call_single", spy_call_single):
+        session = await docs.aget_evidence(
+            "What is the national flag of Canada?", settings=settings
+        )
+
+    assert session.cost > 0
+    assert captured_results, "Test requires LLM calls to check caching"
+
+    if llm_model.provider == litellm.LlmProviders.ANTHROPIC:
+        # Anthropic: on a cold cache, the first call writes a cache entry
+        # Gemini: uses implicit caching with no creation event -- the raw response
+        # omits cachedContentTokenCount entirely
+        # OpenAI's API has no cache creation field, only cache reads,
+        # SEE: https://platform.openai.com/docs/guides/prompt-caching
+        assert (captured_results[0].cache_creation_tokens or 0) > 0 or (
+            captured_results[0].cache_read_tokens or 0
+        ) > 0, "Expected first Anthropic call to interact with prompt cache"
+
+    # On a warm cache (re-running within the TTL), subsequent calls should
+    # read from the cache.
+    assert any(
+        (r.cache_read_tokens or 0) > 0 for r in captured_results[1:]
+    ), "Expected subsequent calls to reuse prompt cache"
 
 
 @pytest.mark.vcr(
