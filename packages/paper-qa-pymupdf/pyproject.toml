@@ -35,6 +35,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
+    "PyMuPDF<1.27",  # Downpin for typing bug in https://github.com/pymupdf/PyMuPDF/issues/4903
     "fhlmi>=0.39",  # Pin for bytes_to_string
     "paper-qa>=5.23",  # Pin for PDFParserFn
     "pytest-asyncio",

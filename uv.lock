@@ -2902,6 +2902,7 @@ source = { editable = "packages/paper-qa-docling" }
 dependencies = [
     { name = "docling" },
     { name = "docling-core" },
+    { name = "docling-parse" },
     { name = "paper-qa" },
 ]
 
@@ -2921,6 +2922,7 @@ requires-dist = [
     { name = "docling", marker = "extra == 'dev'", specifier = ">=2.63" },
     { name = "docling-core", specifier = ">=2" },
     { name = "docling-ibm-models", extras = ["opencv-python-headless"], marker = "extra == 'dev'", specifier = ">=3.10.0" },
+    { name = "docling-parse", specifier = "<5" },
     { name = "fhlmi", marker = "extra == 'dev'", specifier = ">=0.39" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
@@ -3010,6 +3012,7 @@ dependencies = [
 dev = [
     { name = "fhlmi" },
     { name = "paper-qa" },
+    { name = "pymupdf" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
 ]
@@ -3020,6 +3023,7 @@ requires-dist = [
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pymupdf", specifier = ">=1.24.12" },
+    { name = "pymupdf", marker = "extra == 'dev'", specifier = "<1.27" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "pytest-asyncio", marker = "extra == 'dev'" },
 ]
