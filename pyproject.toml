@@ -60,10 +60,12 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
+    "fhlmi>=0.44.0",  # Lower pin for update from Haiku 3.5 to 4.5
     "httpx-aiohttp>=0.1.11",  # Pin for raw headers fix
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.71",  # Lower pin for aiohttp transport adoption
+    "litellm>=1.81.3",  # Lower pin for not retrying 4xx client errors in https://github.com/BerriAI/litellm/pull/19275
     "mypy>=1.19",  # Pin for zip default detection
     "paper-qa[docling,image,ldp,memory,nemotron,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek<0.2.15",  # Downpin for https://github.com/j178/prek/issues/1104
