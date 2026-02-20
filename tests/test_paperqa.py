@@ -2027,7 +2027,7 @@ async def test_image_enrichment_with_oversized_image(caplog) -> None:
     ):
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
-    assert mock_acompletion_function.await_count >= litellm.allowed_fails
+    assert mock_acompletion_function.await_count >= 1
     (record_tuple,) = caplog.record_tuples
     assert (
         "rejected by the LLM provider" in record_tuple[2]

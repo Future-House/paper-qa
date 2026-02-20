@@ -2906,6 +2906,7 @@ requires-dist = [
     { name = "ipython", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ldp", marker = "extra == 'ldp'", specifier = ">=0.25.0,<1" },
     { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.71" },
+    { name = "litellm", marker = "extra == 'dev'", specifier = ">=1.81.3" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.19" },
     { name = "numpy" },
     { name = "openreview-py", marker = "extra == 'openreview'" },
