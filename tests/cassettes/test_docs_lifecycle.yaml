@@ -9,6 +9,71 @@ interactions:
         connection:
           - keep-alive
         host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/61UTY/aMBD9K5HPcbBD4g25sqpUafuhanspcDDJABZJnNrOAkL8946T7UJhd6tK
+          zSkef8yb92bekVgnXWdJTvSWhKQGa+UaqDu0gLGdNltaKesutp7AWKUb3OURi9h5h+RHspIFOHzt
+          eAqJ005W1IDtKh+ajFmaiJAoBzUuZ0eimhL2UPp7pXRAW2n8wdksZnEcJmG8WITDjlO1h+PjlCWU
+          xY9c5CzN0/QH5ve7WEbdkpyLJJvwFL+MM8RgYAUGmgJoobvGkZyFpO2WWNIGDL74vVF9Pe4Q6FXw
+          qI1unA6+ImiLDxe4gsbRUtdSNT3O578ZIiuMtraWyBAed0YVrqdlJSsLp3OakrZG+dS3VXIR8jgc
+          88UCz99/+eg5ZdGYj7P5aHKX8SSJRczTMVbMJ77QQZWl1ltabGTrsAaPA/DdV2nkWTgJubjlkWeU
+          TSgXj4zlLMsTcc1jOr5jqUhjwZjnse31JQlLaTIWeNbqzhQ+NPUsIM0YU5a+8F3S5eGCc6dchadn
+          hIso+IScgVPNOnAbwFVbQfAAcpUHj7iedkbpzgZTacGL8ll6XmUVfKjk2gemspGlDO7lgWBdLaZU
+          +zNzfT/Wy15dLibiWUZUDQx9gTGFCpZG9iCG9/xblWq2fWd+//aA1zfOtTafj+YjNzRGVMLadAek
+          PSp0PR89KdjNR16OK73mo7d1jPZ1ddFbz5o62Lv5aOP+2DuP2pP2SisfLpFb2baVKuTQcP1dWqsG
+          iyGn8Bb9bre7Rl7qoqsxhf9T76Gdj9pydQu3a2wLhVop7Lt/xmtVrSppcOiwi6HY9rh9i0KrcRTf
+          cATuHeE1S+DeEmK0BPSDJOf8xhL4hDORpXxoZVtogzdjEWWpuEu8R/xu5iN2k8KJPvjf/8tir+zp
+          5IfEdm8M66UbvAySvZiia0iYNdJm/V5mcmFEf0nqJejNmbY4KsPE85D87GAgBPk0jvam3aOxIE2x
+          ociG9/Omq6rT6fQLm+KId1EGAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "761"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 20 Feb 2026 19:19:45 GMT
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Vary:
+          - Accept-Encoding
+        permissions-policy:
+          - interest-cohort=()
+        x-api-pool:
+          - plus
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
           - api.semanticscholar.org
         user-agent:
           - python-httpx/0.28.1
@@ -29,7 +94,7 @@ interactions:
           and L. Rankin},\n pages = {405-436},\n title = {16. Marketing the Maple Leaf:
           The Curious Case of National Flag of Canada Day},\n year = {2016}\n}\n"},
           "authors": [{"authorId": "118523421", "name": "Richard Nimijean"}, {"authorId":
-          "144557636", "name": "L. Rankin"}], "matchScore": 107.656364}]}
+          "144557636", "name": "L. Rankin"}], "matchScore": 107.651566}]}
 
           '
       headers:
@@ -42,92 +107,27 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:43 GMT
+          - Fri, 20 Feb 2026 19:19:46 GMT
         Via:
-          - 1.1 22922394e3534f85930c1603d51f2156.cloudfront.net (CloudFront)
+          - 1.1 dfa7ed8d953b69c11d7d19007b3af702.cloudfront.net (CloudFront)
         X-Amz-Cf-Id:
-          - WHrlWAgwRHZP7qqQ3Cnav-a_yS0MxrZwfjxqdNQZmzvmM5DlyG8rQQ==
+          - bBLTRwVisxCU9qihHzC2CZXS0mGKlzjSwv9hoDDRlj7y5g70H70ZBQ==
         X-Amz-Cf-Pop:
           - SFO53-P10
         X-Cache:
           - Miss from cloudfront
         x-amz-apigw-id:
-          - ZDlfSHqUvHcErmA=
+          - ZGEI0FR2PHcEpcQ=
         x-amzn-Remapped-Connection:
           - keep-alive
         x-amzn-Remapped-Content-Length:
           - "1016"
         x-amzn-Remapped-Date:
-          - Fri, 20 Feb 2026 01:16:43 GMT
+          - Fri, 20 Feb 2026 19:19:46 GMT
         x-amzn-Remapped-Server:
           - gunicorn
         x-amzn-RequestId:
-          - 91cad09f-d413-4375-818a-466233336dbc
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.crossref.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1
-    response:
-      body:
-        string: !!binary |
-          H4sIAAAAAAAA/61UTY/aMBD9K5HPcbBDEpJcWVWqtP1QRS8FDiYZwCKJU9tZQCj/veOwXSjsblWp
-          OcXjj3nz3sw7EWOF7QzJidoRn9RgjNgAtccWMLZXekcraezV1hNoI1WDuzxgAbvskPxE1qIAi6+d
-          ep9YZUVFNZiucqFszMYR84m0UONyfiKyKeEApbtXCgu0FdodnM9DFoZ+5IfLpX/esbJ2cFycsoiy
-          cMaTnMV5HP/A/G4Xy6hbkvMkSjMe45dyhhg0rEFDUwAtVNdYkiOAtlthSVvQ+OL3Rg712KOn1t5M
-          adVY5X1F0AYfLnAFjaWlqoVsBpzPf3NEVmhlTC2QITxutSzsQMtaVAb6S5qStlq61PdV8sTnoT/m
-          yyWef/jy0XHKgjEfp4tRNkl5FIVJyOMxVswzV+hZlZVSO1psRWuxBocD8N1XaeSpn/k8ueeRp5Rl
-          lCczxnKW5lFyy2M8nrA4icOEMcdjO+hLIhbTaJzgWaM6XbjQ1LGANGNMGvrCd0lXxyvOrbQVnp4T
-          ngTeJ+QMrGw2nt0CrtoKvEcQ69yb4Xraaak6402FASfKZ+F4FZX3oRIbF5iKRpTCexBHgnW1mFIe
-          LswN/VivBnV5kiXPMqJqoOkLjClUsNJiAHF+z71VyWY3dOb3b494fWtta/LFaDGy58YIStjo7oi0
-          B4WqF6MnCfvFyMlxo9di9LaOwaGurnrrWVMLB7sYbe0fe5dRe1JOaenCJXIr2raShTg33HCX1rLB
-          Ykjv36Pf7/e3yEtVdDWmcH/yPbSLUVuu7+F2jWmhkGuJfffPeI2sZSU0Dh12MRS7AbdrUWgVjuIb
-          jsCdI7xmCdxZQoiWgH4Q5ZzfWQLPOEvSmJ9b2RRK480wCbJkwtKJM4nf3XzCdpI40kf3+39pHKTt
-          ezclpntjWq/t4GWSzNUY3ULCrIHSm/cykysn+ktSp8HgzrTFWTmPPPfJzw7OhCCh2tLBtQc0BoQu
-          thTZcIbedFXV9/0vur07s1IGAAA=
-      headers:
-        Access-Control-Allow-Headers:
-          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
-            Accept-Ranges, Cache-Control
-        Access-Control-Allow-Origin:
-          - "*"
-        Access-Control-Expose-Headers:
-          - Link
-        Connection:
-          - keep-alive
-        Content-Encoding:
-          - gzip
-        Content-Length:
-          - "761"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 20 Feb 2026 01:16:43 GMT
-        Server:
-          - Jetty(9.4.40.v20210413)
-        Vary:
-          - Accept-Encoding
-        permissions-policy:
-          - interest-cohort=()
-        x-api-pool:
-          - plus
-        x-rate-limit-interval:
-          - 1s
-        x-rate-limit-limit:
-          - "150"
+          - 5820c399-d355-4053-8086-595dc131bbbf
       status:
         code: 200
         message: OK
@@ -943,7 +943,7 @@ interactions:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a2908a890cce5-SJC
+          - 9d105b83ced5fb2c-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -951,17 +951,17 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:44 GMT
+          - Fri, 20 Feb 2026 19:19:46 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=NFJAlIJ6_y6i9.RC3Q0rlgRpWaY2.mBfc5e14vLv1XE-1771550204.2689393-1.0.1.1-O.lzlz4WFRTP89j31b6W8tEs5N7q5wDIs32IsDjiNSY8qMZgA66EoNLoqfTCJwlP2NRsmmAeWReTcEOgpJpUY8UcZUmGbIFt53PeI4bKW56dkdt556Cm7NkYpWHAx957;
+          - __cf_bm=req0w6DzjO_TQS5r1UzR1Aljci3iPguC7ozG7uY_4BQ-1771615186.5280168-1.0.1.1-HRltyqJvdAvLLJ5tFyLBWo78jCbJV3BXcs1K6QQsF.BdgK36yJm_xamMbPwJIoM1tDwQoEkUWcvxpHa_wXgj4h3SbyB7pwMxF4yZpKbrRbkVsHd3iO2uiQdp2TbJfhbL;
             HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 20 Feb 2026
-            01:46:44 GMT
+            19:49:46 GMT
         Transfer-Encoding:
           - chunked
         Via:
-          - envoy-router-5b7db9b97b-bb2b8
+          - envoy-router-745994574-s78t4
         X-Content-Type-Options:
           - nosniff
         alt-svc:
@@ -973,7 +973,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "202"
+          - "133"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -987,7 +987,7 @@ interactions:
         x-ratelimit-limit-tokens:
           - "200000000"
         x-ratelimit-remaining-requests:
-          - "199998"
+          - "199999"
         x-ratelimit-remaining-tokens:
           - "199994750"
         x-ratelimit-reset-requests:
@@ -995,74 +995,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 1ms
         x-request-id:
-          - req_b2b10812f8ca4064b78911569ef08324
-      status:
-        code: 200
-        message: OK
-  - request:
-      body: null
-      headers:
-        accept:
-          - "*/*"
-        accept-encoding:
-          - gzip, deflate
-        connection:
-          - keep-alive
-        host:
-          - api.semanticscholar.org
-        user-agent:
-          - python-httpx/0.28.1
-      method: GET
-      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Gravity+hill&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
-    response:
-      body:
-        string:
-          '{"data": [{"paperId": "861b64e8235a5948aec2f2af8a295bae203b3d59", "externalIds":
-          {"DOI": "10.52228/jrub.2025-38-1-6", "CorpusId": 279509683}, "url": "https://www.semanticscholar.org/paper/861b64e8235a5948aec2f2af8a295bae203b3d59",
-          "title": "Explanation of Gravity Hill of Mainpat by using digital Elevation
-          Modeling", "venue": "Journal of Ravishankar University (Part-B)", "year":
-          2025, "citationCount": 0, "influentialCitationCount": 0, "isOpenAccess": false,
-          "openAccessPdf": {"url": "", "status": null, "license": null}, "publicationTypes":
-          ["JournalArticle"], "publicationDate": "2025-06-15", "journal": {"name": "Journal
-          of Ravishankar University (PART-B)"}, "citationStyles": {"bibtex": "@Article{Rajwade2025ExplanationOG,\n
-          author = {Dushyant Kumar Rajwade},\n booktitle = {Journal of Ravishankar University
-          (Part-B)},\n journal = {Journal of Ravishankar University (PART-B)},\n title
-          = {Explanation of Gravity Hill of Mainpat by using digital Elevation Modeling},\n
-          year = {2025}\n}\n"}, "authors": [{"authorId": "2368036338", "name": "Dushyant
-          Kumar Rajwade"}], "matchScore": 60.835304}]}
-
-          '
-      headers:
-        Access-Control-Allow-Origin:
-          - "*"
-        Connection:
-          - keep-alive
-        Content-Length:
-          - "1098"
-        Content-Type:
-          - application/json
-        Date:
-          - Fri, 20 Feb 2026 01:16:45 GMT
-        Via:
-          - 1.1 b17f8a118d57b4772c5ae067cb6b9686.cloudfront.net (CloudFront)
-        X-Amz-Cf-Id:
-          - AYWRPq9Cv_h9vfsfFAjf4DmDVHonxS0GO8z3FGUmwiWS-eQ8Ph0qHA==
-        X-Amz-Cf-Pop:
-          - SFO53-P10
-        X-Cache:
-          - Miss from cloudfront
-        x-amz-apigw-id:
-          - ZDlfjGq9vHcEBmA=
-        x-amzn-Remapped-Connection:
-          - keep-alive
-        x-amzn-Remapped-Content-Length:
-          - "1098"
-        x-amzn-Remapped-Date:
-          - Fri, 20 Feb 2026 01:16:45 GMT
-        x-amzn-Remapped-Server:
-          - gunicorn
-        x-amzn-RequestId:
-          - dfa0a808-0c61-44b0-a44a-290a7945348f
+          - req_91a4054a03d4479bbdc0dfcca016169b
       status:
         code: 200
         message: OK
@@ -1084,17 +1017,17 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/3WT227bMAyGXyXQteVItlUf7ooN2AoUWFGkA9YkF47NNGpsy5PopkGQdx/ldG3Q
-          A+ALmZTI//8oHZjDEgfHCma2LGAtOFc+AMd9DxTbGbvljXZ4lnoC67TpKCtDEYq3DCsObF1WgFTt
-          cAwYGiwbbsENjQ/JJE9VHjCN0NLv/MB0V8Mz1P5cXSLwvrR+43weiSgKkiBZLoNTBnXr5fg4Fwl9
-          MyEKlRdS3FN/nyUbbU9NLpJcxHGuRJ5dkAYLa7DQVcArM3TIChGwfliRpQ1YqnjX6dEP7idmPbnR
-          iG412IfN5IZ0O6pdmQ6hQ16bttTdKPVlNSdxlTXOtSVBou1odYUjmXXZOKDu339deUwijGKRLqaP
-          YYWonrbrTRpK6YWfKK+M2fJqU/ZImnxRIM+fYpFpkAfpRywy5SLnIp3JtIiSQmXvsSiRZMJDEUKQ
-          sH4cF5OKS0U7nRls5QPfvB9iRjHt+Cu8mq/2ZwBRY0O75+zH7eXvq9mfyc+r62tGono6oZ/fLI93
-          o12NpKWM5AtPwgeWv1a5MYB2P9Hd5LIFYlj6UjX0hsbyBYYsUEH+CYaMC0UkZiIrRFzE8QcMkcpU
-          LGR8wuAqY+lkFIdKEJnU35f/LA7kRtNo9355d3tNDTaIvSsW08V0t9uFjw6NDY19WEyp/KqBxfSr
-          SR+PnqcbPnPTDU2zXJ5fVXeG+n3j2uhTyy9bLV9eGO+J8WnOMmB/Bzg5IakW+fjyxgYOSlttON08
-          /yi9mOPx+A89dkFrFgQAAA==
+          H4sIAAAAAAAA/3WT227iMBCGXwX5Og52Ds3hrtqVdpGQtqroSlvgIiQDuCRx1p6UIsS77zh0W9QW
+          KRfOjD3z/9/YR2axwN6ynOkd81gD1hYb4HjogGJ7bXa8VhYvUs9grNItZaUvfPGeYfmRrYsSkKod
+          Tx5DjUXNDdi+diEZZUmaekwhNPQ7PzLVVvAClTtXFQi8K4zbOJ8HIgi8yIuWS++cQdU4OS7ORUTf
+          TIg8znIpHqm/y5KNpqMmN1EmwjCLRZbekAYDazDQlsBL3bfIcuGxrl+RpS0YqvjQqsEPHkZ6PbpT
+          iHbVm812dEe6LdUudYvQIq90U6h2kPq6mpO40mhrm4Ig0XY0qsSBzLqoLVD3778mDpPwg1Aki/GT
+          XyLGz7v1NvGldMLPlFda73i5LTokTa4okOcvscjEy7zkMxaZcJFxkcxkkgdRHqcfscQiSoWDIoQg
+          Yd0wLiZjLmPaaXVvShf45vwQM4opy9/gVXx1uACICmvaPWc/7m9/T2Z/Rj8n0ykjUR2dUC/vloe7
+          0awG0lIG8pUn4QPD36rcaUBzGKl2dNsAMSxcqQo6TWO5giH1Yi/7AkPKRUwkZiLNRZiH4ScMQZzG
+          oZDhGYMttaGTQegTmiRy1+U/iiOZUTTZg1s+3E+p/haxs/livBjv93v/yaI2vjabxZiqr2pYjK8N
+          +nRyOG3/lZm2r+vl8vKm2gvSHxtXWp1bXm21fH1gvCPE5zFLj/3t4eyEpBrkw8MbGlgoTLnldPHc
+          m3RiTqfTP8UZFMQVBAAA
       headers:
         Access-Control-Allow-Headers:
           - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
@@ -1108,11 +1041,11 @@ interactions:
         Content-Encoding:
           - gzip
         Content-Length:
-          - "586"
+          - "585"
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:45 GMT
+          - Fri, 20 Feb 2026 19:19:47 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Vary:
@@ -1160,7 +1093,7 @@ interactions:
         Connection:
           - keep-alive
         Date:
-          - Fri, 20 Feb 2026 01:16:45 GMT
+          - Fri, 20 Feb 2026 19:19:47 GMT
         Server:
           - Jetty(9.4.40.v20210413)
         Transfer-Encoding:
@@ -1173,6 +1106,73 @@ interactions:
           - 1s
         x-rate-limit-limit:
           - "150"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Gravity+hill&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "861b64e8235a5948aec2f2af8a295bae203b3d59", "externalIds":
+          {"DOI": "10.52228/jrub.2025-38-1-6", "CorpusId": 279509683}, "url": "https://www.semanticscholar.org/paper/861b64e8235a5948aec2f2af8a295bae203b3d59",
+          "title": "Explanation of Gravity Hill of Mainpat by using digital Elevation
+          Modeling", "venue": "Journal of Ravishankar University (Part-B)", "year":
+          2025, "citationCount": 0, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": {"url": "", "status": null, "license": null}, "publicationTypes":
+          ["JournalArticle"], "publicationDate": "2025-06-15", "journal": {"name": "Journal
+          of Ravishankar University (PART-B)"}, "citationStyles": {"bibtex": "@Article{Rajwade2025ExplanationOG,\n
+          author = {Dushyant Kumar Rajwade},\n booktitle = {Journal of Ravishankar University
+          (Part-B)},\n journal = {Journal of Ravishankar University (PART-B)},\n title
+          = {Explanation of Gravity Hill of Mainpat by using digital Elevation Modeling},\n
+          year = {2025}\n}\n"}, "authors": [{"authorId": "2368036338", "name": "Dushyant
+          Kumar Rajwade"}], "matchScore": 61.4132}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1096"
+        Content-Type:
+          - application/json
+        Date:
+          - Fri, 20 Feb 2026 19:19:47 GMT
+        Via:
+          - 1.1 b9b806fff4da8bdf505b6f6449eb471c.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 9B5ow9UL3fbpHZgsDB-l7tsIrqKx3AVb9K4zrg3BSa8H6jr5rWnXzg==
+        X-Amz-Cf-Pop:
+          - SFO53-P10
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - ZGEJCEBuPHcEVgg=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1096"
+        x-amzn-Remapped-Date:
+          - Fri, 20 Feb 2026 19:19:47 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 2a813794-49b8-4da0-b198-a480ad199e86
       status:
         code: 200
         message: OK
@@ -1246,156 +1246,156 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/41d684lt3H8r6cQ9rc3INlsXvwqgRHI2YWgRBcj2gAGDL97qmaOYk0VV98nG7Jx
-          dvacGbLZXdVd3fOPb7799sMvf/2vz//55cOfv/3w4w+/fvnwJ3726bsv3+GTf8f///bbf1z/flz5
-          +ae/fv706Yefv78uv/7wh58/ff47/qz8/yf/uui3b+I/H8u/lTqytKj7T89PVysj65JPY5VeSv7r
-          U3zYVou2Vn9e2qJEFvv7e8xoqZ/WnCuqfMGcu42I56cloqy99Btq1plyBz1wq61P+YKJ74ylN9Za
-          jtKeD1bW6HUW+a2Sdff2+x/Dh3jSWeL3y8UvLav2TPkp3NJordZ4/tYerY7f7wKfIHG3pTf9grJr
-          3boyte3ceLzn3lRsbR/ytaOPuYquLFY1dx/yuLH2wG91ubHGL3k+QsMj4FO5gbXbmkP+euAhxvM6
-          LOnozWwACzvkhnCjqxTd7L1H7fW5pgnjnnrvNNXIHGpBtTYYnP5Wn2N2MYtdxpypZoE13b3/frP4
-          BTmj4l/6Y9iXJseowti3WmurG6ejP+2K5j5h3WrZq03alnztnDGXbEBtZa70c8y9fl7Y2xpryLKM
-          NmvvWy1l5Iquz4pt3fgxORkxcIyWWGDneje5gYbl33plzLZDjmDBrwcckdpf6avpA1R83OZ6/lQb
-          u5cMMaw6x6pFn6pwB/t42nDfLWuEPOlqCZclm1LHmltMEK5q1bXEL7TYbU/1rgU7vXcX046OTV2y
-          LjhUeFLxC/i04cI6xLJrnX3IIawwijkkPpzXFUaxy5K7qmXGwJ/oeYGx8bvV4CdurKkRRcMTFHFj
-          gbvSrw0sNv6rp/toRSNG03uFX+5lp5x4hKwN7/A0FxzgrEN/aWSnHTw/nTgB1RzunAMHscnRSNxW
-          UT/EHSxFdivgx2A16ohq2ZPfLV8B51BG0YXd+H24iOfCwos1mP3zQ8S3XFOsEyYEt7PlxgrCfIHZ
-          PlcRhvz8Kd5Azr13ioNrjZhCnTFC7Nj58K94VBxCO7K4NGBH6p/MF18mPyNhXs9nrWtoIEMsX9gc
-          9YR1BKCHfMjQONW5tQY0UWVJ4HA8FC38U/dzSSIQCNIjEeKzxQzEJtiVLkriyMKRPI0NsRBB36Le
-          4mnRE49wOqs4soY9BSachrwQNlIWFfEdCyDeDQu1cyhEmmv2VYfuP7a6KKTE7jViF13XBRsUiAGH
-          l7LTbTKYKsJqjQasTgRxgCBBdgABa22L73BuiHEKsCJmKpxBwIYJriG7TTwRz4fCg0YMOasVHgfR
-          TOMb3F2ou0N8wZkSCwDonDgqsiq54JyrBreG3ZbYgsA+t2GWSiwgV25Y1WNJLleFH1q6eQXfOYps
-          1Gwxq4abhoMKD2RAdk7QCb2ro7tu3GpFJwgscGsSbNZ1txqGI2GTW2x6B496e8/vB8400HDTVYVh
-          6pWVDlxJ1sbHrQqSBmTVE9WxfFNdUmOw1isR6eBTarezB3qgzwS4hVA1LKbAeXcFDCPhkJs4MPjO
-          XcduEoMvdiHmh3NSU1Z68qGUX+VoA7hAPCXiDG1IYyUQDBybhJ9Kn9a20IbkYhsXA2ACOFMoDAcE
-          r2CkGpdvXKwhnyxl5hQrAMJe8IzP58C5zC1BBKcN61We6wUmN4dFJnAUwG6BPANgOiXaIaqAM4iv
-          CXCs6Ib652pN6fSuxQxzVPCmWrqtNcjs89Fz1AwB0oXn5PHod6gHl17qVuAp4OviuUyDQEGXrnWe
-          QDVgoGgwnKGQvSFay42CGinlS3g6hdB0fTONW+NjuHQ11UF2o5sMCNwJ4eRJgajMnPwA3MCUfmUI
-          qIH/XO6r8Dn8dWzNh2wQ1NDTenGh8bxyEljrshJV4gskKGdNBFVxdnCUQbj63EAcSYQqOSTwS0oM
-          QNfw4+35qKM3EBYN1KMDEgooMbB+/Ta+skiYANFp5hASyBfQR3d6dgCCqZCG2aWhBxL8hWHVUCE/
-          FHeAEw5fM5WyAz0Ig2n4kaZOHR4GPF4IJ/YNC1UsYYPfrgoTgUnTXOrCIYkwx4OAXCxjsa/wG4bo
-          uiX4AIawz7KlcHxrVAU0pLDDAvWNCPWxGjHleAeihPuHP1OmgVugR9YQirMGH6SYbDH3uLtaOhNk
-          4sB8C28G13AClSrBqwCENA2MOGuaD0UMBLDRaA1/NfkM9mQkDMOyXHgAZkPEN5MHwLvp8fLUw027
-          AZpya4BexXkzTiJwqGRFYQwbOF4wawyEXCPDDVRmaV7XE8N3WpGBSEkfcFfRBCIOEg6dxhx8KxiO
-          pTOAe7Kqf5pAIwKQ64pWJClcN125ZoTg84CZ1ejGBBPp+vuMo3OKg0HIUygFBIFgZEmujeCg9BQ+
-          Y1rqDBiAoF/yE4giWADxL4iYbSgP3pfTFUcG9zJHNXyKtVPAOAk4lQasBXYpUaDiWM7qmQXA/drF
-          5RNypC5+YEPrDoHcp/TUERhd+dkh0dKTKHdsmIkQaDQe7OpRU7isrCwEfC0IXJBd40gGgs4Wvgmo
-          OZUEguvinG3NkSJcWmqhw+EY4SKrHEPiKFwdImGpljsfpAFW0aDH1ZoAghYzZEOJBPZaE3SbnkYz
-          AzjjqYcX2H42Dc4wFKIT/RTRPSRzDlNlYUpoJJ4UUSCNmmNT+rTcRo98RNgb2OM7ZQVxT6DnVlHY
-          cIkhOwifsMBkNJIN5jOtBreAD6sC1DaB+EuGGAvOy1bIFn3ubhEe54LUU3M2QE7mqkDPwPC6UIbE
-          Z6m7BR5CgC92gZAy0mCvnZdXLAYi0hN35a2qICc4sVnkuIDysjK11TCZS+kaGWvHxopvYFxMLUx5
-          UeLOJQFz51Lmu1nFekeGgGwaRqQwtSfTRmlsaM9uSABsaEz9fWY4LPPc1tyxlApkXU67E7FeGHZg
-          m7blcgGnGXKUdBLziFkOZqjMqBbOsFYVL/vXeMFgBe5mARyLN82qKo7VVFhRmbs3yg83HjAC2WtY
-          D5/hrdLmXcUEF192sAaLy82qmLiLrdY6cDDU5zrwfBVasK5FmfPsVk9AHJhbq11wYyQVWpMh4kmt
-          aRAZdrBiJb8IhpL4BOWEZWoknDyWms1nHiQ8y7MSoXAqyO7MhupjnbDZVcCbsys82Uk/INmUvlZV
-          TgKS+SiA3WR6gedrRg34AAhJiyQIWpGaOal0ePKtcCqI+lWjE+DVmgblmfudKiPAXW0mr5U/WULo
-          9q7gGVvO8VdiEeUQcre4EhtrIpNyudxqt9uJZgzk4Fv6UE9C4YPsDGyodVcIyNm6o9ME9dEfQtSp
-          xZKyQD7Oq88l48B5WV09GVDqDIPDWCnLauEYUThhyapDhKZuQAslG/Fl6a6w4D7Le1avkyMKPfIy
-          y6teDFdscYyuFJhckRN2b+oC0jnHNgvYzBVZrQlBgwUUPVyHUgs8A/nrtBQiHInE4jGx3RL1Ya34
-          uFkGuCcrsVrCggEnSE3XchPOslJ44tleTb0E+Dm0hsN40oJrrmm0ZC1y2k1sIPDsVjim1MUAO9VZ
-          S4Ia+Ndg1k6iV9spPg4EHmtmYpteL2GOGn0rljet8GZ7KTKn9GHb4tZFl6r3H3RQywgfTHRb4WBr
-          lLTk9u3M8ff1xIJmT92XSZqvCjbAd/xKaNUKi9c1fcCMBs6nngOw6uU2AFecXZ4TUADHyzJRsJai
-          BOqqeM6pMYrqrxRM1ZgebVquWAgyuvjMAO1iTqfAoACVLMUGC5rDDqKWMu9SajSTumH/cej1eFsu
-          +PopcNjeVP5CUDfa/uPUwr3bZUwXIfZnjL8jETBCSNUUBHbiYjFqPBJIlPC6QVWhHWAWx2NoEgJ7
-          Ne1bied3KlUBVQ5D6oMk0DSQQEhh4h24YbDb/h71EKyaVEs5ZCzsq1grzM8UdKB/2FYpxSHCFDv/
-          4GhZlFNVPtRSQHXQglzX4j9dSU2CParY7yhlgKuCv5ZSBPN/U5HjaCQbhrILub6mgik6KRJhK+AV
-          gpNi91xYl60Ruq9Q1UoloVVFGIwKhm5O+aycGmNZ0vpYCAQdGMaJSXyAfLtlZbEwkprzEHb9EhVZ
-          WsvYMH/LTB/lf2fVDoW1m85NvRIcSFlW4DwkLBH/hqZVQbR3zy11a7oPgWeZrBCoodLPrlDzB8Ew
-          qTAwyLayN/Nyqx4S6DA0OX0IyrDpYu6391QkWgi5lGRQyTHTSzTH87fAm1w34WXzWzsXZRrAQrSL
-          rgQa1hNjCbDpQH2A2Foep2HrwiQwSG+WciXNDNVobaYbxVsnU/PKPpNyXQ01DOuhyu4cTLZIZpyO
-          tkjRnGetDOE3CIj4x2QAnSlLcVSNBb40gY6UyK7jVwaMd5hYPWIVhXq4cJs+qgLc77nfk+goTA1v
-          U+EHIUAvVtk4YHHm/6xGPvFpKu8ASRlKpTYAaO+mx0wAbg9L1L9uczdYFmANy5UBg5Wm7o4pFXOX
-          6yA2ZgUIK6itAdiuppV764O4/jr3JdzbUZmttSXsAGV2hteWYSUWScVaWCQnWjQRPKx6KbKHZ2e8
-          1yCE+KvlAeaq9jaO520nNwrExpZlKQl2rph6CNTE0pDANldmxMAlVmtqdI3N29DH3QhlU/c7WKBT
-          bTY8KfbQijytA8p3LVywPUSLdsRH1UQpmu97CV1zC8FoVF+pUg/rRMyhoixcWU1xzvhSS9P0NqPW
-          SC8qAzOs0ewoAXNXq7OohuVeGPh8A06I/PCREs1Y+FlaAS/047WJL4d7ZsrKohFrSkuxCztF6jNQ
-          v7TgM639ZLICbFo6FjRSFZsIqWFSxp6IUl2cJ1WIQPR6nvelmlF5EHNLWr4G85/q/PBEAydEXe9u
-          zB2mpivAPky538h2ZzWBJT7WqjosZjJzpD0pLDdrCQ8bmZppCOCUokAfUCmXZw0Rfqy0imOEzfL8
-          Ej61TBwJ9O5Wg2QXUakmst/sVjFHRYVy1ZO/KFIJ85Ts4LA7AwODs7XcGThsV7/eCMRCDD8je7Ey
-          SCW8XMJ3EGoWdtjUs9G7pkRxamie4SlkePtopupl3VOzisAWTIlpFEwE8lRV+lg7NN1OdrW2RVGm
-          /4bpUgddo4myKV8r6uxwHPY2qbTmPV5IlG1LXnQB6nEogE1jokBOJHsKr4a6twkleCOAvuN8uKos
-          JkNP3Ib2bsFs7PSfa/U929LOq6NeqfLDInfKlh9vR0MYA/2ww6BC4uv22TqoyI1AIrVxCp4PZ1ej
-          4KXhbdqeg4stfjB3WI0jBWOrZbFrsy+FpcAKzUesCcDg4KDOaO+SgVfKN4oeRZxlwBNrKJvAfVYj
-          nFgrCz9W6b97xOZu+R5ATMDCirAgv9WfitE7sNdu4tzCfEgqfT+0Pb0SiHMyX2b9Fc1QEw9hwtxN
-          r3QqJtDBhEqL1iai24beqfA1NV/CcajiA1GNlROr8bDg7IiyToXviKCL6kmNH3MhCjZt4MtiujZW
-          HVRX0dglZtnCRj308D67+vTcr2LS1SNlp2ZNg0FXCV5TwwQRTXuXvCZ6rzY2q2hBDiGxzfQ7mEuz
-          tQmuX4Z6HcvX3plZVn8VGQgvvM/s1dNgvpxHic2xXZO7QZWZ4HQ2UFhm9MoNhlFTNkGmwll28arK
-          cxO1mbQAi7VVv8scsCVc2FwMNL3VCBHQjPJ31pqnlaPo4o0yI5IxxWWaCSZCrWbEuKPHm7qzrn2d
-          ROnVJCMbzyql7aNui2j+uQJfc3t1JjmkrPWeVyu8upwGp6UdmCAZgCqqA2L7Wu1KzWNHTjvviAVe
-          UqTILm30ActYwDtibpXRa1tbH7twLBU8wQpVTVfZv2e6LyZOrYENd9Xgjw3zXllK7wAB0lHICre9
-          w0qdOEVBdGm+9BL1WoYCpAax2SL7idmxdb3p/prnO+LuWx2wLJWA7c3qcQpOH4dJq5fwm3AzWicZ
-          E7REJKSLVWjFenYSbnKPU6CeaDMfafF7X/KIUOlWW/pQlHHgat9vAFXLUQVx2TSdlnYR3T4+rrZN
-          jdPBvVIc1uDMqxWlduNZDu+nKaYgzGvQwDQygKOvqWY38Dv9G1hGt+Qeq6nQiIrdafmNTr2aKYrA
-          /2xYwabIwzQubEbsmv+jeCbZUKOViSOlgp/nOU8VRlWqudUlYCOteZRPzAYaHWbSKuVpmk85nPJG
-          8lNlxXql1ETVUidHxdwVaySKMA9C+k7GL2l0Hm6EOrU5ypaNLQOgA5fUcKbYVNlG4tObJlioOkSw
-          2G+NiHm59bVCceDR1bNXm9aogQ2+fhsOS0RGNS/sddsuQZpw4K2p9B9AVHvIzjQF94Wzq8MRsF/p
-          1cDO3rZmvmcwlWETSoq2hX0F4V+l6HThKVAUKajo71kltozFlelq1h3axlI3DaKM+7KSmgud732E
-          T5dGMrAMun+bNJOjKDwobGTtmoltrJF1o3rwtLNalXInINJ0cVK3xgqftXMPfAKD0x4ANgHW9Nws
-          2zb11I/VhnVWUMJvoqK2QAjSNIbzqvRoYD1Wiii40bFGhSn6reLRa44U90HFm7H4aMK0FrOAWpQ8
-          QDQ2iKV1uTH3l0YV2V0SS+VS5NClq8JsXUMGNCMHlLkF4nUExmhT871wMEUPgg2buValgilZwwXh
-          jhpm21sLwLSAtpYX+0+cEkFmMIAaamQ3crfay6QGzfII65p4IxoSUhrjObCKYsf+LNgAJfOO4gbv
-          P9p4R/HDRSS/CaEo6OxKtXDmrOmK07UUTwfbfkznCnsNkFgl/BOBzsheI1kJVULY+IsXIKc0vJrK
-          EDfGwrPghQ1kUYvnF9YcmuBg/xPRa7yj9lypoR2qBYffwQ77eBuWMy2P3OjYNfvvc0TuL1i1F03X
-          WXv4q6gArK7fSs5ZQm3M9T83WsaubxOgFHYLUBimeWBcu5umN49BrzKDFSI3AQzn9ApPXF/TK3Rc
-          FWURRdsgcXqGCjMQseawkxIcv2GKQZCzoRj8VVm3dBucmBYPNnU11lxEEUBaUmQxkWhtZ+EDy7yi
-          cK/gpl5USx0Eyjr8AQ8K82imYgRYF6vtQK+cnyKBfHeVPjfKAnTyEFONzZoWr96mqsK+Ew0DB2OR
-          wybPwKa2NpyyKBRKwuDCmQtWmXxc46N0iFnAXettmWT11Ln/8ZhnuTVUWfey+z8oINjYWkVZRZ3F
-          NkLDsmLRiimH4nEmgrqndhmb9kX1YvOggmG1C4X0hrU7/HR6ETM0pl5U7tOte4ToFFF1vD034zxM
-          AR4XzspmTxROrsGumgjuGuZpEzXWKJ4thbVMLbETxXYbAdeDWgWRxl25VrstfGtM64TONtu0sRrJ
-          RizJHjKZoatFLcCS+H/2XwBlVCy9J28FW1sUaKaRtzCAf6ba52rtNaVMK+mML57ALFf5suscQ6p9
-          ltV1yWf0ZDCFrqnSzdxGN2c5W/Npqmyq2eLEjuXXwkGWQ0eG4td3MykkhVya6OTAzOHSpmDtT5su
-          7wFOmlYAEXJCmQBQVTVEHTy5WhXH+plfYoxRRrqipM5UwNjYBtcMX2OzuzI0YIO0OmOjkFo7JCoB
-          nGWQ4VqZQDBSfZhcu+HFqraTaPH0SP5fDe0XYH6HCOus5YZ3g8fy/kjdl7uRkcfdNGfsb1vVBXrM
-          j6l3gsvcoftNgfjwAZWdFqupmcZBJFWBOGcj7j6srZu5nTK2uRPgudg2BYq8ysYYBJNslm8Odh82
-          bQk8tdzDmqmW1poYc2FTE6A2OfJuC4A5af7TGoBfbfA4psMgf1+iS6XUFAHBxsHAFrZGCRzF8IkN
-          OB9gv0o6+gLLGdUa57BWPrUAobb3w1zTw1A0Ohnu+xvTOV4BbF1jbRQXz/rswbwdPc3sHbpIbBal
-          /J4xOcyypmKc2QktWHeyNKOKnaknY9GruxRLxvLcyZm1mooBKk3ONUxAUc/5o8cs4cdX3WU+feIr
-          1pRpsi9Yd6ZWg/o1A8rSl+uiTKpH8HN+c3NYo8/7gXnYvLrMxtFgGvDB+7Qw166eX+2ijY0H3ttY
-          Zg11HHnNZh0u/Qe6NEEF2PrMpX3fwLJMxZvV1mtoa9pWwG6rqivrpTTQVhVOtkut27JRiD2a6r2q
-          lLvuISR9WZ6ICpCwWa4+HOVOKwKQ2zAz9ipE13ZkAOWehyGtzPqutwfx8ZmwQaZukhG1Lw+OKKCT
-          yzhEe3qbNUNDVwIA/z+GOo9TE+O5w5Vz19J+qwFQVkNUDdy1WAM659OwvVP7NdbVNKX51sH+oOeN
-          7Qn8bGUShnMf1XWU3TYyQFEPMGffpkEfJgW05QmOFpxCuWrlTMJ8j+ugurbYtVGvnsX1Hp/KEXLb
-          FDvnHNd5LC+zqzWslyqIwN4Ucd6y1+QQOh2AzFqXTehYVN5Om4NdY1jCk6WHvd6aR3NDKg7DMCfT
-          2Dip6V32q/cc9Y+bJF/j8qoWFn2s7X2rxBLe+Awn1XXwPCf2LU0ZcwQuoYuYzMb5nmLx50kORxbG
-          OkBP73HeRFjepMIqtw2JH9ve/cCux/QunbFZpbaiMdNWNp53s4NZY9hkFBs60H9al/fVr2DT/a55
-          481GxRX2qRpooMAmdOQds2mImNoGwKG/PVSYegn9DPTAIZqM1xXw9wEF8tICWkdI1O5RwBib2Fc5
-          qCqKVVn4/g1Nl0/QSJv5e3yjAmvO04a8GL78ujzaGrjvowlmpcnU4xztQsGRJW68p/PebYCjqe8E
-          4SHWURRnX3quWgTzrlbrZDZpusbtILZhjWWEXdp5YFxVeql+uw36RJDrWkCkFddl81C0+HQ7vVUP
-          WvIxL/mBlmY3zsw2x792ems68Hhapqxy3FQ1+0T4HLU65CKjtvEnOPPWSVJS8vdZ2FQVNoiszjhR
-          9EMPmxUQ7kGhY+Rcb4ier4YRIB290eBsyuIyFfZlavofoCh0Ru0i0NPq4fW+GHXETGYNm1DSn2b5
-          wj5X8s463fRVSJcFsmHIcs2crAaWYkVcm031ejlM1sPUR6alrZDPPgdVFHJelMGBpOzdGkk7cam6
-          slMjDwsDNhuCs82YgzZVU1ZLjpie/y7ij+Jj9g+vHNJK72192YsGN6wHlbZeiBT10VEDxkMxiQa0
-          DewwmRP+k6+J0JR8sLtLU9rz6rtbb+TojoWG82i/Vx01w06fv3jjoG25S8FYfjUdTnfEOTOB0Hn1
-          NPF5Vx92WBmW/uAQctl6VLULDeAMBM6booAlbQWjAXWqXCISQKR6mnVz+Hq1nLLUsG7NzAot1Mc1
-          gNrgoJWMb79OtbWdVf7+sGrNNeHVkxeJuG20nS+IquaedmOCLd/OVyE4scFAhXmUqWrK8Jo0bINj
-          BsB3C5stLZnuFxrkDHVThuNbl8+Y4PuRtnaut85Umr25qlA/q2E/KzmjjRZnEqnYNIHkTBqjZsT6
-          Q8dJshhrJxyXWh6PLLgPfWMK6x2r2+zJge9VbSBztGnNWpvv57D5y+fetsOQuFvylyy0WjfAukZT
-          vDUo8EaWh1dVcR4hjNzedsaeYRej58SdbRMl4ORZosF6ll42ns3mONPTIwbobMnFwZbqrGn6JviY
-          e04tsmBdgWnMnjs2qHR/E93hFVS19yuTr84KgdbGM+HktDQXzqqeZf3YLtOHvS2EMzsOI8H5nho/
-          wKsAm8lLUHyW0KtYtkdNk5oiDAyfloeVDIU8ixJYkwc4rb9gDEfmd+uN1zeOvL4BT+BtR+cGOCra
-          W/chyOXQQ8k3WKr6sRc26GtTM2jOCIO9nPqvaPDq5AhLj8OLUtbpI3w3Y+07BjeC0vRV0jou9qZ8
-          wOcYC/54TbUg3dH+q9M70b42mmfRXajUhLPd56E/8ST6wlntNiK8XWXOavMIRFR+M7NZUzfdhmC8
-          3nG669JIz0kNW2tjgVua1vbJlHtTWSFnu2oLXbnGu8xqyi6OhFz6+g26y2Wa8OPrIflei8N4Njg7
-          E4wE36BnJIRsnvRAR5YyiWmpXfCFDBNfD3ZC2Cv/Go+k6X7ZC6LdTmw0Tnt16KK+RO0IPqyldvT4
-          FIzXKys4TtoAV+ZybQAAY18afnFhU9JhY19uGj52EfG4v1X3Lq3BoRz6aeBljPJc9L5ZCvWYEgIO
-          TReVN050K+4V4cb1nVXXmDV4NnOLp7F2Z4fgL0N5zT5YwB/tzZYB2OFqoi+x95bcidXFqZA2J4il
-          Yx8fzuqcjq3tiCw9zbZONRJ7Q9cfOK6XBN9bJIude3Y4bl9Wz8ccEwrnqRiXzG7aWyC8yvN6hLXr
-          NP5X+fJAS9dpy9pdlaLRW1euDVX++HX3nZshpJvQynv8g3xAKWwwzlRv9+KLjC1Y0V6XJUUGlWE2
-          hnTCf8tpnnG9aE7PDPjYs8PkyvqCKKowmMNlStR3zCsrfOeGdcHRvplYW29QlFdYG6HvBaISullz
-          PQ/C8EmYKkK+s8YE7K7jAGayhAVHuxlYBRjicG4lM9fLWdXgTm/w2dcgbA0+2kF8F+V2NT1QRYzg
-          QAflMZWiHettV7j9tak31KFerVpiApfco1tFSt4hdakNKYvTmphPc7uLNLBh221729kLNoa9rwwW
-          ZJ00Lpi5GxnXlUOQjo3rvYDeknX1q2lWgpTPhuYAQHQfFQW6Eqok5muGQO/UMsDOrJnHFU5n2ey1
-          LOAq+mI7f/n7Tck72Kna28J/ZtganIhR4Wt29EUn4MykMKpkPWrSfO7bb70H15g9jZ9GZ28XtdbJ
-          EuxtiNc3wBsVKz2ocPPO/AP11bRGcITQMMVd4bRLo1uLV1bt54frMW0L68jLmqthctSFb4Odp1cP
-          92vWRRmvT/9y/e8/8e+/8MIPP/3y6fOPH/787Ycvn//+5ePnn/76+dOnH37+/mN8/PWn73788cN1
-          0f/++t33n3HRP66//OFv//PLT3/78h9ffvnvzz//io9xkO8f/fDlly/f/fj4g2/4Y//85v8AJnBT
-          dyOCAAA=
+          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
+          X4Wi0R0HggAA
       headers:
         Access-Control-Allow-Origin:
           - "*"
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a29142cb9cce5-SJC
+          - 9d105b9139abfb2c-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1403,13 +1403,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:46 GMT
+          - Fri, 20 Feb 2026 19:19:48 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
           - chunked
         Via:
-          - envoy-router-canary-6bddd69c68-gnt5r
+          - envoy-router-6dff9d5fdc-ksxtf
         X-Content-Type-Options:
           - nosniff
         alt-svc:
@@ -1421,7 +1421,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "118"
+          - "149"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -1443,7 +1443,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_27e3f57f70b949eda2cfb3bb32007aa0
+          - req_11531a88016147bcad9909e77d707577
       status:
         code: 200
         message: OK
@@ -1638,7 +1638,7 @@ interactions:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a2915e93ccce5-SJC
+          - 9d105b953d01fb2c-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1646,13 +1646,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:46 GMT
+          - Fri, 20 Feb 2026 19:19:49 GMT
         Server:
           - cloudflare
         Transfer-Encoding:
           - chunked
         Via:
-          - envoy-router-canary-78648f6944-vhw6d
+          - envoy-router-canary-6cdbcdbbf6-m2bnm
         X-Content-Type-Options:
           - nosniff
         alt-svc:
@@ -1664,7 +1664,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "114"
+          - "73"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -1686,24 +1686,24 @@ interactions:
         x-ratelimit-reset-tokens:
           - 0s
         x-request-id:
-          - req_711a51ffa41248a4ace6c821a0561d3e
+          - req_46ef5a0a81474a9f8d1f0ca588d0eeaf
       status:
         code: 200
         message: OK
   - request:
       body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
-        the relevant information that could help answer the question based on the excerpt.
-        Your summary, combined with many others, will be given to the model to generate
-        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
-        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
-        information from the text - about 100 words words. `relevance_score` is an integer
-        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
-        may not contain relevant information. If not, leave `summary` empty, and make
-        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
-        chunk 1: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
-        now\\n\\n---\\n\\nJump to content\\n\\nMain menu\\n\\nMain menu\\n\\nmove to
-        sidebar  hide\\n\\nNavigation\\n\\n  * [Main page](/wiki/Main_Page \\\"Visit
+        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"}]},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 1: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\nJump to content\\n\\nMain menu\\n\\nMain menu\\n\\nmove
+        to sidebar  hide\\n\\nNavigation\\n\\n  * [Main page](/wiki/Main_Page \\\"Visit
         the main page \\\\[z\\\\]\\\")\\n  * [Contents](/wiki/Wikipedia:Contents \\\"Guides
         to browsing Wikipedia\\\")\\n  * [Current events](/wiki/Portal:Current_events
         \\\"Articles related to current events\\\")\\n  * [Random article](/wiki/Special:Random
@@ -1762,7 +1762,7 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "5775"
+          - "5800"
         content-type:
           - application/json
         host:
@@ -1794,19 +1794,19 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/41SwW6jMBC95yuQz0kFKClhj1UP1Wr3UGl7KhVy7Alxa2zLM0TbRvn32pAU0t1K
-          vYB4b95j5s0cZknClGQ/EiZ2nETr9OL2prz/nW/W95u7dvUm12sqf9m3h/2yuPnzk82jwm6eQdBZ
-          dSVs0AEpawZaeOAE0TUrimy1SvP0uidaK0FHWeNosbSLPM2XiywL75NwZ5UADBWP4TNJDv0ztmgk
-          /A1wOj8jLSDyBgJ2LgqgtzoijCMqJG6IzUdSWENg+q4PlUmSimHXtty/VgGqWMXmA+pBw54bATUK
-          6yGyaWWOUysP2w55nMR0Wk8IbowlHpPoh3g6McePtrVtnLcb/CRlW2UU7uoQHIYUQ4tI1rGePYbn
-          Ux9PdzExC0ato5rsC/S/y65Xy8GQjRuZ0ieSQot6ihenWC8dawnElcZJxExwsQM5asd98E4qOyFm
-          k7n/bed/3sPsyjTfsR8JIcCFY6udB6nE5chjmYd4sV+VfeTcN8wQ/D7cYU0KfNyFhC3v9HBMDF+R
-          oK3DwhrwzqvhorauLspclDwti4LNjrN3UmEDS1oDAAA=
+          H4sIAAAAAAAA/3RSXYvbMBB8z68w+5wUO03ium9XCqEf0B6UUlofRpE2tu5kSWjla4+Q/17JTmKn
+          vXuR8czuaHa0h1mSgBTwNgHeMM9bqxbv391++qa+bG8+3n5+uP8gdnz74+fvr026LeR3mMcOs7tH
+          7s9dr7gJfeil0QPNHTKPUTXL82yTrbM3RU+0RqCKbbX1i5VZLNPlapFl4XtqbIzkSKHiV/hNkkN/
+          Rota4J8Ap/Mz0iIRqzFg56IAOqMiAoxIkmfaw3wkudEede/6UOokKYG6tmXuqQxQCSXMB9Shwkem
+          OVbEjcPIpqU+TqUc7jticRLdKTUhmNbGs5hEP8TdiTlebCtTW2d29E8r7KWW1FQhOAopBovkjYWe
+          PYbzro+nu5oYglBrfeXNA/bXZZv1ahCE8UWm9In0waKa4vkp1mvFSqBnUtEkYuCMNygmvevXm8sM
+          rBPSjFw6m4z+v6Pn5Ifxpa4nKi/KjwTnaMO+VdahkPx66rHMYVzal8ouUfeGgdA9hlWsvEQXn0Pg
+          nnVq2CegJ/LYVuHNanTWyWGp9rbKiyUvWFrkOcyOs78AAAD//wMA6huCU10DAAA=
       headers:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a291768aede51-SJC
+          - 9d105b973d1dfa01-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1814,13 +1814,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:47 GMT
+          - Fri, 20 Feb 2026 19:19:50 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=1KxhYXTJYZSnIl_PfhfutDKBaWTSkSycFLaUdFjgf30-1771550206.6268067-1.0.1.1-ika6lj0adysB3ie1XHCZmt7tPDed_vUIoXECtx2yEeT11XZ0gMGMMxFKf2.AU1CoSKnVhfdHw27w5LbN4UN0THbYY9kQsY3WipCpkW483HR0WUYzk.WPZ7_Tnkz84ILY;
+          - __cf_bm=HCQWR5qKsNYUmA_UBwm9QZVWqM08yb2IPLf7z9xsvZs-1771615189.6337447-1.0.1.1-VqH0DUB4sDigZgODYAbFDL7xyJM9VMad6P9reX7tyyhGlIktr09PTV9RC1RPjxhUr2Igpyl.YpkUgvyHuMO1HAVH.kUECG3u_UxAbem6TgkKGHIYBaEWYVnScJWgBpf8;
             HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 20 Feb 2026
-            01:46:47 GMT
+            19:49:50 GMT
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
@@ -1834,7 +1834,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "383"
+          - "398"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -1848,29 +1848,30 @@ interactions:
         x-ratelimit-remaining-requests:
           - "9999"
         x-ratelimit-remaining-tokens:
-          - "29998637"
+          - "29998638"
         x-ratelimit-reset-requests:
           - 6ms
         x-ratelimit-reset-tokens:
           - 2ms
         x-request-id:
-          - req_c4b117fe25ea4786a23bc61d7e03c6d3
+          - req_5516aa3252d94f71987338b8b72970ac
       status:
         code: 200
         message: OK
   - request:
       body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
-        the relevant information that could help answer the question based on the excerpt.
-        Your summary, combined with many others, will be given to the model to generate
-        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
-        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
-        information from the text - about 100 words words. `relevance_score` is an integer
-        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
-        may not contain relevant information. If not, leave `summary` empty, and make
-        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
-        chunk 4: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
-        now\\n\\n---\\n\\n2010.\\n  8. **^** [Dept. of Canadian Heritage news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"}]},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 4: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\n2010.\\n  8. **^** [Dept. of Canadian Heritage
+        news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
         [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
         July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
         February 15, 2010. Retrieved February 15, 2011.\\n  9. **^** [PM pays tribute
@@ -1927,7 +1928,7 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "6222"
+          - "6247"
         content-type:
           - application/json
         host:
@@ -1959,21 +1960,19 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/41TTW8aMRC98ytGvuQCEaAESo9J+oGURKrUqIcSrQZ7dnHjtS3bS0kj/nvGC2Sh
-          H1IvtjxvZvxm3sxLD0BoJd6DkCtMsvZmcHM1+3L38/Z6Xpn7zcXd508Pv749+Nt5+HDltejnCLf8
-          QTIdos6l4zhK2tkdLANhopx1NJ2OLi+H4+GkBWqnyOSwyqfBhRuMh+OLwWjE9z5w5bSkyB7f+Qnw
-          0p6ZolW0YfOwf7DUFCNWxLaDExuDM9kiMEYdE9ok+h0onU1kW9YvCwuwELGpawzPCzYtxNcVAW0k
-          BZ9AOYpgXQIf3ForAgSlA5cMiqIM2udawZWQOMhifqGB0mCVjddoUeE5zBPU/CGDEc7uD14fT7zg
-          Bp/PAK0CbaVpOD0YbZ8iJAeBTG4j39E1gfvSh2WTmBdET1KXWjKdhNpEwKVjJLNpSegUyZSAgQ4V
-          qPOF6O+q5rS0RiupiNIFytUPF3Z73KpAZRMxK2UbY44AtNyVtpJWpMc9sn2TxbiKf1zG30JFqa2O
-          q4IHI/KUsAQxOS9adMvnYyt/c6Ko4ES1T0VyT9R+N5qM9vqLbuI6+PLdHkxM0RyHTQ7IScZi37yj
-          ERIS5YpUF9vNGzZKuyOgd1T3n3T+lntXu7bV/6TvACnJ8xQUPpDS8rTkzi1Q3sh/ub31uSUsIoU1
-          71mRNIWshaISG7NbFhGfY6K6YMEq3oWgdxtT+mI6G8sZDmfTqehte6/La0qNOgQAAA==
+          H4sIAAAAAAAA/3VS0W7bMAx8z1cYek4GK2viZY/FgGEtNmDAVgyrC0OVaVutLGkS3S4I8u+j7CR2
+          1vZFhu9I6u7E3SxJmCrZx4TJRqBsnV58uvx+/YM/NzdfV9X21x98vrpZd79/fuP88vMXNo8d9v4B
+          JB673klLfYDKmoGWHgRCnMqzjK/5in/Y9ERrS9CxrXa4uLCLZbq8WHBO30NjY5WEQBW39Jsku/6M
+          Ek0JfwlO50ekhRBEDYQdiwj0VkeEiRBUQGGQzUdSWoNgetW73CRJzkLXtsJvc4JylrP5gHrQ8CSM
+          hCJI6yGyaW7201Eeqi6I6MR0Wk8IYYxFEZPoTdwdmP1Jtra18/Y+/NfKKmVUaAoKLlCKJDGgdaxn
+          93Te9fF0Z44ZDWodFmgfob+Okj7kw8YXmdIHEkminuLLI3M2sSgBhdJhEjGTQjZQTnpX79cnD6Ir
+          lR25dDax/lLRa+MH+8rUkylvjh8JKcHRvhXOQ6nkueuxzENc2rfKTlH3glkA/0SrWKACH5+jhEp0
+          etgnFrYBoS3ozWrwzqthqSpXZJul3Ih0k2Vstp/9AyH9tepdAwAA
       headers:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a29176f1f3c7d-SJC
+          - 9d105b97e9e5ebe2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -1981,13 +1980,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:47 GMT
+          - Fri, 20 Feb 2026 19:19:50 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=f2uS_Ca1_rZKiqRP5.mI6dxpmuXkCiAGNuiOijX0FKc-1771550206.6263182-1.0.1.1-W.qQbEkBFkPUMtONB2FBrPBWDOaDUBlqkcvf1hSl13Jpmn7_KmCTgvNs0MRhALiKwDb9VoMpNM4clz7cAr30gkMfvifaGqwOeBbt97eHt1gZwjK.oehTgX4QB8sBuP.j;
+          - __cf_bm=328oYUJrQvCnDP.pq_GXF1igeccMQI0L.jEwDpylRQg-1771615189.7483928-1.0.1.1-WCDyIxqh.kStpJdy1O0OytneJj0rGRXQlb2myiVT12jIwjDHkFL1nk5Nmq4FZGtBN5Iqm2O4lbPwNAF.7jeRIATfc5yqTdzku8uShPIYZ6naCn0sRZCrOpSGF8xQkf1U;
             HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 20 Feb 2026
-            01:46:47 GMT
+            19:49:50 GMT
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
@@ -2001,7 +2000,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "722"
+          - "855"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -2021,26 +2020,26 @@ interactions:
         x-ratelimit-reset-tokens:
           - 2ms
         x-request-id:
-          - req_34b02a3adb1f409f9384755cb9caa496
+          - req_ac2a22b18c8048778578ae35dbe7570d
       status:
         code: 200
         message: OK
   - request:
       body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
-        the relevant information that could help answer the question based on the excerpt.
-        Your summary, combined with many others, will be given to the model to generate
-        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
-        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
-        information from the text - about 100 words words. `relevance_score` is an integer
-        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
-        may not contain relevant information. If not, leave `summary` empty, and make
-        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
-        chunk 3: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
-        now\\n\\n---\\n\\n an [Order in\\nCouncil](/wiki/Order_in_Council \\\"Order
-        in Council\\\") from [Governor\\nGeneral](/wiki/Governor_General_of_Canada \\\"Governor
-        General of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc \\\"Rom\xE9o
-        LeBlanc\\\"), on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"}]},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 3: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\n an [Order in\\nCouncil](/wiki/Order_in_Council
+        \\\"Order in Council\\\") from [Governor\\nGeneral](/wiki/Governor_General_of_Canada
+        \\\"Governor General of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc
+        \\\"Rom\xE9o LeBlanc\\\"), on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
         \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
         \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
         proposed cuts to the\\n[unemployment insurance](/wiki/Unemployment_insurance
@@ -2105,7 +2104,7 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "6470"
+          - "6495"
         content-type:
           - application/json
         host:
@@ -2137,21 +2136,21 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/41Ty27bMBC8+ysWPNuGZcRR3GMbFEGLFm2QWx0INLWSmFKkwKUcC4b/vUvJjuw+
-          gF702NkZDvdxmAAInYt3IFQlg6obM7t/v/7+5eHWLT4padL94121elqHR/fZfHtBMY0Mt31BFc6s
-          uXLMw6CdHWDlUQaMqkmaJqvVYrm47YHa5WgirWzC7MbNlovlzSxJ+H0iVk4rJM74wb8Ah/4ZLdoc
-          9xxeTM+RGolkiRw7J3HQOxMjQhJpCtIGMR1B5WxA27s+bCzARlBb19J3Gw5txFOFgHuFvgmQa1It
-          ERIEjn6V8WrSwEcjS3AFfJBW5hLuZQfS5qADQcXnOd9NQVtl2lzbElgKa2c1q8Qs3PHh/EnklI7l
-          gVcdqv6AgnXn8OBeOcezBBtwzLIuOvFcadNBjqS83mJPsGdHxbUjdoKmmAK1quKTemdM1KUF54G6
-          euuMpnq+EdOhAh4N7qRVmJFyHmMllht7vCybx6IlGbtmW2MuAGnZYG+kb9jzCTm+tci4svFuS79R
-          RaGtpirjISGeGG4Hl64RPXrk53M/Cu1VdwUL1U3IgvuJ/XHJXZIMgmKcvhFerU9gYIvmkpaeRuha
-          McsxSG3oYpyEkqrCfOSOsye5we4CmFzc+087f9Me7s5T8j/yI6AUNjw5WeMx1+r6ymOax7id/0p7
-          q3NvWBD6He9cFjT62IscC9maYXEEdRSwzrhhJe+F18P2FE2WrpdqLRfrNBWT4+QXlL9wMEYEAAA=
+          H4sIAAAAAAAA/41TTW/bMAy951cQOjtBHLRNs+NWbN26DShQYIemMBSJtrXKkifKaYMg/32U09TJ
+          1gG7+IOPj3z82o4AhNHiHQhVy6ia1o6v3t/e3H36ite3ttU/ZrEK68+zzt78+vZYfxFZYvjVT1Tx
+          wJoozzyMxrs9rALKiClqPp/nF/l5frnogcZrtIlWtXF85sez6exsnOf8fiHW3igk9rjnX4Bt/0wS
+          ncZnNk+zg6VBIlkh2w5ObAzeJouQRIaidFFkA6i8i+h61dulA1gK6ppGhs2STUtxVyPgs8LQRtCG
+          VEeEBJGt32UqTVr4aGUFvoQP0kkt4UpuQDoNJhLUnM+HTQbGKdtp4yrgUNh4ZzhK8sI1J+dPIq9M
+          ag88mVgzeQLX/onRwGRO7dnf+aQhcI/tBjSSCmaFvRZ30FKeamENaMsMqFM15+g1MdFUDnwA2jQr
+          bw01k6XI9rUHtLiWTmFBygdMPZgt3e64YQHLjmSal+usPQKkY4G9kH5UDy/I7nU41ldt8Cv6gypK
+          4wzVBa8H8a7wILhprejRHT8f+iXoTuYqOFDTxiL6R+zT5Zd5vg8ohr0b4PPLFzCyRHtMu1hkb0Qs
+          NEZpLB0tklBS1agH7rB1kkfrj4DRUd1/y3kr9r523o//CT8ASmHLO1O0AbVRpyUPbgHTXf7L7bXP
+          vWBBGNZ8bUU0GNIsNJays/uTEbShiE3BA6v4IoLZ303ZFvPFTC3kdDGfi9Fu9BsBBNIfQAQAAA==
       headers:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a29176947ce4c-SJC
+          - 9d105b9738627851-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -2159,13 +2158,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:47 GMT
+          - Fri, 20 Feb 2026 19:19:50 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=3ET2ivQtxBvIIHd1WdsH_ljoGk9cxv0D.J.PVEBkNKU-1771550206.6244879-1.0.1.1-kInT_8j5g_DYOi9yDhiKS4buvHrWm7iaNNOBcxlXKzRP1eVHk9tk7_fXf1Lv_7TW33AwJhIOKUX290UpLnZkDBPw8zViNQzMJA.q7xUcQMQV5JsDbchBxYm8g.0soHD8;
+          - __cf_bm=hZ3dtyBEUHPpQuC4kYPOSYSWnQXDoh_lJ1QddqavkMc-1771615189.6341558-1.0.1.1-aH80sPCQZL1kIAIiSW5Uxf38IUdriMg25K4UdMa.MDsDSGctPr96aWypBECl0yPM5s8mEbqvjzo12_aY3u2aoEWmwevIjKlkPKoEAhx5AwhWF8GqXRI3coWajlCmwmkc;
             HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 20 Feb 2026
-            01:46:47 GMT
+            19:49:50 GMT
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
@@ -2179,7 +2178,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "836"
+          - "954"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -2191,34 +2190,34 @@ interactions:
         x-ratelimit-limit-tokens:
           - "30000000"
         x-ratelimit-remaining-requests:
-          - "9998"
+          - "9999"
         x-ratelimit-remaining-tokens:
           - "29998446"
         x-ratelimit-reset-requests:
-          - 7ms
+          - 6ms
         x-ratelimit-reset-tokens:
           - 3ms
         x-request-id:
-          - req_19376f9df199467ca5c0cc45966272f1
+          - req_7d16c544c76d4806831cc1bd41cbba17
       status:
         code: 200
         message: OK
   - request:
       body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
-        the relevant information that could help answer the question based on the excerpt.
-        Your summary, combined with many others, will be given to the model to generate
-        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
-        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
-        information from the text - about 100 words words. `relevance_score` is an integer
-        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
-        may not contain relevant information. If not, leave `summary` empty, and make
-        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from unknownauthorsUnknownyeargravityhill
-        lines 0-44: Unknown author(s). Gravity hill. Poetry in America, pages 15-15,
-        Unknown year. URL: https://doi.org/10.2307/j.ctt5vkfh7.11, doi:10.2307/j.ctt5vkfh7.11.
-        This article has 0 citations.\\n\\n---\\n\\n# Gravity hill\\n\\n> \\\"Magnetic
-        hill\\\" and \\\"Mystery hill\\\" redirect here. For other uses,\\n> see [Magnetic
-        Hill (disambiguation)](<https://en.wikipedia.org/wiki/Magnetic_Hill_(disambiguation)>)\\n>
+        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"}]},{\"role\":\"user\",\"content\":\"Excerpt
+        from unknownauthorsUnknownyeargravityhill lines 0-44: Unknown author(s). Gravity
+        hill. Poetry in America, pages 15-15, Unknown year. URL: https://doi.org/10.2307/j.ctt5vkfh7.11,
+        doi:10.2307/j.ctt5vkfh7.11. This article has 0 citations.\\n\\n---\\n\\n# Gravity
+        hill\\n\\n> \\\"Magnetic hill\\\" and \\\"Mystery hill\\\" redirect here. For
+        other uses,\\n> see [Magnetic Hill (disambiguation)](<https://en.wikipedia.org/wiki/Magnetic_Hill_(disambiguation)>)\\n>
         and [Mystery Hill (disambiguation)](https://en.wikipedia.org/wiki/Mystery_Hill).\\n\\nA
         **gravity hill**, also known as a\\n**magnetic hill**, **mystery hill**, **mystery
         spot**, **gravity road**, or **anti-gravity hill**,\\nis a place where the layout
@@ -2253,7 +2252,7 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "3375"
+          - "3400"
         content-type:
           - application/json
         host:
@@ -2285,19 +2284,19 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/41SwWrjMBC95yvMnJNimyQmeyxlT22hUEqXuhhVmtjaypKqkcuGkH9fyU5qp+3C
-          Xmz83rznmTeznyUJSAE/EuAN87y1anF1ubm7vd/lj+vrtH1TP6+a5fouFQ831439BfOoMC+/kfuT
-          6oKboEMvjR5o7pB5jK5ZUWSrVZqnRU+0RqCKstr6xdIs8jRfLrIsvI/CxkiOFCqewmeS7PtnbFEL
-          /BPgdH5CWiRiNQbsVBRAZ1REgBFJ8kx7mI8kN9qj7rvelzpJSqCubZnblQEqoYT5gDpU+M40x4q4
-          cRjZtNSHqZXDbUcsTqI7pSYE09p4FpPoh3g+MoePtpWprTMv9EkKW6klNVUIjkKKoUXyxkLPHsLz
-          uY+nO5sYglFrfeXNK/a/K1bLwQ/GhYxstj6SPnSoJqriGOq5XyXQM6loEjBwxhsUo3TcBuuENBNi
-          Npn6azffeQ+TS13/j/1IcI42nFplHQrJzyceyxzGe/1X2UfKfcNA6N7DFVZeooubELhlnRpOCWhH
-          HtsqrKtGZ50c7mlrq2KT8w1LN0UBs8PsL4KdQ1ZYAwAA
+          H4sIAAAAAAAA/41SXWvbQBB8968Q+2wXy9gR7ltLKJQQSELTlyqIy2klXXq6O+5WIcH4v3fv5ERy
+          P6AvEprZGe3O7mGRZaBq+JiB7ATJ3unV5efbq/ubTfd0+f3T/beevubmzpgXf93cftnBMirs4xNK
+          elN9kJZ1SMqakZYeBWF0zYsiv8h3+X6diN7WqKOsdbTa2tVmvdmu8pzfJ2FnlcTAFT/4M8sO6Rlb
+          NDW+MJxsEtJjCKJFxt6KGPRWRwRECCqQMATLiZTWEJrU9aE0WVZCGPpe+NeSoRJKWI6oR43Pwkis
+          grQeI7suzXFu5bEZgoiTmEHrGSGMsSRiEmmIhxNzfG9b29Z5+xh+k0KjjApdxcEFTpFbDGQdJPbI
+          z4cUz3A2MbBR76gi+xPT74rddvSDaSETm1+cSOIO9UxVnEI996tqJKF0mAUMUsgO60k6bUMMtbIz
+          YjGb+s9u/uY9Tq5M+z/2EyElOj61ynmslTyfeCrzGO/1X2XvKaeGIaB/5iusSKGPm6ixEYMeTwnC
+          ayDsK15Xi955Nd5T46piv5F7sd4XBSyOi19x8uxxWAMAAA==
       headers:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a291a7fa3de51-SJC
+          - 9d105b9b0f21fa01-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -2305,7 +2304,7 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:47 GMT
+          - Fri, 20 Feb 2026 19:19:50 GMT
         Server:
           - cloudflare
         Strict-Transport-Security:
@@ -2321,7 +2320,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "366"
+          - "377"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -2341,23 +2340,23 @@ interactions:
         x-ratelimit-reset-tokens:
           - 1ms
         x-request-id:
-          - req_3fe52395696f478cb82ffdfbf4c62b91
+          - req_8b096c828f914f5794b3769b03341a4c
       status:
         code: 200
         message: OK
   - request:
       body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
-        the relevant information that could help answer the question based on the excerpt.
-        Your summary, combined with many others, will be given to the model to generate
-        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
-        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
-        information from the text - about 100 words words. `relevance_score` is an integer
-        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
-        may not contain relevant information. If not, leave `summary` empty, and make
-        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
-        chunk 2: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
-        now\\n\\n---\\n\\n_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
+        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"}]},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 2: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\n_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
         \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
         \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
         to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
@@ -2430,7 +2429,7 @@ interactions:
         connection:
           - keep-alive
         content-length:
-          - "6703"
+          - "6728"
         content-type:
           - application/json
         host:
@@ -2462,23 +2461,24 @@ interactions:
     response:
       body:
         string: !!binary |
-          H4sIAAAAAAAA/41UwW7bMAy95ysInZ0gzpKm2XHr0hVbB2wdethSGIxMO1plyZDktkGRfy+lJE3a
-          dcAuNsxHPj2ST37sAQhVivcg5AqDbFrdP/sw+3752Z9fXzxYtXKnan6xvJ7/MmdfpuMrkcUKu/xD
-          MuyrBtJyHQVlzRaWjjBQZM2n03wyGY6GJwlobEk6ltVt6I9tfzQcjft5zu9d4coqSZ4zfvMnwGN6
-          RommpAcOD7N9pCHvsSaO7ZM46KyOEYHeKx/QBJEdQGlNIJNUPy4MwEL4rmnQrRccWoifKwKDsQnU
-          UGmswVbwEQ2WmAFqb+HW2HsD6CFw6iVyy/CVsErJGdwzYKtKSYVarwFL2/IMwBqY09J1fA7kkwzy
-          2clkABch5ZfkVW04a7mGFSu2TqGBc7KuJrjiBjQxkynBUatRcmI8OomKiT848MlEigFE+Ul1xbPv
-          HHlAriqhSTp11IkBVPAgeQjkBvBt3+z8RbNwhusM7NKTu+N6NKZLDb1uhJfeUGMdb3o7EWWwqzuX
-          WCNd2CkaLES2nbcjTXdoJBVeWkdx7vlwYTbHW3JUdR6jSUyn9RHAQmxI5MkfNztk8+wIbevWse5X
-          paJSRvlVwZ70bFDePs+5FQnd8PMmOa97YSbBRE0bimBvKR2Xn45PtoTiYPYDfDrbgYEl6qOy2btJ
-          9gZjUVJApf2Re4VEuaLyUHuwOnalskdA76jvv+W8xb3tXZn6f+gPgJQUPVy0bCQlX7Z8SHMUfwb/
-          SnuecxIsoqv4ihdBkYu7KKnCTm/vqfBrH6gpeGE1udap7WWt2mI6G8kZDmfTqehtek8Ptsi3tQQA
-          AA==
+          H4sIAAAAAAAA/41UTW8TMRC951eMfN5E2apNGo7QFkoBFWhVJFJFE+/sxq3XXmxvQ6jy3xl7myaB
+          InHZKPPm68288WMPQKhCvAIhFxhk3ej+yevPF1dn48u74ubb5VX+7rp5v6T65vjkorq+F1mMsPM7
+          kmETNZCW4ygoazpYOsJAMWs+Huej/Cg/niSgtgXpGFY1oX9o+wfDg8N+nvPvU+DCKkmePb7zX4DH
+          9I0tmoJ+snmYbSw1eY8VsW3jxEZndbQI9F75gCaIbAtKawKZ1PXj1ABMhW/rGt1qyqapuFoQGIwk
+          UEOpsQJbwhs0WGAGqL2Fe2OXBtBDYNePyJThA2GZnDNYMmDLUkmFWq8AC9vwDMAaOKO5a7kO5EcZ
+          5JPR0QDOQ/IvyKvKsNd8BQvu2DqFBt6SdRXBVyagiTOZAhw1GiU7xtKpqej4hQ2nJqYYQGw/dV3y
+          7FtHHpCjCigV6QKWKizYsFyoQOB/cDcEGEAFD5JnQi6DOB5URpmKHX1YafWLipSiTlQ1U+3KJGo8
+          pzig8FzWam2X7I3QkFO2iGhsTfFIeBPMdc6iSGwi9cZZqVHVHfnPLZGBU66Jc+JWz88H8GmzjLO9
+          ZcAJrkDxrOee3EMsaEybRr4/agiWOdU11dbFwpGrMthWrUuJB1ORdTJwpOkBjaSZl9ZRlEM+nJr1
+          rngcla3HqF3Tar0DcHUbUsIk29snZP0sVG0r5jr3f4SKkmftFzM+Fc93w6Lk9TcioWv+3qaDaPc0
+          LjhR3YRZsPeUyuXHh6Muodje4A7MguvQwD3qHWAyyrMXUs4KYg1ov3NVQqJcULGN3Z4gtoWyO0Bv
+          h/jf/byUuyPPkvuf9FtASoq3NWtYnUruc966OYqP1L/cngedGhZRS/z0zIIiF5dRUImt7t4P4Vc+
+          UD3jjVXkGqe6R6RsZuPJgZzgcDIei9669xvNwNRcTQUAAA==
       headers:
         Access-Control-Expose-Headers:
           - X-Request-ID
         CF-RAY:
-          - 9d0a29176f09b1ae-SJC
+          - 9d105b9739747ac2-SJC
         Connection:
           - keep-alive
         Content-Encoding:
@@ -2486,13 +2486,13 @@ interactions:
         Content-Type:
           - application/json
         Date:
-          - Fri, 20 Feb 2026 01:16:47 GMT
+          - Fri, 20 Feb 2026 19:19:51 GMT
         Server:
           - cloudflare
         Set-Cookie:
-          - __cf_bm=TCdT7JTHFsM3cMweM.5rzzLxERgKUHbcIIq_I4DK0pQ-1771550206.6225789-1.0.1.1-PYMonewrpL.5Es3NaLsJHYIiVpGlIPKzo9LxR.oAW6Um__GL18CqXsk8rEzweM5sUu0CX2m36v5GN_lZjm9esPrj3corIP6SeB9dPAaLRTCRtnk7u6ZLn2axm147m2td;
+          - __cf_bm=bWi5tdrueyg8Znw3QyAex2ibToOb.uZNPLfFZ4bL8EY-1771615189.63541-1.0.1.1-IVmlht1wNt62JvT_c.MbU6nF3omqOfuyYujSa4gw6I3geSh8yAMNoFNT2sGs6XjDDkiICoh0dnrXLDDiIe9xxQY1H3rqMtigfGR0owYmMUso.7hgZLfZNnMvdVq6Lnpg;
             HttpOnly; Secure; Path=/; Domain=api.openai.com; Expires=Fri, 20 Feb 2026
-            01:46:47 GMT
+            19:49:51 GMT
         Strict-Transport-Security:
           - max-age=31536000; includeSubDomains; preload
         Transfer-Encoding:
@@ -2506,7 +2506,7 @@ interactions:
         openai-organization:
           - future-house-xr4tdh
         openai-processing-ms:
-          - "939"
+          - "1312"
         openai-project:
           - proj_RpeV6PrPclPHBb5GlExPXSBj
         openai-version:
@@ -2526,7 +2526,7 @@ interactions:
         x-ratelimit-reset-tokens:
           - 3ms
         x-request-id:
-          - req_7c2c55fc034349a4b8562cf44c36ef7c
+          - req_c88765d72e0548aa83e1e6a534b7fa12
       status:
         code: 200
         message: OK
