@@ -2,6 +2,7 @@ import os
 import sys
 import zlib
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
@@ -89,3 +90,29 @@ def test_cli_can_build_and_search_index(
     assert isinstance(result[0][0], Docs)
     assert all(d.startswith("Wellawatte") for d in result[0][0].docnames)
     assert result[0][1] == "paper.pdf"
+
+
+def test_settings_index_name_used_when_index_arg_is_default(
+    stub_data_dir: Path,
+) -> None:
+    settings = Settings(
+        agent={"index": {"paper_directory": stub_data_dir, "name": "my_named_index"}}
+    )
+
+    with patch("paperqa.agents.get_directory_index") as mock_get_directory_index:
+        # When --index isn't provided, the default name of "default" will still
+        # respect a custom-specified index name
+        build_index("default", stub_data_dir, settings)
+
+    assert settings.agent.index.name == "my_named_index"
+    mock_get_directory_index.assert_awaited_once_with(settings=settings)
+    passed_settings = mock_get_directory_index.call_args.kwargs["settings"]
+    assert passed_settings.agent.index.name == "my_named_index"
+
+    with patch("paperqa.agents.index_search", return_value=[]) as mock_index_search:
+        # When --index isn't provided, the default name of "default" will still
+        # respect a custom-specified index name
+        search_query("XAI", "default", settings)
+
+    mock_index_search.assert_awaited_once()
+    assert mock_index_search.call_args.kwargs["index_name"] == "my_named_index"
