@@ -288,6 +288,8 @@ async def run_aviary_agent(
                     Message(
                         role="system",
                         content=settings.agent.agent_system_prompt,
+                        # Reused as prefix on every agent turn
+                        cache_breakpoint=True,
                     )
                 ]
                 if settings.agent.agent_system_prompt

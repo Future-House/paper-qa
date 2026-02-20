@@ -253,7 +253,12 @@ async def _map_fxn_summary(  # noqa: PLR0912
             try:
                 llm_result = await summary_llm_model.call_single(
                     messages=[
-                        Message(role="system", content=system_prompt),
+                        Message(
+                            role="system",
+                            content=system_prompt,
+                            # Shared across all evidence-gathering chunks
+                            cache_breakpoint=True,
+                        ),
                         Message.create_message(
                             text=message_prompt,
                             images=(
@@ -278,7 +283,12 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 )
                 llm_result = await summary_llm_model.call_single(
                     messages=[
-                        Message(role="system", content=system_prompt),
+                        Message(
+                            role="system",
+                            content=system_prompt,
+                            # Shared across all evidence-gathering chunks
+                            cache_breakpoint=True,
+                        ),
                         Message(content=message_prompt),
                         *append_msgs,
                     ],
