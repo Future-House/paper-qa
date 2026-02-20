@@ -480,15 +480,38 @@ async def test_chain_completion(caplog) -> None:
 
 
 @pytest.mark.asyncio
-async def test_anthropic_chain(stub_data_dir: Path) -> None:
-    anthropic_settings = Settings(
-        llm="anthropic/claude-sonnet-4-6", summary_llm="anthropic/claude-sonnet-4-6"
-    )
+@pytest.mark.parametrize(
+    ("llm", "summary_llm", "embedding"),
+    [
+        pytest.param(
+            "anthropic/claude-sonnet-4-6",
+            "anthropic/claude-sonnet-4-6",
+            "text-embedding-3-small",
+            id="anthropic",
+        ),
+        pytest.param(
+            "gemini/gemini-2.5-flash",
+            "gemini/gemini-2.5-flash",
+            "gemini/gemini-embedding-001",
+            id="gemini",
+        ),
+        pytest.param(
+            "gpt-5-mini-2025-08-07",
+            "gpt-5-mini-2025-08-07",
+            "text-embedding-3-small",
+            id="openai",
+        ),
+    ],
+)
+async def test_model_chain(
+    stub_data_dir: Path, llm: str, summary_llm: str, embedding: str
+) -> None:
+    settings = Settings(llm=llm, summary_llm=summary_llm, embedding=embedding)
     # Use sequential evidence calls so later caching assertions are reliable
-    anthropic_settings.answer.max_concurrent_requests = 1
+    settings.answer.max_concurrent_requests = 1
     # Anthropic's Claude Sonnet prompt caching requires a minimum prefix of 2,048 tokens,
     # so extend our prompt to surpass this threshold
-    anthropic_settings.prompts.summary_json_system += (
+    settings.prompts.summary_json_system += (
         "\n\n## Examples\n\n"
         "Below are examples of how to produce your JSON response given an excerpt and"
         " question. Note that the summary should capture specific details like numbers,"
@@ -626,11 +649,11 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     def accum(x) -> None:
         outputs.append(x)
 
-    llm = anthropic_settings.get_llm()
+    llm_model = settings.get_llm()
     messages = [
         Message(content="The duck says"),
     ]
-    completion = await llm.call_single(
+    completion = await llm_model.call_single(
         messages=messages,
         callbacks=[accum],
     )
@@ -643,7 +666,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     assert isinstance(completion.text, str)
     assert completion.cost > 0
 
-    completion = await llm.call_single(
+    completion = await llm_model.call_single(
         messages=messages,
     )
     assert completion.seconds_to_first_token == 0
@@ -655,7 +678,7 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     await docs.aadd(
         stub_data_dir / "flag_day.html",
         "National Flag of Canada Day",
-        settings=anthropic_settings,
+        settings=settings,
     )
     assert len(docs.texts) >= 2, "Test needs at least two chunks for caching assertions"
 
@@ -665,21 +688,29 @@ async def test_anthropic_chain(stub_data_dir: Path) -> None:
     async def spy_call_single(self, *args, **kwargs):
         result = await orig_call_single(self, *args, **kwargs)
         captured_results.append(result)
+        await asyncio.sleep(3)  # Encourage cache warm up between calls
         return result
 
     with patch.object(LLMModel, "call_single", spy_call_single):
         session = await docs.aget_evidence(
-            "What is the national flag of Canada?", settings=anthropic_settings
+            "What is the national flag of Canada?", settings=settings
         )
 
     assert session.cost > 0
     assert captured_results, "Test requires LLM calls to check caching"
-    # On a cold cache the first call writes a cache entry (creation > 0);
-    # on a warm cache (re-running within the TTL) it reads instead (read > 0).
-    assert (captured_results[0].cache_creation_tokens or 0) > 0 or (
-        captured_results[0].cache_read_tokens or 0
-    ) > 0, "Expected first call to interact with prompt cache"
-    # Subsequent sequential calls always read from the (now-warm) cache.
+
+    if llm_model.provider == litellm.LlmProviders.ANTHROPIC:
+        # Anthropic: on a cold cache, the first call writes a cache entry
+        # Gemini: uses implicit caching with no creation event -- the raw response
+        # omits cachedContentTokenCount entirely
+        # OpenAI's API has no cache creation field, only cache reads,
+        # SEE: https://platform.openai.com/docs/guides/prompt-caching
+        assert (captured_results[0].cache_creation_tokens or 0) > 0 or (
+            captured_results[0].cache_read_tokens or 0
+        ) > 0, "Expected first Anthropic call to interact with prompt cache"
+
+    # On a warm cache (re-running within the TTL), subsequent calls should
+    # read from the cache.
     assert any(
         (r.cache_read_tokens or 0) > 0 for r in captured_results[1:]
     ), "Expected subsequent calls to reuse prompt cache"

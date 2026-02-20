@@ -731,7 +731,14 @@ def make_default_litellm_model_list_settings(
         "model_list": [
             {
                 "model_name": llm,
-                "litellm_params": {"model": llm, "temperature": temperature},
+                "litellm_params": {
+                    "model": llm,
+                    "temperature": temperature,
+                    # SEE: https://docs.litellm.ai/docs/tutorials/prompt_caching#litellm-python-sdk-usage
+                    "cache_control_injection_points": [
+                        {"location": "message", "role": "system"}
+                    ],
+                },
             }
         ],
     }

@@ -622,15 +622,11 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 partitioning_fn=partitioning_fn,
             )
             contexts = session.contexts
-
-        system_message = Message(
-            role="system", content=prompt_config.system, cache_breakpoint=True
-        )
         pre_str = None
         if prompt_config.pre is not None:
             with set_llm_session_ids(session.id):
                 messages = [
-                    system_message,
+                    Message(role="system", content=prompt_config.system),
                     Message(
                         role="user",
                         content=prompt_config.pre.format(question=session.question),
@@ -664,7 +660,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                         prior_answer=session.answer
                     )
                 messages = [
-                    system_message,
+                    Message(role="system", content=prompt_config.system),
                     Message(
                         role="user",
                         content=prompt_config.qa.format(
@@ -698,7 +694,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         if prompt_config.post is not None:
             with set_llm_session_ids(session.id):
                 messages = [
-                    system_message,
+                    Message(role="system", content=prompt_config.system),
                     Message(
                         role="user",
                         content=prompt_config.post.format(question=session.question),
