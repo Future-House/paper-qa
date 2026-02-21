@@ -319,7 +319,17 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     # PyPDF will blow up here with a nice message
                     media_list = []
                     for img_idx, img_obj in enumerate(page.images):
-                        width, height = cast("Image.Image", img_obj.image).size
+                        pil_image = cast("Image.Image", img_obj.image)
+                        width, height = pil_image.size
+                        if pil_image.format == "PNG":
+                            # LLM providers accept PNG, so leave the image data as-is
+                            data: bytes = img_obj.data
+                        else:
+                            # Re-encode as PNG because the image may be in a
+                            # format LLM providers reject (e.g. JPEG2000)
+                            buf = io.BytesIO()
+                            pil_image.save(buf, format="PNG")
+                            data = buf.getvalue()
                         media_metadata = {
                             "type": "picture",
                             "width": width,
@@ -332,11 +342,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                         # don't break the cache key
                         media_metadata["page_num"] = i + 1
                         media_list.append(
-                            ParsedMedia(
-                                index=img_idx,
-                                data=img_obj.data,
-                                info=media_metadata,
-                            )
+                            ParsedMedia(index=img_idx, data=data, info=media_metadata)
                         )
                     pages[str(i + 1)] = text, media_list
                     count_media += len(media_list)

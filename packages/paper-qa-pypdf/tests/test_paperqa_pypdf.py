@@ -1,8 +1,10 @@
 import base64
+import io
 import json
 import re
 from collections.abc import Sequence
 from pathlib import Path
+from types import SimpleNamespace
 from typing import cast
 from unittest.mock import patch
 
@@ -11,6 +13,7 @@ from lmi.utils import bytes_to_string
 from paperqa import Doc, Docs
 from paperqa.readers import PDFParserFn, chunk_pdf
 from paperqa.utils import REPLACEMENT_CHAR, ImpossibleParsingError, get_citation_ids
+from PIL import Image
 
 from paperqa_pypdf import parse_pdf_to_pages
 from paperqa_pypdf.reader import MediaMode
@@ -334,6 +337,42 @@ def test_clustering() -> None:
     assert len(p2_small_cluster[1]) >= len(
         p2_default_cluster[1]
     ), "Small tolerance should cluster less aggressively"
+
+
+@pytest.mark.parametrize(
+    "img_format",
+    [
+        pytest.param("BMP", id="non_png_re_encodes"),
+        pytest.param("PNG", id="png_passthrough"),
+    ],
+)
+def test_individual_mode_outputs_png(img_format: str) -> None:
+    # Form an image in the input format
+    raw_buf = io.BytesIO()
+    Image.new("RGB", (4, 4), "red").save(raw_buf, format=img_format)
+    raw_bytes = raw_buf.getvalue()
+    mock_img_obj = SimpleNamespace(
+        image=Image.open(io.BytesIO(raw_bytes)), data=raw_bytes
+    )
+
+    with (
+        patch("paperqa_pypdf.reader.pdfplumber", None),
+        patch(
+            "pypdf.PageObject.images",
+            new_callable=lambda: property(lambda _: [mock_img_obj]),
+        ),
+    ):
+        parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_range=1)
+
+    assert isinstance(parsed_text.content, dict)
+    assert "1" in parsed_text.content
+    assert isinstance(parsed_text.content["1"], tuple)
+    _, (media,) = parsed_text.content["1"]
+
+    # Verify the output is valid PNG by round-tripping through PIL
+    result_image = Image.open(io.BytesIO(media.data))
+    assert result_image.format == "PNG"
+    assert result_image.size == (4, 4)
 
 
 class TestMediaMode:
