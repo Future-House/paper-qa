@@ -321,7 +321,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     for img_idx, img_obj in enumerate(page.images):
                         pil_image = cast("Image.Image", img_obj.image)
                         width, height = pil_image.size
-                        if img_obj.name.lower().endswith(".png"):
+                        if pil_image.format == "PNG":
                             # LLM providers accept PNG, so leave the image data as-is
                             data: bytes = img_obj.data
                         else:

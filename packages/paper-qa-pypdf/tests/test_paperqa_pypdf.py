@@ -340,17 +340,20 @@ def test_clustering() -> None:
 
 
 @pytest.mark.parametrize(
-    ("name", "fmt"),
+    "img_format",
     [
-        pytest.param("Im0.bmp", "BMP", id="non_png_re_encodes"),
-        pytest.param("Im0.png", "PNG", id="png_passthrough"),
+        pytest.param("BMP", id="non_png_re_encodes"),
+        pytest.param("PNG", id="png_passthrough"),
     ],
 )
-def test_individual_mode_outputs_png(name: str, fmt: str) -> None:
-    pil_image = Image.new("RGB", (4, 4), "red")
+def test_individual_mode_outputs_png(img_format: str) -> None:
+    # Form an image in the input format
     raw_buf = io.BytesIO()
-    pil_image.save(raw_buf, format=fmt)
-    mock_img_obj = SimpleNamespace(name=name, image=pil_image, data=raw_buf.getvalue())
+    Image.new("RGB", (4, 4), "red").save(raw_buf, format=img_format)
+    raw_bytes = raw_buf.getvalue()
+    mock_img_obj = SimpleNamespace(
+        image=Image.open(io.BytesIO(raw_bytes)), data=raw_bytes
+    )
 
     with (
         patch("paperqa_pypdf.reader.pdfplumber", None),
