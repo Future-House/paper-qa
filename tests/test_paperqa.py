@@ -1864,30 +1864,71 @@ async def test_chunk_metadata_reader(
 
 
 def test_media_to_image_url(subtests: SubTests) -> None:
-    with subtests.test(msg="jpg"):
+    with subtests.test(msg="data-jpg"):
         media = ParsedMedia(index=0, data=b"fake_jpg", info={"suffix": ".jpg"})
         url = media.to_image_url()
         assert "image/jpeg" in url
 
-    with subtests.test(msg="jpeg"):
+    with subtests.test(msg="data-jpeg"):
         media = ParsedMedia(index=0, data=b"fake_jpeg", info={"suffix": ".jpeg"})
         url = media.to_image_url()
         assert "image/jpeg" in url
 
-    with subtests.test(msg="png"):
+    with subtests.test(msg="data-png"):
         media = ParsedMedia(index=0, data=b"fake_png", info={"suffix": ".png"})
         url = media.to_image_url()
         assert "image/png" in url
 
-    with subtests.test(msg="default"):
+    with subtests.test(msg="data-default"):
         media = ParsedMedia(index=0, data=b"fake_png")
         url = media.to_image_url()
         assert "image/png" in url
 
+    with subtests.test(msg="url"):
+        media = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+        assert media.to_image_url() == "https://storage.example.com/img.png"
 
-def test_parsed_media_empty_data_raises() -> None:
-    with pytest.raises(ValidationError, match="at least 1 byte"):
+
+def test_parsed_media_data_or_url() -> None:
+    with pytest.raises(ValidationError, match="At least one of"):
         ParsedMedia(index=0, data=b"")
+
+    with pytest.raises(ValidationError, match="At least one of"):
+        ParsedMedia(index=0)
+
+    with pytest.raises(ValidationError, match="not both"):
+        ParsedMedia(index=0, data=b"img", url="https://example.com/img.png")
+
+    media_with_data = ParsedMedia(index=0, data=b"image-bytes")
+    assert media_with_data.data == b"image-bytes"
+    assert not media_with_data.url
+
+    media_with_url = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    assert media_with_url.url == "https://storage.example.com/img.png"
+    assert not media_with_url.data
+    with pytest.raises(ValueError, match="Cannot generate an ID"):
+        media_with_url.to_id()
+    with pytest.raises(ValueError, match=r"(?:Cannot|no need to) save"):
+        media_with_url.save("image.png")
+
+    assert media_with_data != media_with_url
+    assert media_with_url != media_with_data
+
+
+def test_parsed_media_url_only_hash_eq() -> None:
+    m1 = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    m2 = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    assert m1 == m2
+    assert hash(m1) == hash(m2)
+
+    m3 = ParsedMedia(index=0, url="https://storage.example.com/other.png")
+    assert m1 != m3
+
+    # Mixed: one has data, the other only a URL — never equal
+    m_data = ParsedMedia(index=0, data=b"img")
+    m_url = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    assert m_data != m_url
+    assert m_url != m_data
 
 
 @pytest.mark.asyncio
