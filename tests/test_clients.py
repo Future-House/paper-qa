@@ -22,12 +22,14 @@ from paperqa.clients import (
     SemanticScholarProvider,
 )
 from paperqa.clients.client_models import MetadataPostProcessor, MetadataProvider
+from paperqa.clients.exceptions import DOINotFoundError
 from paperqa.clients.journal_quality import (
     DEFAULT_JOURNAL_QUALITY_CSV_PATH,
     JournalQualityPostProcessor,
 )
 from paperqa.clients.openalex import OpenAlexProvider, reformat_name
 from paperqa.clients.retractions import RetractionDataPostProcessor
+from paperqa.clients.semantic_scholar import s2_title_search
 from paperqa.types import SOURCE_QUALITY_MESSAGES, DocDetails
 
 # Use to avoid flaky tests every time citation count changes
@@ -377,6 +379,35 @@ async def test_client_os_error() -> None:
         ) as mock_get:
             assert not await client.query(doi="placeholder")
         assert mock_get.call_count >= 1, "Expected the exception to have been thrown"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    ("return_value", "match"),
+    [
+        pytest.param({"data": []}, "No results", id="empty-data"),
+        pytest.param({"data": [{}]}, "Unexpected", id="missing-title-key"),
+    ],
+)
+async def test_s2_title_search_edge_cases(
+    return_value: dict[str, Any], match: str
+) -> None:
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
+        with patch(
+            "paperqa.clients.semantic_scholar._s2_get_with_retrying",
+            return_value=return_value,
+        ):
+            with pytest.raises(DOINotFoundError, match=match):
+                await s2_title_search("some title", client=http_client)
+
+
+@pytest.mark.vcr
+@pytest.mark.asyncio
+async def test_s2_title_search_empty_data() -> None:
+    """Confirm an S2 match response with empty data raises DOINotFoundError."""
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
+        with pytest.raises(DOINotFoundError, match="No results"):
+            await s2_title_search("empty results edge case query", client=http_client)
 
 
 @pytest.mark.vcr

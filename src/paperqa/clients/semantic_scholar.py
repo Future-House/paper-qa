@@ -265,9 +265,13 @@ async def s2_title_search(
             (strings_similarity(entry["title"], title), entry)
             for entry in data.get("data", data)
         )
+    except ValueError as exc:
+        # ValueError: S2 may return {"data": []} causing max() on an empty iterable to
+        # throw a ValueError
+        raise DOINotFoundError(f"No results found for title {title}.") from exc
     except (KeyError, IndexError) as exc:
         raise DOINotFoundError(
-            f"Unexpected Semantic Scholar search/match endpoint shape for {title}"
+            f"Unexpected Semantic Scholar search/match endpoint shape for title {title}"
             f" given data {data}."
         ) from exc
 
