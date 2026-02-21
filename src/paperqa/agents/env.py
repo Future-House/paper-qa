@@ -317,14 +317,7 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
             #  if given a plain Message, or into LDP as a tool-calling SimpleAgent
             #  should not be responding with a plain Message
             return (  # type: ignore[unreachable]
-                [
-                    Message(
-                        content=(
-                            f"Expected a {ToolRequestMessage.__name__} containing"
-                            f" 0+ tool calls, but received a {type(action).__name__}."
-                        )
-                    )
-                ],
+                [Message(content="You must call tools to proceed.")],
                 self.USE_POST_PROCESSED_REWARD,
                 False,
                 False,
