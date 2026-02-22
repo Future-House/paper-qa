@@ -453,21 +453,23 @@ def test_render_page(subtests: pytest.Subtests) -> None:
     filepath = str(STUB_DATA_DIR / "pasa.pdf")
 
     with subtests.test(msg="no-bbox"):
-        page_num, image, pil_img, ph, pw, ox, oy = _render_page(
+        page_num, image_data_uri, pil_img, ph, pw, ox, oy = _render_page(
             filepath, page_num=0, dpi=72, needs_bbox=False
         )
         assert page_num == 0
-        assert image.ndim == 3
+        assert isinstance(image_data_uri, str)
+        assert image_data_uri.startswith("data:image/png;base64,")
         assert pil_img.width > 0
         assert pil_img.height > 0
         assert ph == pw == ox == oy == 0
 
     with subtests.test(msg="with-bbox"):
-        page_num, image, pil_img, ph, pw, ox, oy = _render_page(
+        page_num, image_data_uri, pil_img, ph, pw, ox, oy = _render_page(
             filepath, page_num=0, dpi=72, border=60
         )
         assert page_num == 0
-        assert image.ndim == 3
+        assert isinstance(image_data_uri, str)
+        assert image_data_uri.startswith("data:image/png;base64,")
         assert ph == pil_img.height + 120
         assert pw == pil_img.width + 120
         assert ox == oy == 60

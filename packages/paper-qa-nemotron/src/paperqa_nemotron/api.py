@@ -352,7 +352,7 @@ def _wait_exponential_for_nvidia_api_retry(retry_state: RetryCallState) -> float
 
 @overload
 async def _call_nvidia_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: Literal["markdown_bbox"],
     api_key: str | None = None,
     api_base: str = ...,
@@ -363,7 +363,7 @@ async def _call_nvidia_api(
 
 @overload
 async def _call_nvidia_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: Literal["markdown_no_bbox"],
     api_key: str | None = None,
     api_base: str = ...,
@@ -374,7 +374,7 @@ async def _call_nvidia_api(
 
 @overload
 async def _call_nvidia_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: Literal["detection_only"],
     api_key: str | None = None,
     api_base: str = ...,
@@ -394,7 +394,7 @@ async def _call_nvidia_api(
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 async def _call_nvidia_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: NemotronParseToolName,
     api_key: str | None = None,
     api_base: str = "https://integrate.api.nvidia.com/v1",
@@ -409,7 +409,7 @@ async def _call_nvidia_api(
     """Call the Nvidia API with an image via LiteLLM.
 
     Args:
-        image: Image to parse.
+        image: Image to parse, either a numpy array or a pre-encoded base64 data URI.
         tool_name: Name of the nemotron-parse tool.
         api_key: Optional API key for Nvidia, default uses the NVIDIA_API_KEY env var.
         api_base: API base URL to pass to the completion,
@@ -429,9 +429,12 @@ async def _call_nvidia_api(
 
     if api_key is None:
         api_key = os.environ["NVIDIA_API_KEY"]
-    image_data = Message.create_message(images=[image]).model_dump()["content"][0][
-        "image_url"
-    ]["url"]
+    if isinstance(image, str):
+        image_data: str = image
+    else:
+        image_data = Message.create_message(images=[image]).model_dump()["content"][0][
+            "image_url"
+        ]["url"]
     tool_spec = ToolCall.from_name(tool_name).model_dump(
         exclude={"id": True, "function": {"arguments"}}
     )
@@ -456,9 +459,12 @@ async def _call_nvidia_api(
             f"Didn't yet handle choices shape of model response {response}."
         )
     if response.choices[0].finish_reason == "length":
+        image_desc = (
+            "(pre-encoded)" if isinstance(image, str) else f"of shape {image.shape}"
+        )
         raise NemotronLengthError(
             f"Model response {response} from tool {tool_name!r} indicates the input"
-            f" image of shape {image.shape} is too large or the model started babbling.",
+            f" image {image_desc} is too large or the model started babbling.",
             response.choices[0],  # Include if callers want
         )
     if (
@@ -490,7 +496,7 @@ async def _call_nvidia_api(
 
 @overload
 async def _call_sagemaker_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: Literal["markdown_bbox"],
     endpoint_name: str = ...,
     aws_region: str = ...,
@@ -501,7 +507,7 @@ async def _call_sagemaker_api(
 
 @overload
 async def _call_sagemaker_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: Literal["markdown_no_bbox"],
     endpoint_name: str = ...,
     aws_region: str = ...,
@@ -512,7 +518,7 @@ async def _call_sagemaker_api(
 
 @overload
 async def _call_sagemaker_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: Literal["detection_only"],
     endpoint_name: str = ...,
     aws_region: str = ...,
@@ -527,7 +533,7 @@ async def _call_sagemaker_api(
     before_sleep=before_sleep_log(logger, logging.WARNING),
 )
 async def _call_sagemaker_api(
-    image: "np.ndarray",
+    image: "np.ndarray | str",
     tool_name: NemotronParseToolName,
     endpoint_name: str = "nemotron-parse",
     aws_region: str = "us-west-2",
@@ -541,7 +547,7 @@ async def _call_sagemaker_api(
     """Call the AWS SageMaker API with an image via aiobotocore.
 
     Args:
-        image: Image to parse.
+        image: Image to parse, either a numpy array or a pre-encoded base64 data URI.
         tool_name: Name of the nemotron-parse tool.
         endpoint_name: Name of the AWS SageMaker endpoint,
             default assumes the name is 'nemotron-parse'.
@@ -595,9 +601,12 @@ async def _call_sagemaker_api(
             f"Didn't yet handle choices shape of model response {response}."
         )
     if response.choices[0].finish_reason == "length":
+        image_desc = (
+            "(pre-encoded)" if isinstance(image, str) else f"of shape {image.shape}"
+        )
         raise NemotronLengthError(
             f"Model response {response} from tool {tool_name!r} indicates the input"
-            f" image of shape {image.shape} is too large or the model started babbling.",
+            f" image {image_desc} is too large or the model started babbling.",
             response.choices[0],  # Include if callers want
         )
     if (

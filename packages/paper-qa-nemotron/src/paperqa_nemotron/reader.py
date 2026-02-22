@@ -8,12 +8,12 @@ import os
 from collections.abc import Awaitable, Mapping
 from concurrent.futures import ProcessPoolExecutor
 from contextlib import closing
-from itertools import starmap
 from typing import Any, Literal, cast
 
 import litellm
 import numpy as np
 import pypdfium2 as pdfium
+from aviary.core import encode_image_to_base64
 from lmi.utils import gather_with_concurrency
 from paperqa.readers import PDFParserFn, resolve_page_range
 from paperqa.settings import ParsingSettings
@@ -84,13 +84,13 @@ def _render_page(
     border: int | tuple[int, int] = DEFAULT_BORDER_SIZE,
     needs_bbox: bool = True,
     page_range: int | tuple[int, int] | None = None,
-) -> tuple[int, "np.ndarray", "Image.Image", int, int, int, int]:
-    """Render a single PDF page to a numpy array and PIL image.
+) -> tuple[int, str, "Image.Image", int, int, int, int]:
+    """Render a single PDF page and pre-encode the API image as a base64 data URI.
 
     NOTE: keep this top-level for pickling support.
 
     Returns:
-        Seven-tuple of (page_num, image_for_api, rendered_page_pil,
+        Seven-tuple of (page_num, image_data_uri, rendered_page_pil,
             padded_height, padded_width, offset_x, offset_y).
     """
     pdf_doc = pdfium.PdfDocument(path)
@@ -116,15 +116,15 @@ def _render_page(
             padded_pil, offset_x, offset_y = pad_image_with_border(
                 rendered_page_pil, border
             )
-            image_for_api = np.array(padded_pil)
+            image_data_uri = encode_image_to_base64(padded_pil, format="PNG")
             padded_height, padded_width = padded_pil.height, padded_pil.width
         else:
-            image_for_api = rendered_page.to_numpy()
+            image_data_uri = encode_image_to_base64(rendered_page_pil, format="PNG")
             offset_x = offset_y = padded_height = padded_width = 0
 
     return (
         page_num,
-        image_for_api,
+        image_data_uri,
         rendered_page_pil,
         padded_height,
         padded_width,
@@ -200,28 +200,13 @@ async def parse_pdf_to_pages(
     with closing(pdf_doc):
         page_count = len(pdf_doc)
 
-    # Phase 1: Pre-render all pages (CPU-bound, parallelized via multiprocessing)
+    # Pre-render and send to model API in a pipeline
     needs_bbox = parse_media and not full_page
     path_str = str(path)
     render_args = [
         (path_str, i, dpi, border, needs_bbox, page_range)
         for i in resolve_page_range(page_range, page_count)
     ]
-    if num_workers > 1 and len(render_args) > 1:
-        loop = asyncio.get_running_loop()
-        with ProcessPoolExecutor(max_workers=num_workers) as executor:
-            rendered_pages = list(
-                await asyncio.gather(
-                    *(
-                        loop.run_in_executor(executor, _render_page, *args)
-                        for args in render_args
-                    )
-                )
-            )
-    else:
-        rendered_pages = list(starmap(_render_page, render_args))
-
-    # Phase 2: Async API calls + response processing (I/O-bound)
     render_kwargs: dict[str, Any] = {}
     if dpi is not None:
         render_kwargs["scale"] = dpi / 72
@@ -257,7 +242,7 @@ async def parse_pdf_to_pages(
 
     async def process_page(
         i: int,
-        image_for_api: "np.ndarray",
+        image_data_uri: str,
         rendered_page_pil: "Image.Image",
         padded_height: int,
         padded_width: int,
@@ -272,7 +257,7 @@ async def parse_pdf_to_pages(
         try:
             try:
                 response = await call_fn(
-                    image=image_for_api, tool_name=tool_name, **api_params
+                    image=image_data_uri, tool_name=tool_name, **api_params
                 )
             except NemotronLengthError:
                 if tool_name != "markdown_bbox":
@@ -280,7 +265,7 @@ async def parse_pdf_to_pages(
                 # Fallback to detection_only + markdown_no_bbox to reinvent
                 # markdown_bbox, bypassing its length error
                 detection_results = await call_fn(
-                    image=image_for_api, tool_name="detection_only", **api_params
+                    image=image_data_uri, tool_name="detection_only", **api_params
                 )
 
                 async def extract_text(
@@ -356,7 +341,7 @@ async def parse_pdf_to_pages(
                     f" temperature {api_params.get('temperature')}."
                 ) from model_err
             raise
-        del image_for_api  # Free up memory as API call is done
+        del image_data_uri  # Free up memory as API call is done
 
         # Per https://docs.nvidia.com/nim/vision-language-models/1.5.0/examples/nemotron-parse/overview.html#nemotron-parse-overview
         # > It outputs text in reading order.
@@ -453,22 +438,45 @@ async def parse_pdf_to_pages(
 
         return str(i + 1), text if not parse_media else (text, media)
 
+    # Pipeline rendering with API calls: each page is rendered then immediately
+    # sent to the API, overlapping compute-bound rendering with network-bound waits
+    loop = asyncio.get_running_loop()
+    executor = (
+        ProcessPoolExecutor(max_workers=num_workers)
+        if num_workers > 1 and len(render_args) > 1
+        else None
+    )
+
+    async def render_and_process(
+        page_args: tuple,
+    ) -> tuple[str, str | tuple[str, list[ParsedMedia]]]:
+        if executor is not None:
+            rendered = await loop.run_in_executor(executor, _render_page, *page_args)
+        else:
+            rendered = _render_page(*page_args)
+        return await process_page(*rendered)
+
     content: dict[str, str | tuple[str, list[ParsedMedia]]] = {}
     total_length = count_media = 0
-
-    gather = (
-        asyncio.gather(*starmap(process_page, rendered_pages))
-        if concurrency is None
-        else gather_with_concurrency(concurrency, starmap(process_page, rendered_pages))
-    )
-    for page_num, page_content in await gather:
-        content[page_num] = page_content
-        if parse_media:
-            page_text, page_media = page_content  # type: ignore[misc]
-            total_length += len(page_text)
-            count_media += len(page_media)
-        else:
-            total_length += len(page_content)
+    try:
+        gather = (
+            asyncio.gather(*(render_and_process(args) for args in render_args))
+            if concurrency is None
+            else gather_with_concurrency(
+                concurrency, (render_and_process(args) for args in render_args)
+            )
+        )
+        for page_num, page_content in await gather:
+            content[page_num] = page_content
+            if parse_media:
+                page_text, page_media = page_content  # type: ignore[misc]
+                total_length += len(page_text)
+                count_media += len(page_media)
+            else:
+                total_length += len(page_content)
+    finally:
+        if executor is not None:
+            executor.shutdown(wait=True)
 
     # No need to reflect border or api_params such as api_base or temperature here
     multimodal_string = (
