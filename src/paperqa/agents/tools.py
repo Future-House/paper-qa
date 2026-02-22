@@ -10,7 +10,7 @@ from collections.abc import Callable
 from itertools import chain
 from typing import ClassVar, Self, cast
 
-from aviary.core import ToolRequestMessage
+from aviary.core import Message, ToolRequestMessage
 from lmi import Embeddable, EmbeddingModel, LiteLLMModel
 from pydantic import BaseModel, ConfigDict, Field, computed_field
 
@@ -80,9 +80,12 @@ class EnvironmentState(BaseModel):
             if score_threshold is None or c.score > score_threshold
         ]
 
-    def record_action(self, action: ToolRequestMessage) -> None:
+    def record_action(self, action: Message | ToolRequestMessage) -> None:
         self.session.add_tokens(action)
-        self.session.tool_history.append([tc.function.name for tc in action.tool_calls])
+        if isinstance(action, ToolRequestMessage):
+            self.session.tool_history.append(
+                [tc.function.name for tc in action.tool_calls]
+            )
 
     def query_tool_history(self, tool_name: str) -> bool:
         """Return true if the tool is has been called in history."""

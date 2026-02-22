@@ -310,6 +310,18 @@ class PaperQAEnvironment(Environment[EnvironmentState]):
         self, action: ToolRequestMessage
     ) -> tuple[Messages, float, bool, bool]:
         self.state.record_action(action)
+        if not isinstance(action, ToolRequestMessage):
+            # Do this check after recording, so the cost gets recorded,
+            # even if the action was the wrong type
+            # TODO: upstream this to Aviary's exec_tool_calls as it will also crash
+            #  if given a plain Message, or into LDP as a tool-calling SimpleAgent
+            #  should not be responding with a plain Message
+            return (  # type: ignore[unreachable]
+                [Message(content="You must call tools to proceed.")],
+                self.USE_POST_PROCESSED_REWARD,
+                False,
+                False,
+            )
 
         response_messages = cast(
             "list[Message]",
