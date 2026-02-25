@@ -616,13 +616,14 @@ def citation_to_docname(citation: str) -> str:
     if match is not None:
         author = match.group(1)
     else:
-        # Fall back to acronym/symbol-led starts like "CD47/SIRPα ...".
+        # Fall back to acronym/symbol-led starts like "CD47/SIRP-alpha ...".
         match = re.search(r"([A-Z0-9]{2,})", citation)
-        if match is not None:
-            author = match.group(1)
-        else:
-            # Final deterministic fallback for non-text-like citation strings.
-            author = f"Doc{hexdigest(citation)[:8]}"
+        # Final deterministic fallback for non-text-like citation strings.
+        author = (
+            match.group(1)
+            if match is not None
+            else f"Doc{hexdigest(citation)[:8]}"
+        )
     year = ""
     match = re.search(r"(\d{4})", citation)
     if match is not None:

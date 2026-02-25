@@ -2,7 +2,7 @@ from paperqa.utils import citation_to_docname
 
 
 def test_citation_to_docname_acronym_title() -> None:
-    citation = "CD47/SIRPα axis: bridging innate and adaptive immunity, 2022"
+    citation = "CD47/SIRP\u03b1 axis: bridging innate and adaptive immunity, 2022"
     assert citation_to_docname(citation) == "CD472022"
 
 
