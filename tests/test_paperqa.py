@@ -3475,10 +3475,7 @@ async def test_timeout_resilience() -> None:
         "text": text,
         "question": "The duck says",
         "summary_llm_model": llm,
-        # Placeholder prompt templates are required as due to
-        # https://github.com/BerriAI/litellm/issues/21622,
-        # empty system message content isn't allowed for Anthropic models
-        "prompt_templates": ("{question}", "{question}"),
+        "prompt_templates": ("", ""),
     }
     # This *should* raise
     with pytest.raises(LLMContextTimeoutError):
