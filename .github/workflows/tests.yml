@@ -98,7 +98,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: ~/.npm
-          key: renovate-npm-${{ runner.os }}
+          key: renovate-npm-${{ runner.os }}-${{ hashFiles('.github/workflows/tests.yaml') }}
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v2.0.0
   test-src:
     runs-on: ubuntu-latest
