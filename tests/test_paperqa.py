@@ -711,9 +711,16 @@ async def test_model_chain(
 
     # On a warm cache (re-running within the TTL), subsequent calls should
     # read from the cache.
-    assert any(
-        (r.cache_read_tokens or 0) > 0 for r in captured_results[1:]
-    ), "Expected subsequent calls to reuse prompt cache"
+    try:
+        assert any(
+            (r.cache_read_tokens or 0) > 0 for r in captured_results[1:]
+        ), "Expected subsequent calls to reuse prompt cache"
+    except AssertionError:
+        if llm_model.provider != litellm.LlmProviders.GEMINI:
+            raise
+        # Even with a 3-sec delay for caching to take place, Google Gemini
+        # does not reliably report cache reads. So to avoid flaky CI,
+        # this assertion is only enforced for non-Gemini providers
 
 
 @pytest.mark.vcr(
