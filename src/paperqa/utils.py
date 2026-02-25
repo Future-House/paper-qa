@@ -620,9 +620,7 @@ def citation_to_docname(citation: str) -> str:
         match = re.search(r"([A-Z0-9]{2,})", citation)
         # Final deterministic fallback for non-text-like citation strings.
         author = (
-            match.group(1)
-            if match is not None
-            else f"Doc{hexdigest(citation)[:8]}"
+            match.group(1) if match is not None else f"Doc{hexdigest(citation)[:8]}"
         )
     year = ""
     match = re.search(r"(\d{4})", citation)
