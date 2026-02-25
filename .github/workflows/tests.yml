@@ -94,6 +94,11 @@ jobs:
       - run: uv sync
       - run: uv run pylint src packages
       - run: uv run refurb .
+      - name: Cache npm for github-action-renovate-config-validator
+        uses: actions/cache@v5
+        with:
+          path: ~/.npm
+          key: renovate-npm-${{ runner.os }}-${{ hashFiles('.github/workflows/tests.yaml') }}
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v2.0.0
   test-src:
     runs-on: ubuntu-latest
