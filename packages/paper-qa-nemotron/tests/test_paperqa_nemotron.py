@@ -17,7 +17,7 @@ from tenacity import Future, RetryError
 
 from paperqa_nemotron import parse_pdf_to_pages
 from paperqa_nemotron.api import NemotronBBoxError, NemotronLengthError
-from paperqa_nemotron.reader import pad_image_with_border
+from paperqa_nemotron.reader import _render_page, pad_image_with_border
 
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
@@ -239,8 +239,13 @@ async def test_page_range() -> None:
     assert "page_range=(1,2)" in parsed_text_p1_2.metadata.name
 
     # NOTE: exceeds 15-page PDF length
-    with pytest.raises(ValueError, match="value 15 is outside the size"):
-        await parse_pdf_to_pages(filepath, page_range=(1, 20))
+    parsed_text_p1_20 = await parse_pdf_to_pages(filepath, page_range=(1, 20))
+    assert isinstance(parsed_text_p1_20.content, dict)
+    assert list(parsed_text_p1_20.content) == [
+        str(i) for i in range(1, 15 + 1)
+    ], "Expected pages to be truncated to 15 or us to get blown up"
+    assert parsed_text_p1_20.metadata.name
+    assert "page_range=(1,20)" in parsed_text_p1_20.metadata.name
 
 
 @pytest.mark.skip(reason="Nemotron Parse cannot handle duplicate_media.pdf reliably")
@@ -442,6 +447,38 @@ async def test_media_enrichment_filters_irrelevant() -> None:
         and "wikimedia" in m.info["enriched_description"].lower()
     ]
     assert len(wikimedia_media_after) <= 1, "Expected most Wikimedia logos to be gone"
+
+
+def test_render_page(subtests: pytest.Subtests) -> None:
+    filepath = str(STUB_DATA_DIR / "pasa.pdf")
+
+    with subtests.test(msg="no-bbox"):
+        page_num, image_data_uri, pil_img, ph, pw, ox, oy = _render_page(
+            filepath, page_num=0, dpi=72, needs_bbox=False
+        )
+        assert page_num == 0
+        assert isinstance(image_data_uri, str)
+        assert image_data_uri.startswith("data:image/png;base64,")
+        assert pil_img.width > 0
+        assert pil_img.height > 0
+        assert ph == pw == ox == oy == 0
+
+    with subtests.test(msg="with-bbox"):
+        page_num, image_data_uri, pil_img, ph, pw, ox, oy = _render_page(
+            filepath, page_num=0, dpi=72, border=60
+        )
+        assert page_num == 0
+        assert isinstance(image_data_uri, str)
+        assert image_data_uri.startswith("data:image/png;base64,")
+        assert ph == pil_img.height + 120
+        assert pw == pil_img.width + 120
+        assert ox == oy == 60
+
+    with (
+        subtests.test(msg="out-of-range"),
+        pytest.raises(ValueError, match="is outside"),
+    ):
+        _render_page(filepath, page_num=100, page_range=(1, 200))
 
 
 def _wrap_into_retry_error(exception: Exception) -> RetryError:
