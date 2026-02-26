@@ -611,16 +611,16 @@ def logging_filters(
 
 def citation_to_docname(citation: str) -> str:
     """Create a docname that follows MLA parenthetical in-text citation."""
-    # get first name and year from citation
+    # Prefer title-case token first to preserve existing behavior.
     match = re.search(r"([A-Z][a-z]+)", citation)
     if match is not None:
         author = match.group(1)
     else:
-        # panicking - no word??
-        raise ValueError(
-            f"Could not parse docname from citation {citation}. "
-            "Consider just passing key explicitly - e.g. docs.py "
-            "(path, citation, key='mykey')"
+        # Fall back to acronym/symbol-led starts like "CD47/SIRP-alpha ...".
+        match = re.search(r"([A-Z0-9]{2,})", citation)
+        # Final deterministic fallback for non-text-like citation strings.
+        author = (
+            match.group(1) if match is not None else f"Doc{hexdigest(citation)[:8]}"
         )
     year = ""
     match = re.search(r"(\d{4})", citation)
