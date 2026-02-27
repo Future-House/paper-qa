@@ -1383,7 +1383,9 @@ async def test_hybrid_embedding(
 
 
 @pytest.mark.asyncio
-async def test_custom_llm(stub_data_dir: Path) -> None:
+async def test_custom_llm_custom_media(stub_data_dir: Path) -> None:
+    captured_messages: list[list[Message]] = []
+
     class StubLLMModel(LLMModel):
         name: str = "custom/myllm"
 
@@ -1392,10 +1394,11 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
             messages: list[Message],
             **kwargs,  # noqa: ARG002
         ) -> list[LLMResult]:
+            captured_messages.append(messages)
             return [
                 LLMResult(
                     model=self.name,
-                    text="Echo 2",
+                    text="Echo 2\nRelevance score: 8",
                     prompt=messages,
                     prompt_count=1,
                     completion_count=1,
@@ -1410,7 +1413,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         ) -> AsyncIterable[LLMResult]:
             yield LLMResult(
                 model=self.name,
-                text="Echo 2",
+                text="Echo 2\nRelevance score: 8",
                 prompt=messages,
                 prompt_count=1,
                 completion_count=1,
@@ -1426,29 +1429,50 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         dockey="test",
         llm_model=StubLLMModel(),
     )
-    # ensure JSON summaries are not used
-    no_json_settings = Settings(prompts={"use_json": False})
-    evidence = (
-        await docs.aget_evidence(
-            "Echo", summary_llm_model=StubLLMModel(), settings=no_json_settings
-        )
-    ).contexts
-    assert evidence
-    assert "Echo" in evidence[0].context
+    stub_doc = Doc(docname="stub-gcs", citation="Stub GCS Citation", dockey="stub-gcs")
+    signed_url = (
+        "https://storage.googleapis.com/test-bucket/img.png"
+        "?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Signature=abc"
+    )
+    await docs.aadd_texts(
+        texts=[
+            Text(
+                text="This chunk contains an image from GCS.",
+                name="gcs-chunk",
+                doc=stub_doc,
+                media=[ParsedMedia(index=0, url=signed_url)],
+            )
+        ],
+        doc=stub_doc,
+    )
 
-    async def test_callback(result: LLMResult | str) -> None:
-        """Empty callback for testing purposes."""
-
-    evidence = (
-        await docs.aget_evidence(
-            "Echo",
-            callbacks=[test_callback],
-            summary_llm_model=StubLLMModel(),
-            settings=no_json_settings,
+    settings = Settings(
+        prompts={"use_json": False},
+        answer={"evidence_retrieval": False, "evidence_skip_summary": False},
+    )
+    session = await docs.aget_evidence(
+        "Echo", summary_llm_model=StubLLMModel(), settings=settings
+    )
+    assert session.contexts, "Expected at least one context"
+    assert any(
+        "Echo" in c.context for c in session.contexts
+    ), "Expected text-based evidence containing 'Echo'"
+    signed_url_msgs = [
+        m
+        for msgs in captured_messages
+        for m in msgs
+        if m.content
+        and m.is_multimodal
+        and any(
+            entry.get("type") == "image_url" and entry["image_url"]["url"] == signed_url
+            for entry in json.loads(m.content)
         )
-    ).contexts
-    assert evidence
-    assert "Echo" in evidence[0].context
+    ]
+    assert any(
+        "Summarize the excerpt below to help answer a question" in m.content
+        for m in signed_url_msgs
+        if m.content
+    ), "Expected the signed GCS URL to be used when gathering evidence"
 
 
 @pytest.mark.asyncio
