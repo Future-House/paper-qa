@@ -575,7 +575,12 @@ class ParsedMedia(BaseModel):
         PlainSerializer(bytes_to_string),
         BeforeValidator(lambda x: x if isinstance(x, bytes) else string_to_bytes(x)),
     ] = Field(
-        min_length=1, description="Raw image, ideally directly savable to a PNG image."
+        default=b"",
+        description="Raw image, ideally directly savable to a PNG image.",
+    )
+    url: str | None = Field(
+        default=None,
+        description="Optional HTTP(S) URL to the media (e.g. a signed GCS link).",
     )
     text: str | None = Field(
         default=None,
@@ -594,6 +599,19 @@ class ParsedMedia(BaseModel):
         ),
     )
 
+    @model_validator(mode="after")
+    def _check_data_xor_url(self) -> Self:
+        if not self.data and not self.url:
+            raise ValueError("Setting one of 'data' (non-empty) or 'url' is required.")
+        if self.data and self.url:
+            raise ValueError(
+                "Set 'data' or 'url', not both. Having both creates ambiguous"
+                " state (e.g. which source is canonical for hashing/equality)."
+                " Convert between them instead: upload bytes to get a signed"
+                " URL, or download a URL to get bytes."
+            )
+        return self
+
     def _get_info_hashable(self) -> Hashable:
         if info_hashable := self.info.get("info_hashable"):
             return cast(Hashable, info_hashable)
@@ -601,10 +619,20 @@ class ParsedMedia(BaseModel):
         return json.dumps(self.info, sort_keys=True)
 
     def __hash__(self) -> int:
-        return hash((self.index, self.data, self.text, self._get_info_hashable()))
+        data_or_url = self.data or self.url
+        return hash((self.index, data_or_url, self.text, self._get_info_hashable()))
 
     def to_id(self) -> UUID:
-        """Convert this media to a UUID4 suitable for a database ID."""
+        """Convert this media to a UUID4 suitable for a database ID.
+
+        Raises:
+            ValueError: If ``data`` is empty (ID generation requires image bytes).
+        """
+        if not self.data:
+            raise ValueError(
+                "Cannot generate an ID without image data bytes."
+                " URL-only ParsedMedia instances do not support to_id()."
+            )
         # We only hash the image and text content, since we don't want
         # minor parsing details (e.g. inconsequentially-small decimal values
         # in bounding boxes) to change the resultant ID
@@ -625,15 +653,28 @@ class ParsedMedia(BaseModel):
     def __eq__(self, other) -> bool:
         if not isinstance(other, ParsedMedia):
             return NotImplemented
-        return (
-            self.index == other.index
-            and self.data == other.data
-            and self.text == other.text
-            and self._get_info_hashable() == other._get_info_hashable()
-        )
+        if bool(self.data) != bool(other.data):
+            # We only compare bytes or URLs, we consider mixes incompatible.
+            # If you need compatibility, resolve the URL to bytes or generate a URL
+            return False
+        if (
+            self.index != other.index
+            or self.text != other.text
+            or self._get_info_hashable() != other._get_info_hashable()
+        ):
+            return False
+        if self.data:
+            return self.data == other.data
+        return self.url == other.url
 
     def to_image_url(self) -> str:
-        """Convert the image data to an RFC 2397 data URL format."""
+        """Get a URL suitable for LLM image content.
+
+        Returns a signed/public HTTP URL when available, otherwise falls back
+        to an RFC 2397 base64 data URL built from the raw bytes.
+        """
+        if self.url:
+            return self.url
         image_type = cast(str, self.info.get("suffix", "png")).removeprefix(".")
         if image_type == "jpg":  # SEE: https://stackoverflow.com/a/54488403
             image_type = "jpeg"
@@ -641,8 +682,35 @@ class ParsedMedia(BaseModel):
 
     def save(self, path: str | os.PathLike) -> None:
         """Save the image to the input file path."""
+        if not self.data:
+            # We are forcing users to handle downloads themselves to local storage.
+            # if they desire it. Also, developers should question the necessity
+            # of local saving, as remotely-stored media is already 'saved'
+            raise ValueError(
+                "There's no need to save media when image data is stored via a URL,"
+                " as the media is already saved remotely."
+            )
         with Path(path).open("wb") as f:
             f.write(self.data)
+
+
+def create_multimodal_message(
+    text: str | None,
+    image_urls: list[str],
+    role: str = "user",
+) -> Message:
+    """Build an OpenAI-format multimodal message, bypassing aviary's validation.
+
+    aviary's Message.create_message passes images through base64 image validation,
+    which rejects HTTP(S) URLs. So this helper constructs the same content list directly,
+    allowing signed GCS links alongside RFC 2397 data URLs.
+    """
+    content: list[dict[str, Any]] = [
+        {"type": "image_url", "image_url": {"url": url}} for url in image_urls
+    ]
+    if text is not None:
+        content.append({"type": "text", "text": text})
+    return Message(role=role, content=content)
 
 
 class ParsedText(BaseModel):

@@ -10,7 +10,7 @@ from lmi import LLMModel, LLMResult
 from pydantic import JsonValue
 
 from paperqa.prompts import text_with_tables_prompt_template
-from paperqa.types import Context, Text
+from paperqa.types import Context, Text, create_multimodal_message
 from paperqa.utils import extract_score, strip_citations
 
 logger = logging.getLogger(__name__)
@@ -254,13 +254,13 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 llm_result = await summary_llm_model.call_single(
                     messages=[
                         Message(role="system", content=system_prompt),
-                        Message.create_message(
-                            text=message_prompt,
-                            images=(
-                                [i.to_image_url() for i in unique_media]
-                                if unique_media
-                                else None
-                            ),
+                        (
+                            create_multimodal_message(
+                                text=message_prompt,
+                                image_urls=[i.to_image_url() for i in unique_media],
+                            )
+                            if unique_media
+                            else Message.create_message(text=message_prompt)
                         ),
                         *append_msgs,
                     ],

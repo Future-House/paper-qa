@@ -1383,7 +1383,9 @@ async def test_hybrid_embedding(
 
 
 @pytest.mark.asyncio
-async def test_custom_llm(stub_data_dir: Path) -> None:
+async def test_custom_llm_custom_media(stub_data_dir: Path) -> None:
+    captured_messages: list[list[Message]] = []
+
     class StubLLMModel(LLMModel):
         name: str = "custom/myllm"
 
@@ -1392,10 +1394,11 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
             messages: list[Message],
             **kwargs,  # noqa: ARG002
         ) -> list[LLMResult]:
+            captured_messages.append(messages)
             return [
                 LLMResult(
                     model=self.name,
-                    text="Echo 2",
+                    text="Echo 2\nRelevance score: 8",
                     prompt=messages,
                     prompt_count=1,
                     completion_count=1,
@@ -1410,7 +1413,7 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         ) -> AsyncIterable[LLMResult]:
             yield LLMResult(
                 model=self.name,
-                text="Echo 2",
+                text="Echo 2\nRelevance score: 8",
                 prompt=messages,
                 prompt_count=1,
                 completion_count=1,
@@ -1426,29 +1429,50 @@ async def test_custom_llm(stub_data_dir: Path) -> None:
         dockey="test",
         llm_model=StubLLMModel(),
     )
-    # ensure JSON summaries are not used
-    no_json_settings = Settings(prompts={"use_json": False})
-    evidence = (
-        await docs.aget_evidence(
-            "Echo", summary_llm_model=StubLLMModel(), settings=no_json_settings
-        )
-    ).contexts
-    assert evidence
-    assert "Echo" in evidence[0].context
+    stub_doc = Doc(docname="stub-gcs", citation="Stub GCS Citation", dockey="stub-gcs")
+    signed_url = (
+        "https://storage.googleapis.com/test-bucket/img.png"
+        "?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Signature=abc"
+    )
+    await docs.aadd_texts(
+        texts=[
+            Text(
+                text="This chunk contains an image from GCS.",
+                name="gcs-chunk",
+                doc=stub_doc,
+                media=[ParsedMedia(index=0, url=signed_url)],
+            )
+        ],
+        doc=stub_doc,
+    )
 
-    async def test_callback(result: LLMResult | str) -> None:
-        """Empty callback for testing purposes."""
-
-    evidence = (
-        await docs.aget_evidence(
-            "Echo",
-            callbacks=[test_callback],
-            summary_llm_model=StubLLMModel(),
-            settings=no_json_settings,
+    settings = Settings(
+        prompts={"use_json": False},
+        answer={"evidence_retrieval": False, "evidence_skip_summary": False},
+    )
+    session = await docs.aget_evidence(
+        "Echo", summary_llm_model=StubLLMModel(), settings=settings
+    )
+    assert session.contexts, "Expected at least one context"
+    assert any(
+        "Echo" in c.context for c in session.contexts
+    ), "Expected text-based evidence containing 'Echo'"
+    signed_url_msgs = [
+        m
+        for msgs in captured_messages
+        for m in msgs
+        if m.content
+        and m.is_multimodal
+        and any(
+            entry.get("type") == "image_url" and entry["image_url"]["url"] == signed_url
+            for entry in json.loads(m.content)
         )
-    ).contexts
-    assert evidence
-    assert "Echo" in evidence[0].context
+    ]
+    assert any(
+        "Summarize the excerpt below to help answer a question" in m.content
+        for m in signed_url_msgs
+        if m.content
+    ), "Expected the signed GCS URL to be used when gathering evidence"
 
 
 @pytest.mark.asyncio
@@ -1864,30 +1888,71 @@ async def test_chunk_metadata_reader(
 
 
 def test_media_to_image_url(subtests: SubTests) -> None:
-    with subtests.test(msg="jpg"):
+    with subtests.test(msg="data-jpg"):
         media = ParsedMedia(index=0, data=b"fake_jpg", info={"suffix": ".jpg"})
         url = media.to_image_url()
         assert "image/jpeg" in url
 
-    with subtests.test(msg="jpeg"):
+    with subtests.test(msg="data-jpeg"):
         media = ParsedMedia(index=0, data=b"fake_jpeg", info={"suffix": ".jpeg"})
         url = media.to_image_url()
         assert "image/jpeg" in url
 
-    with subtests.test(msg="png"):
+    with subtests.test(msg="data-png"):
         media = ParsedMedia(index=0, data=b"fake_png", info={"suffix": ".png"})
         url = media.to_image_url()
         assert "image/png" in url
 
-    with subtests.test(msg="default"):
+    with subtests.test(msg="data-default"):
         media = ParsedMedia(index=0, data=b"fake_png")
         url = media.to_image_url()
         assert "image/png" in url
 
+    with subtests.test(msg="url"):
+        media = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+        assert media.to_image_url() == "https://storage.example.com/img.png"
 
-def test_parsed_media_empty_data_raises() -> None:
-    with pytest.raises(ValidationError, match="at least 1 byte"):
+
+def test_parsed_media_data_or_url() -> None:
+    with pytest.raises(ValidationError, match="one of"):
         ParsedMedia(index=0, data=b"")
+
+    with pytest.raises(ValidationError, match="one of"):
+        ParsedMedia(index=0)
+
+    with pytest.raises(ValidationError, match="not both"):
+        ParsedMedia(index=0, data=b"img", url="https://example.com/img.png")
+
+    media_with_data = ParsedMedia(index=0, data=b"image-bytes")
+    assert media_with_data.data == b"image-bytes"
+    assert not media_with_data.url
+
+    media_with_url = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    assert media_with_url.url == "https://storage.example.com/img.png"
+    assert not media_with_url.data
+    with pytest.raises(ValueError, match="Cannot generate an ID"):
+        media_with_url.to_id()
+    with pytest.raises(ValueError, match=r"(?:Cannot|no need to) save"):
+        media_with_url.save("image.png")
+
+    assert media_with_data != media_with_url
+    assert media_with_url != media_with_data
+
+
+def test_parsed_media_url_only_hash_eq() -> None:
+    m1 = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    m2 = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    assert m1 == m2
+    assert hash(m1) == hash(m2)
+
+    m3 = ParsedMedia(index=0, url="https://storage.example.com/other.png")
+    assert m1 != m3
+
+    # Mixed: one has data, the other only a URL — never equal
+    m_data = ParsedMedia(index=0, data=b"img")
+    m_url = ParsedMedia(index=0, url="https://storage.example.com/img.png")
+    assert m_data != m_url
+    assert m_url != m_data
 
 
 @pytest.mark.asyncio
