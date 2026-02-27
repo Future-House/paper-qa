@@ -602,7 +602,7 @@ class ParsedMedia(BaseModel):
     @model_validator(mode="after")
     def _check_data_xor_url(self) -> Self:
         if not self.data and not self.url:
-            raise ValueError("At least one of 'data' (non-empty) or 'url' is required.")
+            raise ValueError("Setting one of 'data' (non-empty) or 'url' is required.")
         if self.data and self.url:
             raise ValueError(
                 "Set 'data' or 'url', not both. Having both creates ambiguous"
@@ -657,14 +657,15 @@ class ParsedMedia(BaseModel):
             # We only compare bytes or URLs, we consider mixes incompatible.
             # If you need compatibility, resolve the URL to bytes or generate a URL
             return False
-        common = (
-            self.index == other.index
-            and self.text == other.text
-            and self._get_info_hashable() == other._get_info_hashable()
-        )
+        if (
+            self.index != other.index
+            or self.text != other.text
+            or self._get_info_hashable() != other._get_info_hashable()
+        ):
+            return False
         if self.data:
-            return common and self.data == other.data
-        return common and self.url == other.url
+            return self.data == other.data
+        return self.url == other.url
 
     def to_image_url(self) -> str:
         """Get a URL suitable for LLM image content.
@@ -672,7 +673,7 @@ class ParsedMedia(BaseModel):
         Returns a signed/public HTTP URL when available, otherwise falls back
         to an RFC 2397 base64 data URL built from the raw bytes.
         """
-        if self.url and not self.data:
+        if self.url:
             return self.url
         image_type = cast(str, self.info.get("suffix", "png")).removeprefix(".")
         if image_type == "jpg":  # SEE: https://stackoverflow.com/a/54488403

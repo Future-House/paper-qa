@@ -1914,10 +1914,10 @@ def test_media_to_image_url(subtests: SubTests) -> None:
 
 
 def test_parsed_media_data_or_url() -> None:
-    with pytest.raises(ValidationError, match="At least one of"):
+    with pytest.raises(ValidationError, match="one of"):
         ParsedMedia(index=0, data=b"")
 
-    with pytest.raises(ValidationError, match="At least one of"):
+    with pytest.raises(ValidationError, match="one of"):
         ParsedMedia(index=0)
 
     with pytest.raises(ValidationError, match="not both"):
