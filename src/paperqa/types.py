@@ -693,6 +693,25 @@ class ParsedMedia(BaseModel):
             f.write(self.data)
 
 
+def create_multimodal_message(
+    text: str | None,
+    image_urls: list[str],
+    role: str = "user",
+) -> Message:
+    """Build an OpenAI-format multimodal message, bypassing aviary's validation.
+
+    aviary's Message.create_message passes images through base64 image validation,
+    which rejects HTTP(S) URLs. So this helper constructs the same content list directly,
+    allowing signed GCS links alongside RFC 2397 data URLs.
+    """
+    content: list[dict[str, Any]] = [
+        {"type": "image_url", "image_url": {"url": url}} for url in image_urls
+    ]
+    if text is not None:
+        content.append({"type": "text", "text": text})
+    return Message(role=role, content=content)
+
+
 class ParsedText(BaseModel):
     """All text from a document read, before chunking."""
 
