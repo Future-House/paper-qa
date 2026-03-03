@@ -68,6 +68,10 @@ HOME_DIR = str(pathlib.Path.home())
 
 def test_settings_default_instantiation(tmpdir, subtests: SubTests) -> None:
     default_settings = Settings()
+
+    # Check we can export a JSON schema
+    Settings.model_json_schema()
+
     # Also let's check our default settings work fine with round-trip JSON serialization
     serde_default_settings = Settings(**default_settings.model_dump(mode="json"))
     for setting in (default_settings, serde_default_settings):
