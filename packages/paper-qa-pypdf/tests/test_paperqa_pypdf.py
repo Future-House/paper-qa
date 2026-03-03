@@ -344,16 +344,20 @@ def test_clustering() -> None:
 
 
 @pytest.mark.parametrize(
-    "img_format",
+    ("img_mode", "img_format", "expected_mode"),
     [
-        pytest.param("BMP", id="non_png_re_encodes"),
-        pytest.param("PNG", id="png_passthrough"),
+        pytest.param("RGB", "BMP", "RGB", id="non_png_re_encodes"),
+        pytest.param("RGB", "PNG", "RGB", id="png_passthrough"),
+        pytest.param("CMYK", "TIFF", "RGB", id="cmyk_converts_to_rgb"),
+        pytest.param("L", "BMP", "L", id="grayscale_preserves_mode"),
     ],
 )
-def test_individual_mode_outputs_png(img_format: str) -> None:
-    # Form an image in the input format
+def test_individual_mode_outputs_png(
+    img_mode: str, img_format: str, expected_mode: str
+) -> None:
+    # Form an image in the input format (and mode)
     raw_buf = io.BytesIO()
-    Image.new("RGB", (4, 4), "red").save(raw_buf, format=img_format)
+    Image.new(img_mode, (4, 4)).save(raw_buf, format=img_format)
     raw_bytes = raw_buf.getvalue()
     mock_img_obj = SimpleNamespace(
         image=Image.open(io.BytesIO(raw_bytes)), data=raw_bytes
@@ -377,6 +381,7 @@ def test_individual_mode_outputs_png(img_format: str) -> None:
     result_image = Image.open(io.BytesIO(media.data))
     assert result_image.format == "PNG"
     assert result_image.size == (4, 4)
+    assert result_image.mode == expected_mode
 
 
 class TestMediaMode:
