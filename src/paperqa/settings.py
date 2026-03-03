@@ -41,6 +41,7 @@ from pydantic import (
     model_serializer,
     model_validator,
 )
+from pydantic.json_schema import SkipJsonSchema
 from pydantic_core.core_schema import SerializationInfo
 from pydantic_settings import BaseSettings, CliSettingsSource, SettingsConfigDict
 
@@ -284,13 +285,13 @@ class ParsingSettings(BaseModel):
             " summarization."
         ),
     )
-    parse_pdf: PDFParserFn = Field(
+    parse_pdf: SkipJsonSchema[PDFParserFn] = Field(
         default_factory=get_default_pdf_parser,
         description="Function to parse PDF, or a fully qualified name to import.",
         examples=["paperqa_docling.parse_pdf_to_pages"],
         exclude=True,  # NOTE: a custom serializer is used below, so it's not excluded
     )
-    configure_pdf_parser: Callable[[], Any] = Field(
+    configure_pdf_parser: SkipJsonSchema[Callable[[], Any]] = Field(
         default=default_pdf_parser_configurator,
         description=(
             "Callable to configure the PDF parser within parse_pdf,"
@@ -576,7 +577,7 @@ class IndexSettings(BaseModel):
             " directory."
         ),
     )
-    files_filter: Callable[[anyio.Path | pathlib.Path], bool] = Field(
+    files_filter: SkipJsonSchema[Callable[[anyio.Path | pathlib.Path], bool]] = Field(
         default=lambda f: (
             f.suffix
             # TODO: add images after embeddings are supported
@@ -692,7 +693,9 @@ class AgentSettings(BaseModel):
         ),
     )
 
-    callbacks: Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]] = Field(
+    callbacks: SkipJsonSchema[
+        Mapping[str, Sequence[Callable[[_EnvironmentState], Any]]]
+    ] = Field(
         default_factory=dict,
         description="""
             A mapping that associates callback names with lists of corresponding callable functions.
@@ -808,7 +811,7 @@ class Settings(BaseSettings):
             " logged."
         ),
     )
-    custom_context_serializer: AsyncContextSerializer | None = Field(
+    custom_context_serializer: SkipJsonSchema[AsyncContextSerializer | None] = Field(
         default=None,
         description=(
             "Function to turn settings and contexts into an answer context str."
