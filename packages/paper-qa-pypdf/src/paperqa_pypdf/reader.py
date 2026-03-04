@@ -320,7 +320,15 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                             # Re-encode as PNG because the image may be in a
                             # format LLM providers reject (e.g. JPEG2000)
                             buf = io.BytesIO()
-                            pil_image.save(buf, format="PNG")
+                            try:
+                                pil_image.save(buf, format="PNG")
+                            except OSError as exc:
+                                if "cannot write mode" not in str(exc):
+                                    raise  # Don't swallow unrelated IO errors
+                                # PNG doesn't support all color modes (e.g. CMYK
+                                # from print-oriented PDFs), so fall back to RGB
+                                buf = io.BytesIO()  # Reset after partial write
+                                pil_image.convert("RGB").save(buf, format="PNG")
                             data = buf.getvalue()
                         media_metadata = {
                             "type": "picture",
