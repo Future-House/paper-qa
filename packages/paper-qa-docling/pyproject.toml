@@ -19,8 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "docling-core>=2",  # Pin for v2 with DocItem, TextItem, etc.
-    "docling-parse<5",  # Downpin for https://github.com/docling-project/docling-parse/issues/226
-    "docling>=2",  # Pin for v2 introducing PdfPipelineOptions
+    "docling>=2.74",  # Pin for moving to DoclingParseDocumentBackend in https://github.com/docling-project/docling/pull/2872
     "paper-qa",
 ]
 description = "PaperQA readers implemented using Docling"
