@@ -219,7 +219,7 @@ def parse_pdf_to_pages(
                         )
 
                     # Capture tables
-                    for table_i, table in enumerate(t for t in find_tables(page)):
+                    for table_i, table in enumerate(find_tables(page)):
                         pix = page.get_pixmap(clip=table.bbox, dpi=dpi)
                         media_metadata = {
                             "bbox": tuple(table.bbox),
