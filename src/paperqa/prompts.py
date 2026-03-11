@@ -45,7 +45,8 @@ CITATION_KEY_CONSTRAINTS = (
     "- (pqac-d79ef6fa-pqac-0f650d59)\n"
     "- pqac-d79ef6fa and pqac-0f650d59\n"
     "- Example's work (pqac-d79ef6fa)\n"
-    "- (pages pqac-d79ef6fa)"
+    "- (pages pqac-d79ef6fa)\n"
+    "- Author et al. (2023)"
 )
 
 qa_prompt = (
