@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
 import docling
-from docling.backend.docling_parse_v4_backend import DoclingParseV4DocumentBackend
+from docling.backend.docling_parse_backend import DoclingParseDocumentBackend
 from docling.datamodel.base_models import ConversionStatus
 from docling.datamodel.pipeline_options import PdfPipelineOptions
 from docling.datamodel.settings import DEFAULT_PAGE_RANGE
@@ -43,7 +43,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     pipeline_cls: type = StandardPdfPipeline,
     dpi: int | None = None,
     custom_pipeline_options: Mapping[str, Any] | None = None,
-    backend: "type[AbstractDocumentBackend]" = DoclingParseV4DocumentBackend,
+    backend: "type[AbstractDocumentBackend]" = DoclingParseDocumentBackend,
     **_,
 ) -> ParsedText:
     """Parse a PDF.
@@ -62,7 +62,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
         page_range: Optional start_page or two-tuple of inclusive (start_page, end_page)
             to parse only specific pages, where pages are one-indexed.
             Leaving as the default of None will parse all pages.
-        backend: PDF backend class to use for parsing, defaults to docling-parse v4.
+        backend: PDF backend class to use for parsing, defaults to docling-parse.
         **_: Thrown away kwargs.
     """
     path = Path(path)
