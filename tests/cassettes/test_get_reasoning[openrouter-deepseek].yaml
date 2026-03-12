@@ -6529,7 +6529,7 @@ interactions:
         pqac-0f650d59)\n- (pqac-d79ef6fa)\n## Invalid citation examples:\n- (pqac-d79ef6fa
         and pqac-0f650d59)\n- (pqac-d79ef6fa;pqac-0f650d59)\n- (pqac-d79ef6fa-pqac-0f650d59)\n-
         pqac-d79ef6fa and pqac-0f650d59\n- Example''s work (pqac-d79ef6fa)\n- (pages
-        pqac-d79ef6fa)\n\nDo not concatenate citation keys, just use them as is. Write
+        pqac-d79ef6fa)\n- Author et al. (2023)\n\nDo not concatenate citation keys, just use them as is. Write
         in the style of a scientific article, with concise sentences and coherent paragraphs.
         This answer will be used directly, so do not add any extraneous information.\n\nAnswer
         (about 200 words, but can be longer):"}], "temperature": 0.0, "n": 1, "stream":
