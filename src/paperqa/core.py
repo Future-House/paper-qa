@@ -4,7 +4,6 @@ import re
 from collections.abc import Callable, Sequence
 from typing import Any, ClassVar
 
-import litellm
 from aviary.core import Message
 from lmi import LLMModel, LLMResult
 from pydantic import JsonValue
@@ -211,6 +210,8 @@ async def _map_fxn_summary(  # noqa: PLR0912
     Returns:
         A two-tuple of the made Context, and any LLM results made along the way.
     """
+    import litellm
+
     if _prior_attempt is not None:
         llm_results = _prior_attempt.llm_results
         append_msgs = [

@@ -23,7 +23,6 @@ from typing import (
 )
 
 import anyio
-import litellm
 from aviary.core import Message, Tool, ToolSelector
 from lmi import (
     CommonLLMNames,
@@ -1088,6 +1087,8 @@ class Settings(BaseSettings):
                 page_num: int | str, media: ParsedMedia
             ) -> None:
                 """Enrich a single media item with LLM-generated description."""
+                import litellm
+
                 if radius == -1:  # All pages
                     context_text: str = "\n\n".join(
                         (
