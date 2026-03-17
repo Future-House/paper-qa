@@ -185,9 +185,7 @@ async def run_fake_agent(
     docs: Docs,
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
-    on_agent_action_callback: (
-        Callable[[ToolRequestMessage, BaseModel], Awaitable] | None
-    ) = None,
+    on_agent_action_callback: Callable[[Message, BaseModel], Awaitable] | None = None,
     on_env_step_callback: (
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
@@ -265,9 +263,7 @@ async def run_aviary_agent(
     agent: ToolSelector,
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
-    on_agent_action_callback: (
-        Callable[[ToolRequestMessage, BaseModel], Awaitable] | None
-    ) = None,
+    on_agent_action_callback: Callable[[Message, BaseModel], Awaitable] | None = None,
     on_env_step_callback: (
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
@@ -334,7 +330,7 @@ class LDPRolloutCallback(Callback):
         self,
         env: "Environment",
         on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
-        on_agent_action_callback: "Callable[[OpResult[ToolRequestMessage], SimpleAgentState, float], Awaitable] | None" = None,  # noqa: E501
+        on_agent_action_callback: "Callable[[OpResult[Message], SimpleAgentState, float], Awaitable] | None" = None,
         on_env_step_callback: (
             Callable[[list[Message], float, bool, bool], Awaitable] | None
         ) = None,
@@ -374,7 +370,7 @@ async def run_ldp_agent(
     agent: "Agent[SimpleAgentState]",
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
-    on_agent_action_callback: "Callable[[OpResult[ToolRequestMessage], SimpleAgentState, float], Awaitable] | None" = None,  # noqa: E501
+    on_agent_action_callback: "Callable[[OpResult[Message], SimpleAgentState, float], Awaitable] | None" = None,
     on_env_step_callback: (
         Callable[[list[Message], float, bool, bool], Awaitable] | None
     ) = None,
