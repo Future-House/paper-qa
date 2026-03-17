@@ -1,9 +1,7 @@
-from __future__ import annotations
-
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import Collection
-from typing import Any, Generic, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 import httpx
 from pydantic import (
@@ -17,7 +15,8 @@ from pydantic import (
 )
 from tenacity import RetryError
 
-from paperqa.types import DocDetails
+if TYPE_CHECKING:
+    from paperqa.types import DocDetails
 
 from .exceptions import DOINotFoundError
 
@@ -94,11 +93,11 @@ class MetadataProvider(ABC, Generic[ClientQueryType]):
     An example is going from a DOI to full paper metadata using Semantic Scholar.
     """
 
-    async def query(self, query: dict) -> DocDetails | None:
+    async def query(self, query: dict) -> "DocDetails | None":
         return await self._query(self.query_factory(query))
 
     @abstractmethod
-    async def _query(self, query: ClientQueryType) -> DocDetails | None:
+    async def _query(self, query: ClientQueryType) -> "DocDetails | None":
         """Run a query against the provider."""
 
     @abstractmethod
@@ -108,7 +107,7 @@ class MetadataProvider(ABC, Generic[ClientQueryType]):
 
 class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
 
-    async def query(self, query: dict) -> DocDetails | None:
+    async def query(self, query: dict) -> "DocDetails | None":
         try:
             client_query = self.query_factory(query)
             return await self._query(client_query)
@@ -143,7 +142,7 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
         return None
 
     @abstractmethod
-    async def _query(self, query: DOIQuery | TitleAuthorQuery) -> DocDetails | None:
+    async def _query(self, query: DOIQuery | TitleAuthorQuery) -> "DocDetails | None":
         """
         Query the source using either a DOI or title/author search.
 
@@ -175,19 +174,19 @@ class MetadataPostProcessor(ABC, Generic[ClientQueryType]):
     all MetadataPostProcessor instances should be able to run in parallel.
     """
 
-    async def process(self, doc_details: DocDetails, **kwargs) -> DocDetails:
+    async def process(self, doc_details: "DocDetails", **kwargs) -> "DocDetails":
         if query := self.query_creator(doc_details, **kwargs):
             return await self._process(query, doc_details)
         return doc_details
 
     @abstractmethod
     async def _process(
-        self, query: ClientQueryType, doc_details: DocDetails
-    ) -> DocDetails:
+        self, query: ClientQueryType, doc_details: "DocDetails"
+    ) -> "DocDetails":
         pass
 
     @abstractmethod
     def query_creator(
-        self, doc_details: DocDetails, **kwargs
+        self, doc_details: "DocDetails", **kwargs
     ) -> ClientQueryType | None:
         pass

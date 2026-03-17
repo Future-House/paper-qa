@@ -1,39 +1,18 @@
-from __future__ import annotations
-
 import copy
 import logging
 from collections.abc import Awaitable, Collection, Coroutine, Sequence
-from typing import Any, TypeAlias, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, cast
 
 import httpx
 import httpx_aiohttp
-from lmi.utils import gather_with_concurrency
 from pydantic import BaseModel, ConfigDict, Field
 
-from paperqa.types import Doc, DocDetails
-
 from .client_models import MetadataPostProcessor, MetadataProvider
-from .crossref import CrossrefProvider
-from .journal_quality import JournalQualityPostProcessor
-from .openalex import OpenAlexProvider
-from .retractions import RetractionDataPostProcessor
-from .semantic_scholar import SemanticScholarProvider
-from .unpaywall import UnpaywallProvider
+
+if TYPE_CHECKING:
+    from paperqa.types import Doc, DocDetails
 
 logger = logging.getLogger(__name__)
-
-# NOTE: we use tuple here so ordering is constant for unit testing's HTTP caching
-DEFAULT_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = (
-    CrossrefProvider,
-    SemanticScholarProvider,
-    JournalQualityPostProcessor,
-)
-ALL_CLIENTS: Collection[type[MetadataPostProcessor | MetadataProvider]] = (
-    *DEFAULT_CLIENTS,
-    OpenAlexProvider,
-    UnpaywallProvider,
-    RetractionDataPostProcessor,
-)
 
 MetadataClientQuerier: TypeAlias = (
     MetadataProvider
@@ -41,6 +20,54 @@ MetadataClientQuerier: TypeAlias = (
     | type[MetadataProvider]
     | type[MetadataPostProcessor]
 )
+
+
+def _default_clients() -> tuple:
+    from .crossref import CrossrefProvider
+    from .journal_quality import JournalQualityPostProcessor
+    from .semantic_scholar import SemanticScholarProvider
+
+    # NOTE: we use tuple here so ordering is constant for unit testing's HTTP caching
+    return (CrossrefProvider, SemanticScholarProvider, JournalQualityPostProcessor)
+
+
+def _all_clients() -> tuple:
+    from .openalex import OpenAlexProvider
+    from .retractions import RetractionDataPostProcessor
+    from .unpaywall import UnpaywallProvider
+
+    return (
+        *_default_clients(),
+        OpenAlexProvider,
+        UnpaywallProvider,
+        RetractionDataPostProcessor,
+    )
+
+
+_LAZY_IMPORTS: dict[str, tuple[str, str]] = {
+    "CrossrefProvider": (".crossref", "CrossrefProvider"),
+    "SemanticScholarProvider": (".semantic_scholar", "SemanticScholarProvider"),
+    "JournalQualityPostProcessor": (".journal_quality", "JournalQualityPostProcessor"),
+    "OpenAlexProvider": (".openalex", "OpenAlexProvider"),
+    "UnpaywallProvider": (".unpaywall", "UnpaywallProvider"),
+    "RetractionDataPostProcessor": (".retractions", "RetractionDataPostProcessor"),
+}
+
+
+def __getattr__(name: str) -> object:
+    if name == "DEFAULT_CLIENTS":
+        return _default_clients()
+    if name == "ALL_CLIENTS":
+        return _all_clients()
+    if name in _LAZY_IMPORTS:
+        import importlib
+
+        module_path, attr_name = _LAZY_IMPORTS[name]
+        module = importlib.import_module(module_path, __name__)
+        val = getattr(module, attr_name)
+        globals()[name] = val
+        return val
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 class DocMetadataTask(BaseModel):
@@ -63,13 +90,13 @@ class DocMetadataTask(BaseModel):
 
     def provider_queries(
         self, query: dict
-    ) -> list[Coroutine[Any, Any, DocDetails | None]]:
+    ) -> "list[Coroutine[Any, Any, DocDetails | None]]":
         """Set up query coroutines for each contained metadata provider."""
         return [p.query(query) for p in self.providers]
 
     def processor_queries(
-        self, doc_details: DocDetails, client: httpx.AsyncClient
-    ) -> list[Coroutine[Any, Any, DocDetails]]:
+        self, doc_details: "DocDetails", client: httpx.AsyncClient
+    ) -> "list[Coroutine[Any, Any, DocDetails]]":
         """Set up process coroutines for each contained metadata post-processor."""
         return [
             p.process(copy.copy(doc_details), client=client) for p in self.processors
@@ -88,7 +115,8 @@ class DocMetadataClient:
         metadata_clients: (
             Collection[MetadataClientQuerier]
             | Sequence[Collection[MetadataClientQuerier]]
-        ) = DEFAULT_CLIENTS,
+            | None
+        ) = None,
     ) -> None:
         """Metadata client for querying multiple metadata providers and processors.
 
@@ -99,7 +127,10 @@ class DocMetadataClient:
                 will query in order looking for termination criteria after each.
                 Will terminate early if either DocDetails.is_hydration_needed is False
                 OR if all requested fields are present in the DocDetails object.
+                Defaults to DEFAULT_CLIENTS if not specified.
         """
+        if metadata_clients is None:
+            metadata_clients = _default_clients()
         self._http_client = http_client
         self.tasks: list[DocMetadataTask] = []
 
@@ -153,7 +184,8 @@ class DocMetadataClient:
         if not self.tasks or (self.tasks and not self.tasks[0].providers):
             raise ValueError("At least one MetadataProvider must be provided.")
 
-    async def query(self, **kwargs) -> DocDetails | None:
+    async def query(self, **kwargs) -> "DocDetails | None":
+        from lmi.utils import gather_with_concurrency
 
         client = (
             httpx_aiohttp.HttpxAiohttpClient(timeout=10.0)
@@ -214,13 +246,17 @@ class DocMetadataClient:
 
     async def bulk_query(
         self, queries: Collection[dict[str, Any]], concurrency: int = 10
-    ) -> list[DocDetails]:
+    ) -> "list[DocDetails]":
+        from lmi.utils import gather_with_concurrency
+
         return await gather_with_concurrency(
             concurrency,
             [cast("Awaitable[DocDetails]", self.query(**kwargs)) for kwargs in queries],
         )
 
-    async def upgrade_doc_to_doc_details(self, doc: Doc, **kwargs) -> DocDetails:
+    async def upgrade_doc_to_doc_details(self, doc: "Doc", **kwargs) -> "DocDetails":
+        from paperqa.types import DocDetails
+
         # Collect fields (e.g. title, DOI, or authors) that have been externally
         # specified (e.g. by a caller, or inferred from the document's contents)
         # but are not on the input `doc` object
