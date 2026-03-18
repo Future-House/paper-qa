@@ -81,6 +81,7 @@ dev = [
     "pytest-xdist",
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
+    "pyzotero>=1.11.0",  # Lower pin for typing fix on Zotero.dump in https://github.com/urschrei/pyzotero/issues/298
     "refurb>=2",  # Pin to keep recent
     "typeguard",
     "vcrpy>=8",  # Pin for dropping unused requests support
