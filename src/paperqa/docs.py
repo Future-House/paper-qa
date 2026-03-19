@@ -594,6 +594,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         summary_llm_model: LLMModel | None = None,
         embedding_model: EmbeddingModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
+        response_schema: BaseModel | None = None,
     ) -> PQASession:
         query_settings = get_settings(settings)
         answer_config = query_settings.answer
@@ -676,6 +677,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                     messages=messages,
                     callbacks=callbacks,
                     name="answer",
+                    response_format=response_schema,
                 )
             answer_text = cast("str", answer_result.text)
             answer_reasoning = answer_result.reasoning_content
