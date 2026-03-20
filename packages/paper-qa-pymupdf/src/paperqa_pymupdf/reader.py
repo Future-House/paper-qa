@@ -8,7 +8,6 @@ from paperqa.readers import resolve_page_range
 from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError, clean_invalid_unicode
 from pydantic import JsonValue
-from pymupdf.table import find_tables
 
 
 def setup_pymupdf_python_logging() -> None:
@@ -219,7 +218,7 @@ def parse_pdf_to_pages(
                         )
 
                     # Capture tables
-                    for table_i, table in enumerate(find_tables(page)):
+                    for table_i, table in enumerate(page.find_tables()):
                         pix = page.get_pixmap(clip=table.bbox, dpi=dpi)
                         media_metadata = {
                             "bbox": tuple(table.bbox),
