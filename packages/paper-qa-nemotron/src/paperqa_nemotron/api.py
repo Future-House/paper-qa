@@ -91,6 +91,69 @@ NemotronParseToolName: TypeAlias = Literal[
     "markdown_bbox", "markdown_no_bbox", "detection_only"
 ]
 
+# nemotron-parse resizes each input image (preserving aspect ratio) to fit within this
+# fixed height x width canvas, then center-pads the remainder with white, and emits
+# bounding boxes normalized to that padded canvas. These are the model's native input
+# dimensions; see "size" / "final_size" in:
+# https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/main/preprocessor_config.json
+NEMOTRON_PARSE_TARGET_HEIGHT = 2048  # px
+NEMOTRON_PARSE_TARGET_WIDTH = 1648  # px
+
+
+def transform_canvas_bbox_to_original(
+    xmin: float,
+    ymin: float,
+    xmax: float,
+    ymax: float,
+    height: float,
+    width: float,
+    target_height: int = NEMOTRON_PARSE_TARGET_HEIGHT,
+    target_width: int = NEMOTRON_PARSE_TARGET_WIDTH,
+) -> tuple[float, float, float, float]:
+    """Map nemotron-parse canvas-normalized coords to original-image pixel coordinates.
+
+    nemotron-parse emits bounding boxes normalized to its letterboxed
+    ``target_height`` x ``target_width`` canvas (aspect-preserving resize, then centered
+    white padding). This inverts that preprocessing to recover pixel coordinates in the
+    original ``height`` x ``width`` image. It is a faithful port of NVIDIA's reference
+    ``transform_bbox_to_original``:
+    https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/main/postprocessing.py
+
+    NVIDIA's hosted NIM applies this server-side (so its coordinates are already
+    original-image-relative); raw vLLM/Hugging Face output does not.
+
+    Args:
+        xmin: Canvas-normalized left bound in [0, 1].
+        ymin: Canvas-normalized top bound in [0, 1].
+        xmax: Canvas-normalized right bound in [0, 1].
+        ymax: Canvas-normalized bottom bound in [0, 1].
+        height: Original (pre-letterbox) image height in pixels.
+        width: Original (pre-letterbox) image width in pixels.
+        target_height: Canvas height the model normalized against.
+        target_width: Canvas width the model normalized against.
+
+    Returns:
+        Four-tuple of (xmin, ymin, xmax, ymax) in original-image pixel coordinates.
+    """
+    aspect_ratio = width / height
+    # Replicate the model's "LongestMaxSize" resize, which only shrinks oversized inputs
+    resized_width, resized_height = width, height
+    if height > target_height:
+        resized_height = target_height
+        resized_width = int(resized_height * aspect_ratio)
+    if resized_width > target_width:
+        resized_width = target_width
+        resized_height = int(resized_width / aspect_ratio)
+    # Padding is centered (matches the Albumentations PadIfNeeded used in preprocessing)
+    pad_left = (target_width - resized_width) // 2
+    pad_top = (target_height - resized_height) // 2
+    return (
+        (xmin * target_width - pad_left) * width / resized_width,
+        (ymin * target_height - pad_top) * height / resized_height,
+        (xmax * target_width - pad_left) * width / resized_width,
+        (ymax * target_height - pad_top) * height / resized_height,
+    )
+
 
 class NemotronParseBBox(BaseModel):
     """
@@ -159,6 +222,33 @@ class NemotronParseBBox(BaseModel):
             self.ymin * height,
             self.xmax * width,
             self.ymax * height,
+        )
+
+    def to_original_coordinates(
+        self,
+        height: float,
+        width: float,
+        target_height: int = NEMOTRON_PARSE_TARGET_HEIGHT,
+        target_width: int = NEMOTRON_PARSE_TARGET_WIDTH,
+    ) -> tuple[float, float, float, float]:
+        """Map this canvas-normalized bbox to ``(xmin, ymin, xmax, ymax)`` image pixels.
+
+        Companion to ``to_page_coordinates`` for when coordinates are normalized to
+        nemotron-parse's letterboxed ``target_height`` x ``target_width`` canvas rather
+        than directly to the page (e.g. raw vLLM/Hugging Face output, as opposed to
+        NVIDIA's hosted NIM which already maps coordinates to the input image). Inverts
+        the aspect-preserving resize + centered white pad; see
+        ``transform_canvas_bbox_to_original``.
+        """
+        return transform_canvas_bbox_to_original(
+            self.xmin,
+            self.ymin,
+            self.xmax,
+            self.ymax,
+            height,
+            width,
+            target_height,
+            target_width,
         )
 
     def iou(self, other: "NemotronParseBBox") -> float:

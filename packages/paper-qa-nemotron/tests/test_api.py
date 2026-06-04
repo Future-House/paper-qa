@@ -9,6 +9,8 @@ from pydantic import ValidationError
 from tenacity import Future, RetryCallState
 
 from paperqa_nemotron.api import (
+    NEMOTRON_PARSE_TARGET_HEIGHT,
+    NEMOTRON_PARSE_TARGET_WIDTH,
     NemotronParseAnnotatedBBox,
     NemotronParseBBox,
     NemotronParseClassification,
@@ -82,6 +84,121 @@ class TestNemotronParseBBox:
         assert bbox.to_page_coordinates(height=100, width=200) == pytest.approx(
             (20.0, 20.0, 180.0, 80.0)
         )
+
+    @pytest.mark.parametrize(
+        ("coords", "width", "height"),
+        [
+            # coords are (xmin, xmax, ymin, ymax) per from_coordinates; (width, height) px
+            pytest.param(
+                (0.1559, 0.8436, 0.0801, 0.1010), 1191, 1684, id="a4-no-resize"
+            ),
+            pytest.param(
+                (0.1, 0.9, 0.1, 0.9), 2550, 3300, id="letter-300dpi-downsized"
+            ),
+            pytest.param(
+                (0.2, 0.8, 0.2, 0.8), 1395, 1770, id="letter-150dpi-heavy-pad"
+            ),
+            pytest.param((0.0, 1.0, 0.0, 1.0), 600, 1000, id="tall-full-canvas"),
+            pytest.param(
+                (0.25, 0.75, 0.25, 0.75), 1648, 2048, id="exact-canvas-no-pad"
+            ),
+            pytest.param((0.1, 0.7, 0.2, 0.6), 3000, 2000, id="landscape-width-resize"),
+        ],
+    )
+    def test_bbox_to_original_coordinates_matches_nvidia_reference(
+        self, coords: tuple[float, float, float, float], width: int, height: int
+    ) -> None:
+        # Verbatim port target: NVIDIA's postprocessing.py::transform_bbox_to_original
+        # https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/main/postprocessing.py
+        def nvidia_reference(
+            bbox: tuple[float, float, float, float],
+            original_width: int,
+            original_height: int,
+            target_w: int = 1648,
+            target_h: int = 2048,
+        ) -> tuple[float, float, float, float]:
+            aspect_ratio = original_width / original_height
+            new_height = original_height
+            new_width = original_width
+            if original_height > target_h:
+                new_height = target_h
+                new_width = int(new_height * aspect_ratio)
+            if new_width > target_w:
+                new_width = target_w
+                new_height = int(new_width / aspect_ratio)
+            resized_width = new_width
+            resized_height = new_height
+            pad_left = (target_w - resized_width) // 2
+            pad_top = (target_h - resized_height) // 2
+            left = ((bbox[0] * target_w) - pad_left) * original_width / resized_width
+            right = ((bbox[2] * target_w) - pad_left) * original_width / resized_width
+            top = ((bbox[1] * target_h) - pad_top) * original_height / resized_height
+            bottom = ((bbox[3] * target_h) - pad_top) * original_height / resized_height
+            return left, top, right, bottom
+
+        bbox = NemotronParseBBox.from_coordinates(coords)
+        # NVIDIA's reference orders bbox as (xmin, ymin, xmax, ymax)
+        expected = nvidia_reference(
+            (bbox.xmin, bbox.ymin, bbox.xmax, bbox.ymax), width, height
+        )
+        assert bbox.to_original_coordinates(
+            height=height, width=width
+        ) == pytest.approx(expected)
+
+    @pytest.mark.parametrize(
+        ("width", "height"),
+        [
+            pytest.param(595, 842, id="a4-72dpi"),
+            pytest.param(2550, 3300, id="letter-300dpi"),
+            pytest.param(1395, 1770, id="letter-150dpi"),
+            pytest.param(3000, 2000, id="landscape"),
+        ],
+    )
+    def test_bbox_to_original_coordinates_round_trip(
+        self, width: int, height: int
+    ) -> None:
+        """A page rectangle, letterboxed as the model does, must invert back to itself."""
+        target_w, target_h = NEMOTRON_PARSE_TARGET_WIDTH, NEMOTRON_PARSE_TARGET_HEIGHT
+        # Forward: replicate the model's aspect-preserving resize + centered white pad
+        aspect_ratio = width / height
+        resized_w, resized_h = width, height
+        if height > target_h:
+            resized_h = target_h
+            resized_w = int(resized_h * aspect_ratio)
+        if resized_w > target_w:
+            resized_w = target_w
+            resized_h = int(resized_w / aspect_ratio)
+        pad_left = (target_w - resized_w) // 2
+        pad_top = (target_h - resized_h) // 2
+
+        # An inset rectangle in original-image pixels
+        xmin_px, ymin_px = 0.1 * width, 0.2 * height
+        xmax_px, ymax_px = 0.7 * width, 0.6 * height
+        canvas = NemotronParseBBox(
+            xmin=(xmin_px * resized_w / width + pad_left) / target_w,
+            xmax=(xmax_px * resized_w / width + pad_left) / target_w,
+            ymin=(ymin_px * resized_h / height + pad_top) / target_h,
+            ymax=(ymax_px * resized_h / height + pad_top) / target_h,
+        )
+        assert canvas.to_original_coordinates(
+            height=height, width=width
+        ) == pytest.approx((xmin_px, ymin_px, xmax_px, ymax_px), abs=1.0)
+
+    def test_bbox_to_original_coordinates_corrects_letterbox_padding(self) -> None:
+        """At low DPI the letterbox correction is large vs. a naive page scaling.
+
+        Guards against regressing to a passthrough that treats canvas-normalized
+        coordinates as if normalized directly to the page (the bug behind every box
+        being drawn shifted/compressed against a raw vLLM endpoint).
+        """
+        # ~US-Letter @150 DPI + 60px border: smaller than the 1648x2048 canvas on both
+        # axes, so the model adds heavy centered white padding the naive scaling ignores.
+        width, height = 1395, 1770
+        bbox = NemotronParseBBox(xmin=0.0, xmax=1.0, ymin=0.0, ymax=1.0)
+        naive = bbox.to_page_coordinates(height=height, width=width)
+        corrected = bbox.to_original_coordinates(height=height, width=width)
+        assert corrected[0] < naive[0] - 100, "Expected a large left-edge correction"
+        assert corrected[2] > naive[2] + 100, "Expected a large right-edge correction"
 
     @pytest.mark.parametrize(
         ("bbox1_coords", "bbox2_coords", "expected_iou"),
