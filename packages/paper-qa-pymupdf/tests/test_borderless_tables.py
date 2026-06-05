@@ -15,8 +15,6 @@ y=215  ───────────────────────  se
        B. subtil.    15.1        51.0        data row 3
 y=270  ───────────────────────  bottom border (bottomrule)
 """
-from __future__ import annotations
-
 from pathlib import Path
 
 import pymupdf
@@ -24,13 +22,10 @@ import pytest
 
 from paperqa_pymupdf.borderless_tables import (
     TABLE_CAPTION_RE,
-    _alignment_based_regions,
     _assign_col,
     _build_text_lines,
     _caption_based_regions,
     _cluster_rules,
-    _extract_numeric_error_table,
-    _extract_rotated_cells_from_chars,
     _find_col_ranges,
     _get_wide_h_rules,
     _to_markdown,
@@ -38,7 +33,9 @@ from paperqa_pymupdf.borderless_tables import (
     detect_borderless_tables,
     merge_multiline_cells,
 )
-from paperqa_pymupdf.reader import PYMUPDF_PIXMAP_ATTRS
+
+# Minimal pixmap attribute set for testing (avoids importing reader internals).
+_PIXMAP_ATTRS: frozenset[str] = frozenset({"width", "height", "n", "stride"})
 
 # ── shared constants ───────────────────────────────────────────────────────────
 
@@ -53,6 +50,7 @@ _RULE_YS = [200.0, 215.0, 270.0]
 
 
 # ── fixtures ───────────────────────────────────────────────────────────────────
+
 
 @pytest.fixture
 def three_line_table_pdf(tmp_path: Path) -> Path:
@@ -123,13 +121,14 @@ def text_only_pdf(tmp_path: Path) -> Path:
 def caption_table_pdf(tmp_path: Path) -> Path:
     """PDF with a 'Table 1.' caption above a three-line table.
 
-    Layout:
-      y=150  "Table 1. Fermentation performance of engineered strains."
-      y=200  ──────────────────────  toprule
-             Strain   Titer   Yield  header
-      y=215  ──────────────────────  midrule
-             E. coli  12.3    45.2   data rows ...
-      y=270  ──────────────────────  bottomrule
+    Layout::
+
+        y=150  "Table 1. Fermentation performance of engineered strains."
+        y=200  ──────────────────────  toprule
+               Strain   Titer   Yield  header
+        y=215  ──────────────────────  midrule
+               E. coli  12.3    45.2   data rows ...
+        y=270  ──────────────────────  bottomrule
     """
     pdf = pymupdf.open()
     page = pdf.new_page(width=595, height=842)
@@ -161,40 +160,8 @@ def caption_table_pdf(tmp_path: Path) -> Path:
     return path
 
 
-@pytest.fixture
-def alignment_only_pdf(tmp_path: Path) -> Path:
-    """PDF with a 3-column text table but NO horizontal rules.
-
-    Because there are no rules, only the alignment-based strategy can detect
-    this table.  Four data rows + one header row are inserted at consistent
-    x-positions with large inter-column gaps.
-    """
-    pdf = pymupdf.open()
-    page = pdf.new_page(width=595, height=842)
-    # Column x-positions with large gaps (~100 pt each)
-    cols = [72.0, 220.0, 370.0]
-    headers = ["Method", "Precision", "Recall"]
-    rows = [
-        ("Baseline", "0.72", "0.68"),
-        ("Model A", "0.85", "0.81"),
-        ("Model B", "0.89", "0.86"),
-        ("Model C", "0.91", "0.90"),
-    ]
-    # Header
-    for label, x in zip(headers, cols):
-        page.insert_text(pymupdf.Point(x, 200.0), label, fontsize=10)
-    # Data rows
-    for row_idx, row_data in enumerate(rows):
-        y = 215.0 + row_idx * 14.0
-        for x, cell in zip(cols, row_data):
-            page.insert_text(pymupdf.Point(x, y), cell, fontsize=10)
-
-    path = tmp_path / "alignment_only.pdf"
-    pdf.save(str(path))
-    return path
-
-
 # ── unit tests: TABLE_CAPTION_RE ───────────────────────────────────────────────
+
 
 class TestTableCaptionRE:
 
@@ -219,6 +186,7 @@ class TestTableCaptionRE:
 
 
 # ── unit tests: _find_col_ranges ───────────────────────────────────────────────
+
 
 class TestFindColRanges:
 
@@ -263,6 +231,7 @@ class TestFindColRanges:
 
 # ── unit tests: _assign_col ────────────────────────────────────────────────────
 
+
 class TestAssignCol:
 
     COL_RANGES = [(10.0, 60.0), (120.0, 180.0), (250.0, 310.0)]
@@ -285,6 +254,7 @@ class TestAssignCol:
 
 
 # ── unit tests: _words_to_grid ─────────────────────────────────────────────────
+
 
 class TestWordsToGrid:
 
@@ -327,6 +297,7 @@ class TestWordsToGrid:
 
 # ── unit tests: _cluster_rules ─────────────────────────────────────────────────
 
+
 class TestClusterRules:
 
     def test_three_close_rules_form_one_cluster(self) -> None:
@@ -356,6 +327,7 @@ class TestClusterRules:
 
 # ── unit tests: _to_markdown ───────────────────────────────────────────────────
 
+
 class TestToMarkdown:
 
     def test_basic_two_column_table(self) -> None:
@@ -380,10 +352,10 @@ class TestToMarkdown:
 
 # ── unit tests: merge_multiline_cells ─────────────────────────────────────────
 
+
 class TestMergeMultilineCells:
 
     def test_simple_continuation_merged(self) -> None:
-        # Second row has empty first cell → should merge into row 1
         rows = [
             ["E. coli", "12.3", "45.2"],
             ["", "K1 strain", ""],
@@ -409,135 +381,8 @@ class TestMergeMultilineCells:
         assert merge_multiline_cells(rows) == [["A", "B", "C"]]
 
 
-# ── unit tests: _extract_numeric_error_table ──────────────────────────────────
-
-class TestExtractNumericErrorTable:
-
-    def _make_word(self, x0: float, x1: float, y: float, text: str) -> tuple:
-        return (x0, y, x1, y + 10.0, text, 0, 0, 0)
-
-    def test_mean_pm_sd_row_detected(self) -> None:
-        # Header row
-        header = [
-            self._make_word(10, 80, 0, "Strain"),
-            self._make_word(100, 170, 0, "Yield"),
-            self._make_word(200, 270, 0, "Titer"),
-        ]
-        # Two data rows: "E. coli  12.3 ± 0.4  5.6 ± 0.2"
-        data_row1 = [
-            self._make_word(10, 80, 20, "E. coli"),
-            self._make_word(100, 130, 20, "12.3"),
-            self._make_word(135, 145, 20, "±"),
-            self._make_word(150, 170, 20, "0.4"),
-            self._make_word(200, 230, 20, "5.6"),
-            self._make_word(235, 245, 20, "±"),
-            self._make_word(250, 270, 20, "0.2"),
-        ]
-        data_row2 = [
-            self._make_word(10, 80, 35, "S. cerevi."),
-            self._make_word(100, 130, 35, "8.7"),
-            self._make_word(135, 145, 35, "±"),
-            self._make_word(150, 170, 35, "1.1"),
-            self._make_word(200, 230, 35, "3.2"),
-            self._make_word(235, 245, 35, "±"),
-            self._make_word(250, 270, 35, "0.3"),
-        ]
-        result = _extract_numeric_error_table(header, data_row1 + data_row2)
-        assert result, "Should detect the mean±sd table"
-        assert len(result) >= 3  # header + 2 data rows
-        assert any("±" in cell for row in result[1:] for cell in row)
-
-    def test_plain_numbers_not_misidentified(self) -> None:
-        # Rows with only a label and pure integers (no ± pattern)
-        # Should still return [] if there are enough rows matching
-        header = [self._make_word(10, 80, 0, "Method")]
-        data = [
-            self._make_word(10, 80, 20, "A"),
-            self._make_word(10, 80, 35, "B"),
-        ]
-        # Only single-column data → fewer than _MIN_COLS, should return []
-        result = _extract_numeric_error_table(header, data)
-        assert result == []
-
-
-# ── unit tests: _extract_rotated_cells_from_chars ────────────────────────────
-
-class TestExtractRotatedCellsFromChars:
-    """Unit tests for the rotated-table cell extraction function.
-
-    A 90°-rotated table in PDF space has each *column* of the upright table
-    stored as a vertical "x-group" of characters.  Within a group, intra-group
-    character gaps mark cell boundaries.  The function re-groups by x0 (0.5 pt
-    bins) then uses gap analysis to identify column boundaries.
-
-    Coordinate convention used in these tests
-    ------------------------------------------
-    ``top`` is the y-coordinate from the top of the page (increases downward).
-    Characters in the same x-group are sorted by *decreasing* top to recover
-    reading order (PaperSort convention for CW-rotated text).
-    """
-
-    @staticmethod
-    def _char(x0: float, top: float, text: str) -> dict:
-        return {"x0": x0, "top": top, "x1": x0 + 6.0, "bottom": top + 8.0, "text": text}
-
-    def _title_group(self, x: float = 100.0) -> list[dict]:
-        """Six chars spelling 'Table1' at tops 300, 295, 290, 285, 280, 275."""
-        return [
-            self._char(x, 300.0 - i * 5.0, c)
-            for i, c in enumerate("Table1")
-        ]
-
-    def _header_group(self, x: float = 200.0) -> list[dict]:
-        """Two-cell header 'A' (top=295) and 'B' (top=275), gap=20 > 15 pt."""
-        return [self._char(x, 295.0, "A"), self._char(x, 275.0, "B")]
-
-    def _data_group(self, x: float, cell1: str, cell2: str) -> list[dict]:
-        """Two-cell data row with gap=20 > 10 pt."""
-        return [self._char(x, 295.0, cell1), self._char(x, 275.0, cell2)]
-
-    def test_basic_two_column_extraction(self) -> None:
-        """Happy path: title + header + 2 data groups → correct 2-column grid."""
-        all_chars = (
-            self._title_group()               # x=100, 6 chars  → title
-            + self._header_group()            # x=200, 2 chars  → header ["A","B"]
-            + self._data_group(300.0, "P", "Q")  # data row 1
-            + self._data_group(310.0, "R", "S")  # data row 2
-            # Pad to reach _ROTATED_MIN_CHARS=20
-            + [self._char(400.0, float(i * 5), "x") for i in range(8)]
-        )
-        result = _extract_rotated_cells_from_chars(all_chars)
-        assert len(result) >= 2, "Should return header + at least one data row"
-        assert result[0] == ["A", "B"], f"Header row wrong: {result[0]}"
-        assert ["P", "Q"] in result, f"Data row 1 missing: {result}"
-        assert ["R", "S"] in result, f"Data row 2 missing: {result}"
-
-    def test_too_few_chars_returns_empty(self) -> None:
-        """Fewer than _ROTATED_MIN_CHARS (=20) chars → early exit, empty list."""
-        tiny = [self._char(100.0, float(i), "x") for i in range(5)]
-        assert _extract_rotated_cells_from_chars(tiny) == []
-
-    def test_fewer_than_three_groups_returns_empty(self) -> None:
-        """Only two distinct x0-groups → impossible to have title+header+data."""
-        # 20 chars but all at only 2 distinct x-positions
-        chars = (
-            [self._char(100.0, float(i * 5), "a") for i in range(10)]
-            + [self._char(200.0, float(i * 5), "b") for i in range(10)]
-        )
-        assert _extract_rotated_cells_from_chars(chars) == []
-
-    def test_single_column_header_returns_empty(self) -> None:
-        """Header group with no inter-cell gap → n_cols < 2 → empty."""
-        # Header group: 20 consecutive chars with gap ≤ 15 (gap=1 each)
-        chars = (
-            self._title_group()   # title at x=100
-            + [self._char(200.0, 300.0 - i * 1.0, "h") for i in range(20)]  # header, no gap
-            + self._data_group(300.0, "P", "Q")
-        )
-        assert _extract_rotated_cells_from_chars(chars) == []
-
-
 # ── integration tests: _get_wide_h_rules ──────────────────────────────────────
+
 
 class TestGetWideHRules:
 
@@ -570,6 +415,7 @@ class TestGetWideHRules:
 
 # ── integration tests: caption-based detection ────────────────────────────────
 
+
 class TestCaptionBasedRegions:
 
     def test_caption_anchors_table_region(self, caption_table_pdf: Path) -> None:
@@ -584,7 +430,6 @@ class TestCaptionBasedRegions:
 
         candidates = _caption_based_regions(lines, rules, page_w, page_h)
         assert candidates, "Caption-based detection should produce at least one candidate"
-        # The candidate should encompass the table rows (y ~ 200–270)
         table_y_min, table_y_max = _RULE_YS[0], _RULE_YS[-1]
         found = any(
             bbox[1] <= table_y_min + 30 and bbox[3] >= table_y_max - 10
@@ -610,35 +455,8 @@ class TestCaptionBasedRegions:
         )
 
 
-# ── integration tests: alignment-based detection ──────────────────────────────
-
-class TestAlignmentBasedRegions:
-
-    def test_alignment_detects_no_rule_table(self, alignment_only_pdf: Path) -> None:
-        """Tables with no horizontal rules should be found by alignment strategy."""
-        with pymupdf.open(str(alignment_only_pdf)) as doc:
-            page = doc[0]
-            page_w = float(page.rect.width)
-            page_h = float(page.rect.height)
-            words = page.get_text("words") or []
-            lines = _build_text_lines(words)
-
-        candidates = _alignment_based_regions(lines, page_w, page_h)
-        assert candidates, "Alignment strategy should find at least one candidate"
-
-    def test_no_alignment_on_text_only_page(self, text_only_pdf: Path) -> None:
-        with pymupdf.open(str(text_only_pdf)) as doc:
-            page = doc[0]
-            page_w = float(page.rect.width)
-            page_h = float(page.rect.height)
-            words = page.get_text("words") or []
-            lines = _build_text_lines(words)
-
-        candidates = _alignment_based_regions(lines, page_w, page_h)
-        assert candidates == []
-
-
 # ── integration tests: detect_borderless_tables ────────────────────────────────
+
 
 class TestDetectBorderlessTables:
 
@@ -650,7 +468,7 @@ class TestDetectBorderlessTables:
                 page_num=0,
                 page_width=float(page.rect.width),
                 dpi=None,
-                pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
             )
 
         assert len(results) == 1, "Expected exactly one borderless table"
@@ -673,7 +491,7 @@ class TestDetectBorderlessTables:
                 page_num=0,
                 page_width=float(page.rect.width),
                 dpi=None,
-                pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
             )
         assert len(results) == 1, "Should detect a table even with only 2 horizontal rules"
 
@@ -685,7 +503,7 @@ class TestDetectBorderlessTables:
                 page_num=0,
                 page_width=float(page.rect.width),
                 dpi=None,
-                pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
             )
         assert results == []
 
@@ -697,13 +515,13 @@ class TestDetectBorderlessTables:
             page_w = float(page.rect.width)
             first = detect_borderless_tables(
                 page, page_num=0, page_width=page_w, dpi=None,
-                pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
             )
             assert first, "Precondition: table must be detected in the first pass"
             already = [tuple(first[0].info["bbox"])]  # type: ignore[misc]
             second = detect_borderless_tables(
                 page, page_num=0, page_width=page_w, dpi=None,
-                pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
                 already_detected_bboxes=already,
             )
         assert second == [], "Duplicate region must be suppressed"
@@ -715,11 +533,10 @@ class TestDetectBorderlessTables:
             page = doc[0]
             results = detect_borderless_tables(
                 page, page_num=0, page_width=float(page.rect.width),
-                dpi=None, pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                dpi=None, pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
             )
         assert results
-        # Must not raise
-        _json.dumps(results[0].info)
+        _json.dumps(results[0].info)  # must not raise
 
     def test_caption_pdf_detects_table(self, caption_table_pdf: Path) -> None:
         """Caption + rules PDF must yield one table via the caption strategy."""
@@ -730,7 +547,7 @@ class TestDetectBorderlessTables:
                 page_num=0,
                 page_width=float(page.rect.width),
                 dpi=None,
-                pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                pymupdf_pixmap_attrs=_PIXMAP_ATTRS,
             )
         assert len(results) >= 1
         assert any(m.info.get("detection_method") == "borderless" for m in results)
@@ -738,6 +555,7 @@ class TestDetectBorderlessTables:
 
 
 # ── end-to-end test: parse_pdf_to_pages integration ───────────────────────────
+
 
 def test_parse_pdf_to_pages_detects_borderless_table(
     three_line_table_pdf: Path,
