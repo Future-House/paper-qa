@@ -91,6 +91,12 @@ NemotronParseToolName: TypeAlias = Literal[
     "markdown_bbox", "markdown_no_bbox", "detection_only"
 ]
 
+# nemotron-parse resizes each input image (preserving aspect ratio) to fit within this
+# target height x width canvas. These are the model's native input dimensions:
+# https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/fd1e3c6ba0b61a6dcab5a905f0ff92c5b19f14a4/preprocessor_config.json#L22-L33
+NEMOTRON_PARSE_TARGET_HEIGHT = 2048  # px
+NEMOTRON_PARSE_TARGET_WIDTH = 1648  # px
+
 
 class NemotronParseBBox(BaseModel):
     """
@@ -159,6 +165,68 @@ class NemotronParseBBox(BaseModel):
             self.ymin * height,
             self.xmax * width,
             self.ymax * height,
+        )
+
+    def to_original_coordinates(
+        self,
+        height: float,
+        width: float,
+        target_height: int = NEMOTRON_PARSE_TARGET_HEIGHT,
+        target_width: int = NEMOTRON_PARSE_TARGET_WIDTH,
+    ) -> tuple[float, float, float, float]:
+        """Map this canvas-normalized bbox to original-image pixel coordinates.
+
+        Port of https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/fd1e3c6ba0b61a6dcab5a905f0ff92c5b19f14a4/postprocessing.py#L23-L53
+
+        nemotron-parse resizes each input image (preserving aspect ratio)
+        and center-pads it to a `target_height` x `target_width` canvas,
+        then emits bounding boxes normalized to that padded canvas.
+        SEE its image processor's LongestMaxSize resize:
+        https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/fd1e3c6ba0b61a6dcab5a905f0ff92c5b19f14a4/hf_nemotron_parse_processor.py#L151-L170
+        and its centered white PadIfNeeded:
+        https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/fd1e3c6ba0b61a6dcab5a905f0ff92c5b19f14a4/hf_nemotron_parse_processor.py#L74-L82
+
+        This method inverts that (the aspect-preserving resize, then centered padding)
+        to recover original-image pixels. It is needed for the model's raw output,
+        i.e. when you run the weights yourself via vLLM or HuggingFace `transformers`,
+        as NVIDIA's example.py does:
+        https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/fd1e3c6ba0b61a6dcab5a905f0ff92c5b19f14a4/example.py#L34
+
+        NOTE: NVIDIA's hosted NIM returns coordinates already in input-image space,
+        as opposed to the model's padded-canvas space, so NIM responses do not need it.
+        Contrast `to_page_coordinates`, which just scales coordinates already relative to the page.
+
+        Args:
+            height: Original ("pre-letterbox") image height (px).
+            width: Original ("pre-letterbox") image width (px).
+            target_height: Canvas height (px) the model normalized coordinates against.
+            target_width: Canvas width (px) the model normalized coordinates against.
+
+        Returns:
+            Four-tuple of (xmin, ymin, xmax, ymax), in original-image pixel coordinates.
+                Returned coordinates can fall outside the image (negative, or past
+                width/height) when the box overlaps the padded canvas region, matching
+                NVIDIA's reference `transform_bbox_to_original`. Clamp the returned
+                coordinates to the image bounds if you need in-bounds values.
+        """
+        aspect_ratio = width / height
+        # Replicate the model's "LongestMaxSize" resize (only shrinks oversized inputs)
+        resized_width, resized_height = width, height
+        if height > target_height:
+            resized_height = target_height
+            resized_width = int(resized_height * aspect_ratio)
+        if resized_width > target_width:
+            resized_width = target_width
+            resized_height = int(resized_width / aspect_ratio)
+        # Centered padding (matching the Albumentations PadIfNeeded)
+        # SEE: https://huggingface.co/nvidia/NVIDIA-Nemotron-Parse-v1.1/blob/fd1e3c6ba0b61a6dcab5a905f0ff92c5b19f14a4/hf_nemotron_parse_processor.py#L74-L82
+        pad_left = (target_width - resized_width) // 2
+        pad_top = (target_height - resized_height) // 2
+        return (
+            (self.xmin * target_width - pad_left) * width / resized_width,
+            (self.ymin * target_height - pad_top) * height / resized_height,
+            (self.xmax * target_width - pad_left) * width / resized_width,
+            (self.ymax * target_height - pad_top) * height / resized_height,
         )
 
     def iou(self, other: "NemotronParseBBox") -> float:
