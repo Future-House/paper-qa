@@ -11,7 +11,7 @@ summary_prompt = (
     " Stay detailed; report specific numbers, equations, or direct quotes"
     ' (marked with quotation marks). Reply "Not applicable" if the excerpt is'
     " irrelevant. At the end of your response,"
-    " provide an integer score from 1-10 on a newline indicating relevance to question."  
+    " provide an integer score from 1-10 on a newline indicating relevance to question."
     " Do not explain your score.\n"
     "IMPORTANT: Your response must end with the score alone on its own line (e.g., '7'). "
     "No other text after the score."
