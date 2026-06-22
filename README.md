@@ -580,6 +580,24 @@ answer_response = ask(
 )
 ```
 
+Or DeepSeek, by setting the `DEEPSEEK_API_KEY` environment variable.
+
+```python
+from paperqa import Settings, ask
+
+answer_response = ask(
+    "What is PaperQA2?",
+    settings=Settings(
+        llm="deepseek/deepseek-chat",
+        summary_llm="deepseek/deepseek-chat",
+        embedding="text-embedding-3-small",
+    ),
+)
+```
+
+See the [DeepSeek setup tutorial](docs/tutorials/deepseek_setup.md) for more details,
+including custom API base URL, JSON config files, and DeepSeek-R1 usage.
+
 #### Locally Hosted
 
 You can use llama.cpp to be the LLM.
