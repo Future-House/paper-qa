@@ -12,7 +12,7 @@ from typing import ClassVar, Self, cast
 
 from aviary.core import Message, ToolRequestMessage
 from lmi import Embeddable, EmbeddingModel, LiteLLMModel
-from pydantic import BaseModel, ConfigDict, Field, computed_field
+from pydantic import BaseModel, ConfigDict, Field, PrivateAttr, computed_field
 
 from paperqa.docs import Docs
 from paperqa.settings import Settings
@@ -47,10 +47,11 @@ def default_status(state: "EnvironmentState") -> str:
 class EnvironmentState(BaseModel):
     """State here contains documents and answer being populated."""
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
 
     docs: Docs
     session: PQASession
+    _evidence_lock: asyncio.Lock = PrivateAttr(default_factory=asyncio.Lock)
     status_fn: Callable[[Self], str] | None = Field(
         default=None,
         description=(
@@ -217,17 +218,28 @@ class EmptyDocsError(RuntimeError):
 class GatherEvidence(NamedTool):
     TOOL_FN_NAME = "gather_evidence"
 
+    # Safe to run concurrently: sub-questions are passed explicitly and session
+    # mutations are serialized via EnvironmentState._evidence_lock in aget_evidence.
+    CONCURRENCY_SAFE = True
+
     settings: Settings
     summary_llm_model: LiteLLMModel
     embedding_model: EmbeddingModel
     partitioning_fn: Callable[[Embeddable], int] | None = None
 
-    async def gather_evidence(self, question: str, state: EnvironmentState) -> str:
+    async def gather_evidence(
+        self,
+        question: str,
+        state: EnvironmentState,
+        *,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
+    ) -> str:
         """
         Gather evidence from previous papers given a specific question to increase evidence and relevant paper counts.
 
         A valuable time to invoke this tool is right after another tool increases paper count.
-        Feel free to invoke this tool in parallel with other tools, but do not call this tool in parallel with itself.
+        Feel free to invoke this tool in parallel with other tools, including other
+        gather_evidence calls with different questions (up to a few at once).
         Only invoke this tool when the paper count is above zero, or this tool will be useless.
 
         Args:
@@ -237,42 +249,58 @@ class GatherEvidence(NamedTool):
         Returns:
             String describing gathered evidence and the current status.
         """
+        return await self._gather_evidence_for_question(
+            question,
+            state,
+            partitioning_fn=partitioning_fn,
+        )
+
+    async def _gather_evidence_for_question(
+        self,
+        question: str,
+        state: EnvironmentState,
+        *,
+        partitioning_fn: Callable[[Embeddable], int] | None = None,
+        settings: Settings | None = None,
+    ) -> str:
+        effective_settings = settings or self.settings
+
         if not state.docs.docs:
             raise EmptyDocsError("Not gathering evidence due to having no papers.")
 
-        if f"{self.TOOL_FN_NAME}_initialized" in self.settings.agent.callbacks:
+        if f"{self.TOOL_FN_NAME}_initialized" in effective_settings.agent.callbacks:
             await asyncio.gather(
                 *(
                     c(state)
-                    for c in self.settings.agent.callbacks[
+                    for c in effective_settings.agent.callbacks[
                         f"{self.TOOL_FN_NAME}_initialized"
                     ]
                 )
             )
 
         logger.info(f"{self.TOOL_FN_NAME} starting for question {question!r}.")
-        original_question = state.session.question
-        l1 = l0 = len(state.session.contexts)
+        l0 = len(state.session.contexts)
 
-        try:
-            # Swap out the question with the more specific question
-            # TODO: remove this swap, as it prevents us from supporting parallel calls
-            state.session.question = question
+        effective_partitioning_fn = (
+            partitioning_fn
+            if partitioning_fn is not None
+            else self.partitioning_fn
+        )
 
-            # TODO: refactor answer out of this...
-            state.session = await state.docs.aget_evidence(
-                query=state.session,
-                settings=self.settings,
-                embedding_model=self.embedding_model,
-                summary_llm_model=self.summary_llm_model,
-                partitioning_fn=self.partitioning_fn,
-                callbacks=self.settings.agent.callbacks.get(
-                    f"{self.TOOL_FN_NAME}_aget_evidence"
-                ),
-            )
-            l1 = len(state.session.contexts)
-        finally:
-            state.session.question = original_question
+        # TODO: refactor answer out of this...
+        state.session = await state.docs.aget_evidence(
+            query=state.session,
+            evidence_question=question,
+            settings=effective_settings,
+            embedding_model=self.embedding_model,
+            summary_llm_model=self.summary_llm_model,
+            partitioning_fn=effective_partitioning_fn,
+            session_lock=state._evidence_lock,
+            callbacks=effective_settings.agent.callbacks.get(
+                f"{self.TOOL_FN_NAME}_aget_evidence"
+            ),
+        )
+        l1 = len(state.session.contexts)
 
         status = state.status
         logger.info(status)
@@ -289,7 +317,7 @@ class GatherEvidence(NamedTool):
 
         top_contexts = "\n\n".join(
             f"- {sc.context}"
-            for sc in sorted_contexts[: self.settings.agent.agent_evidence_n]
+            for sc in sorted_contexts[: effective_settings.agent.agent_evidence_n]
         )
 
         best_evidence = (
@@ -298,11 +326,11 @@ class GatherEvidence(NamedTool):
             else ""
         )
 
-        if f"{self.TOOL_FN_NAME}_completed" in self.settings.agent.callbacks:
+        if f"{self.TOOL_FN_NAME}_completed" in effective_settings.agent.callbacks:
             await asyncio.gather(
                 *(
                     callback(state)
-                    for callback in self.settings.agent.callbacks[
+                    for callback in effective_settings.agent.callbacks[
                         f"{self.TOOL_FN_NAME}_completed"
                     ]
                 )

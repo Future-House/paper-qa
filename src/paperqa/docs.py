@@ -41,6 +41,33 @@ from paperqa.utils import (
 
 logger = logging.getLogger(__name__)
 
+_evidence_global_semaphore: asyncio.Semaphore | None = None
+_evidence_global_semaphore_limit: int | None = None
+_texts_index_locks: dict[UUID, asyncio.Lock] = {}
+
+
+def _get_evidence_global_semaphore(limit: int | None) -> asyncio.Semaphore | None:
+    """Return a process-wide semaphore capping concurrent evidence summary LLM calls."""
+    global _evidence_global_semaphore, _evidence_global_semaphore_limit  # noqa: PLW0603
+    if limit is None:
+        return None
+    if (
+        _evidence_global_semaphore is None
+        or _evidence_global_semaphore_limit != limit
+    ):
+        _evidence_global_semaphore = asyncio.Semaphore(limit)
+        _evidence_global_semaphore_limit = limit
+    return _evidence_global_semaphore
+
+
+def _texts_index_lock(docs: "Docs") -> asyncio.Lock:
+    """Per-Docs asyncio lock stored outside the model so Docs remains picklable."""
+    lock = _texts_index_locks.get(docs.id)
+    if lock is None:
+        lock = asyncio.Lock()
+        _texts_index_locks[docs.id] = lock
+    return lock
+
 
 class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     """A collection of documents to be used for answering questions."""
@@ -437,6 +464,12 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     async def _build_texts_index(
         self, embedding_model: EmbeddingModel, with_enrichment: bool = False
     ) -> None:
+        async with _texts_index_lock(self):
+            await self._build_texts_index_unlocked(embedding_model, with_enrichment)
+
+    async def _build_texts_index_unlocked(
+        self, embedding_model: EmbeddingModel, with_enrichment: bool = False
+    ) -> None:
         texts = [t for t in self.texts if t not in self.texts_index]
         # For any embeddings we are supposed to lazily embed, embed them now
         to_embed = [t for t in texts if t.embedding is None]
@@ -497,6 +530,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         embedding_model: EmbeddingModel | None = None,
         summary_llm_model: LLMModel | None = None,
         partitioning_fn: Callable[[Embeddable], int] | None = None,
+        evidence_question: str | None = None,
+        session_lock: asyncio.Lock | None = None,
     ) -> PQASession:
 
         evidence_settings = get_settings(settings)
@@ -507,6 +542,9 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             PQASession(question=query, config_md5=evidence_settings.md5)
             if isinstance(query, str)
             else query
+        )
+        question_for_evidence = (
+            evidence_question if evidence_question is not None else session.question
         )
 
         if not self.docs and len(self.texts_index) == 0:
@@ -520,7 +558,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
         if answer_config.evidence_retrieval:
             matches = await self.retrieve_texts(
-                session.question,
+                question_for_evidence,
                 answer_config.evidence_k,
                 evidence_settings,
                 embedding_model,
@@ -548,41 +586,68 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                     prompt_config.system,
                 )
 
-        with set_llm_session_ids(session.id):
-            results = await gather_with_concurrency(
-                answer_config.max_concurrent_requests,
-                [
-                    map_fxn_summary(
-                        text=m,
-                        question=session.question,
+        global_semaphore = _get_evidence_global_semaphore(
+            answer_config.evidence_global_max_concurrent
+        )
+
+        async def _summarize_text(text: Text):
+            if global_semaphore is not None:
+                async with global_semaphore:
+                    return await map_fxn_summary(
+                        text=text,
+                        question=question_for_evidence,
                         summary_llm_model=summary_llm_model,
                         prompt_templates=prompt_templates,
                         extra_prompt_data={
                             "summary_length": answer_config.evidence_summary_length,
-                            "citation": f"{m.name}: {m.doc.formatted_citation}",
+                            "citation": f"{text.name}: {text.doc.formatted_citation}",
                         },
                         parser=llm_parse_json if prompt_config.use_json else None,
                         callbacks=callbacks,
                         skip_citation_strip=answer_config.skip_evidence_citation_strip,
                         evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
                     )
-                    for m in matches
-                ],
+            return await map_fxn_summary(
+                text=text,
+                question=question_for_evidence,
+                summary_llm_model=summary_llm_model,
+                prompt_templates=prompt_templates,
+                extra_prompt_data={
+                    "summary_length": answer_config.evidence_summary_length,
+                    "citation": f"{text.name}: {text.doc.formatted_citation}",
+                },
+                parser=llm_parse_json if prompt_config.use_json else None,
+                callbacks=callbacks,
+                skip_citation_strip=answer_config.skip_evidence_citation_strip,
+                evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
             )
 
-        for _, llm_results in results:
-            for r in llm_results:
-                session.add_tokens(r)
+        with set_llm_session_ids(session.id):
+            results = await gather_with_concurrency(
+                answer_config.max_concurrent_requests,
+                [_summarize_text(m) for m in matches],
+            )
 
-        # Filter out failed context creations or irrelevant contexts,
-        # and don't add duplicate contexts
-        session.contexts += list(
-            {
-                c
-                for c, _ in results
-                if c is not None and c.score > 0 and c not in session.contexts
-            }
-        )
+        async def _merge_results() -> None:
+            for _, llm_results in results:
+                for r in llm_results:
+                    session.add_tokens(r)
+
+            # Filter out failed context creations or irrelevant contexts,
+            # and don't add duplicate contexts
+            session.contexts += list(
+                {
+                    c
+                    for c, _ in results
+                    if c is not None and c.score > 0 and c not in session.contexts
+                }
+            )
+
+        if session_lock is not None:
+            async with session_lock:
+                await _merge_results()
+        else:
+            await _merge_results()
         return session
 
     async def aquery(

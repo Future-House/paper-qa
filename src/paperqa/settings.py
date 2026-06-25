@@ -152,6 +152,14 @@ class AnswerSettings(BaseModel):
     max_concurrent_requests: int = Field(
         default=4, description="Max concurrent requests to LLMs."
     )
+    evidence_global_max_concurrent: int | None = Field(
+        default=None,
+        description=(
+            "Global cap on concurrent evidence summary LLM calls across parallel"
+            " gather_evidence invocations. If unset, only max_concurrent_requests"
+            " per call applies."
+        ),
+    )
     answer_filter_extra_background: bool = Field(
         default=False,
         description="Whether to cite background information provided by model.",

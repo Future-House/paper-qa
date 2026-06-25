@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib
 import itertools
 import json
@@ -814,6 +815,50 @@ async def test_agent_sharing_state(
         await reset_tool.reset(state=env_state)
         assert not session.context
         assert not session.contexts
+
+
+@pytest.mark.asyncio
+async def test_parallel_gather_evidence(agent_test_settings: Settings) -> None:
+    """Parallel gather_evidence calls should overlap and preserve session.question."""
+    assert GatherEvidence.CONCURRENCY_SAFE is True
+
+    stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
+    docs = Docs(docs={"stub": stub_doc})
+    session = PQASession(question="Main question")
+    env_state = EnvironmentState(docs=docs, session=session)
+
+    gather_evidence_tool = GatherEvidence(
+        settings=agent_test_settings,
+        summary_llm_model=agent_test_settings.get_summary_llm(),
+        embedding_model=agent_test_settings.get_embedding_model(),
+    )
+
+    active_calls = 0
+    max_active_calls = 0
+    evidence_questions: list[str | None] = []
+
+    original_aget_evidence = Docs.aget_evidence
+
+    async def tracking_aget_evidence(self, *args, **kwargs):  # noqa: ANN001
+        nonlocal active_calls, max_active_calls
+        evidence_questions.append(kwargs.get("evidence_question"))
+        active_calls += 1
+        max_active_calls = max(max_active_calls, active_calls)
+        await asyncio.sleep(0.05)
+        try:
+            return await original_aget_evidence(self, *args, **kwargs)
+        finally:
+            active_calls -= 1
+
+    with patch.object(Docs, "aget_evidence", tracking_aget_evidence):
+        await asyncio.gather(
+            gather_evidence_tool.gather_evidence("Sub-question A", env_state),
+            gather_evidence_tool.gather_evidence("Sub-question B", env_state),
+        )
+
+    assert max_active_calls > 1, "Expected parallel gather_evidence invocations"
+    assert env_state.session.question == "Main question"
+    assert set(evidence_questions) == {"Sub-question A", "Sub-question B"}
 
 
 def test_settings_model_config() -> None:
