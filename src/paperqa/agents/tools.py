@@ -282,9 +282,7 @@ class GatherEvidence(NamedTool):
         l0 = len(state.session.contexts)
 
         effective_partitioning_fn = (
-            partitioning_fn
-            if partitioning_fn is not None
-            else self.partitioning_fn
+            partitioning_fn if partitioning_fn is not None else self.partitioning_fn
         )
 
         # TODO: refactor answer out of this...

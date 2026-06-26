@@ -839,7 +839,7 @@ async def test_parallel_gather_evidence(agent_test_settings: Settings) -> None:
 
     original_aget_evidence = Docs.aget_evidence
 
-    async def tracking_aget_evidence(self, *args, **kwargs):  # noqa: ANN001
+    async def tracking_aget_evidence(self, *args, **kwargs):
         nonlocal active_calls, max_active_calls
         evidence_questions.append(kwargs.get("evidence_question"))
         active_calls += 1

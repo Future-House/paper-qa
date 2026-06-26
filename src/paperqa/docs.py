@@ -52,16 +52,13 @@ def _get_evidence_global_semaphore(limit: int | None) -> asyncio.Semaphore | Non
     global _evidence_global_semaphore, _evidence_global_semaphore_limit  # noqa: PLW0603
     if limit is None:
         return None
-    if (
-        _evidence_global_semaphore is None
-        or _evidence_global_semaphore_limit != limit
-    ):
+    if _evidence_global_semaphore is None or _evidence_global_semaphore_limit != limit:
         _evidence_global_semaphore = asyncio.Semaphore(limit)
         _evidence_global_semaphore_limit = limit
     return _evidence_global_semaphore
 
 
-def _texts_index_lock(docs: "Docs") -> asyncio.Lock:
+def _texts_index_lock(docs: Docs) -> asyncio.Lock:
     """Per-Docs asyncio lock stored outside the model so Docs remains picklable."""
     lock = _texts_index_locks.get(docs.id)
     if lock is None:
