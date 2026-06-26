@@ -820,7 +820,7 @@ async def test_agent_sharing_state(
 @pytest.mark.asyncio
 async def test_parallel_gather_evidence(agent_test_settings: Settings) -> None:
     """Parallel gather_evidence calls should overlap and preserve session.question."""
-    assert GatherEvidence.CONCURRENCY_SAFE is True
+    assert GatherEvidence.CONCURRENCY_SAFE
 
     stub_doc = Doc(docname="stub", citation="stub", dockey="stub")
     docs = Docs(docs={"stub": stub_doc})
@@ -934,8 +934,9 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
                     " to increase evidence and relevant paper counts.\n\nA valuable"
                     " time to invoke this tool is right after another tool"
                     " increases paper count.\nFeel free to invoke this tool in"
-                    " parallel with other tools, but do not call this tool in"
-                    " parallel with itself.\nOnly invoke this tool when the paper"
+                    " parallel with other tools, including other\n"
+                    "gather_evidence calls with different questions (up to a few at"
+                    " once).\nOnly invoke this tool when the paper"
                     " count is above zero, or this tool will be useless."
                 ),
                 "parameters": {

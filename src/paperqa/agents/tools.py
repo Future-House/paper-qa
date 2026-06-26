@@ -227,13 +227,7 @@ class GatherEvidence(NamedTool):
     embedding_model: EmbeddingModel
     partitioning_fn: Callable[[Embeddable], int] | None = None
 
-    async def gather_evidence(
-        self,
-        question: str,
-        state: EnvironmentState,
-        *,
-        partitioning_fn: Callable[[Embeddable], int] | None = None,
-    ) -> str:
+    async def gather_evidence(self, question: str, state: EnvironmentState) -> str:
         """
         Gather evidence from previous papers given a specific question to increase evidence and relevant paper counts.
 
@@ -249,11 +243,7 @@ class GatherEvidence(NamedTool):
         Returns:
             String describing gathered evidence and the current status.
         """
-        return await self._gather_evidence_for_question(
-            question,
-            state,
-            partitioning_fn=partitioning_fn,
-        )
+        return await self._gather_evidence_for_question(question, state)
 
     async def _gather_evidence_for_question(
         self,

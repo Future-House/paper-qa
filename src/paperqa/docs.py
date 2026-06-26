@@ -611,7 +611,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 [_summarize_text(m) for m in matches],
             )
 
-        async def _merge_results() -> None:
+        def _merge_results() -> None:
             for _, llm_results in results:
                 for r in llm_results:
                     session.add_tokens(r)
@@ -627,7 +627,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             )
 
         async with session_lock or nullcontext():
-            await _merge_results()
+            _merge_results()
         return session
 
     async def aquery(
