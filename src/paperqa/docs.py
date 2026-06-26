@@ -9,6 +9,7 @@ import tempfile
 import urllib.request
 import warnings
 from collections.abc import Callable, Sequence
+from contextlib import nullcontext
 from datetime import datetime
 from io import BytesIO
 from pathlib import Path
@@ -591,36 +592,21 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
         )
 
         async def _summarize_text(text: Text):
-            if global_semaphore is not None:
-                async with global_semaphore:
-                    return await map_fxn_summary(
-                        text=text,
-                        question=question_for_evidence,
-                        summary_llm_model=summary_llm_model,
-                        prompt_templates=prompt_templates,
-                        extra_prompt_data={
-                            "summary_length": answer_config.evidence_summary_length,
-                            "citation": f"{text.name}: {text.doc.formatted_citation}",
-                        },
-                        parser=llm_parse_json if prompt_config.use_json else None,
-                        callbacks=callbacks,
-                        skip_citation_strip=answer_config.skip_evidence_citation_strip,
-                        evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
-                    )
-            return await map_fxn_summary(
-                text=text,
-                question=question_for_evidence,
-                summary_llm_model=summary_llm_model,
-                prompt_templates=prompt_templates,
-                extra_prompt_data={
-                    "summary_length": answer_config.evidence_summary_length,
-                    "citation": f"{text.name}: {text.doc.formatted_citation}",
-                },
-                parser=llm_parse_json if prompt_config.use_json else None,
-                callbacks=callbacks,
-                skip_citation_strip=answer_config.skip_evidence_citation_strip,
-                evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
-            )
+            async with global_semaphore or nullcontext():
+                return await map_fxn_summary(
+                    text=text,
+                    question=question_for_evidence,
+                    summary_llm_model=summary_llm_model,
+                    prompt_templates=prompt_templates,
+                    extra_prompt_data={
+                        "summary_length": answer_config.evidence_summary_length,
+                        "citation": f"{text.name}: {text.doc.formatted_citation}",
+                    },
+                    parser=llm_parse_json if prompt_config.use_json else None,
+                    callbacks=callbacks,
+                    skip_citation_strip=answer_config.skip_evidence_citation_strip,
+                    evidence_text_only_fallback=answer_config.evidence_text_only_fallback,
+                )
 
         with set_llm_session_ids(session.id):
             results = await gather_with_concurrency(
@@ -643,10 +629,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 }
             )
 
-        if session_lock is not None:
-            async with session_lock:
-                await _merge_results()
-        else:
+        async with session_lock or nullcontext():
             await _merge_results()
         return session
 
