@@ -836,6 +836,9 @@ async def test_parallel_gather_evidence(agent_test_settings: Settings) -> None:
     active_calls = 0
     max_active_calls = 0
     evidence_questions: list[str | None] = []
+    # Force both invocations to overlap deterministically instead of relying on
+    # a wall-clock sleep, which can be flaky under slow/loaded CI.
+    overlap_barrier = asyncio.Barrier(2)
 
     original_aget_evidence = Docs.aget_evidence
 
@@ -844,7 +847,7 @@ async def test_parallel_gather_evidence(agent_test_settings: Settings) -> None:
         evidence_questions.append(kwargs.get("evidence_question"))
         active_calls += 1
         max_active_calls = max(max_active_calls, active_calls)
-        await asyncio.sleep(0.05)
+        await overlap_barrier.wait()
         try:
             return await original_aget_evidence(self, *args, **kwargs)
         finally:
