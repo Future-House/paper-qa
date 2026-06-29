@@ -583,6 +583,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                     prompt_config.summary,
                     prompt_config.system,
                 )
+        else:
+            summary_llm_model = None
 
         global_semaphore = _get_evidence_global_semaphore(
             answer_config.evidence_global_max_concurrent

@@ -63,6 +63,7 @@ from paperqa.clients.journal_quality import JournalQualityPostProcessor
 from paperqa.core import (
     LLMContextTimeoutError,
     _map_fxn_summary,
+    format_text_with_tables,
     llm_parse_json,
     map_fxn_summary,
 )
@@ -936,10 +937,41 @@ async def test_ablations(docs_fixture: Docs) -> None:
         )
     ).contexts
     assert (
-        contexts[0].text.text.strip() == contexts[0].context
+        contexts[0].context == format_text_with_tables(contexts[0].text)
     ), "summarization not ablated"
 
     assert len(contexts) == len(docs_fixture.texts), "evidence retrieval not ablated"
+
+
+@pytest.mark.asyncio
+async def test_skip_summary_includes_tables() -> None:
+    doc = Doc(docname="stub", citation="Stub 2024", dockey="stub")
+    table_markdown = "| A | B |\n|---|---|\n| 1 | 2 |"
+    text = Text(
+        text="Chunk body text.",
+        name="stub_text",
+        doc=doc,
+        media=[
+            ParsedMedia(
+                index=0,
+                data=b"png",
+                text=table_markdown,
+                info={"type": "table"},
+            )
+        ],
+    )
+    docs = Docs()
+    docs.texts = [text]
+    docs.docs = {"stub": doc}
+
+    settings = Settings()
+    settings.answer.evidence_skip_summary = True
+    settings.answer.evidence_retrieval = False
+
+    contexts = (await docs.aget_evidence("What is in the table?", settings=settings)).contexts
+    assert len(contexts) == 1
+    assert contexts[0].context == format_text_with_tables(text)
+    assert table_markdown in contexts[0].context
 
 
 @pytest.mark.asyncio

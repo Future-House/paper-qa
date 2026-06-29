@@ -175,6 +175,34 @@ class LLMContextRequestFailedError(LLMContextError):
     )
 
 
+def format_text_with_tables(
+    text: Text,
+    *,
+    cleaned_text: str | None = None,
+    citation: str | None = None,
+) -> str:
+    """Format chunk text for evidence, appending table markdown like the summary LLM path."""
+    cleaned = (
+        cleaned_text
+        if cleaned_text is not None
+        else text.text.strip("\n") or "(no text)"
+    )
+    citation_str = (
+        citation if citation is not None else text.name + ": " + text.doc.formatted_citation
+    )
+    unique_media = list(dict.fromkeys(text.media))
+    table_texts: list[str] = [
+        m.text for m in unique_media if m.info.get("type") == "table" and m.text
+    ]
+    if table_texts:
+        return text_with_tables_prompt_template.format(
+            text=cleaned,
+            citation=citation_str,
+            tables="\n\n".join(table_texts),
+        )
+    return cleaned
+
+
 async def _map_fxn_summary(  # noqa: PLR0912
     text: Text,
     question: str,
@@ -230,23 +258,15 @@ async def _map_fxn_summary(  # noqa: PLR0912
     # Strip newlines in case chunking led to blank lines,
     # but not spaces, to preserve text alignment
     cleaned_text = text.text.strip("\n") or "(no text)"
+    evidence_text = format_text_with_tables(
+        text, cleaned_text=cleaned_text, citation=citation
+    )
     if summary_llm_model and prompt_templates:
         unique_media = list(dict.fromkeys(text.media))  # Preserve order
-        table_texts: list[str] = [
-            m.text for m in unique_media if m.info.get("type") == "table" and m.text
-        ]
         data = {
             "question": question,
             "citation": citation,
-            "text": (
-                text_with_tables_prompt_template.format(
-                    text=cleaned_text,
-                    citation=citation,
-                    tables="\n\n".join(table_texts),
-                )
-                if table_texts
-                else cleaned_text
-            ),
+            "text": evidence_text,
         } | (extra_prompt_data or {})
         message_prompt, system_prompt = (pt.format(**data) for pt in prompt_templates)
         try:
@@ -349,7 +369,7 @@ async def _map_fxn_summary(  # noqa: PLR0912
                 ) from exc
     else:
         llm_results.append(LLMResult(model="", date=""))
-        context = cleaned_text
+        context = evidence_text
         # If we don't assign scores, just default to 5.
         # why 5? Because we filter out 0s in another place
         # and 5/10 is the only default I could come up with
