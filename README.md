@@ -1067,6 +1067,8 @@ It's probably best to just download PDFs of papers you think will help answer yo
 
 See detailed docs [about zotero, openreview and parsing](docs/tutorials/where_do_I_get_papers.md)
 
+For agent workflows, see the reusable [PaperQA skill](docs/skills/paper-qa/SKILL.md) and [Claude Code plugin](claude-code/paper-qa/).
+
 ## Callbacks
 
 To execute a function on each chunk of LLM completions,
