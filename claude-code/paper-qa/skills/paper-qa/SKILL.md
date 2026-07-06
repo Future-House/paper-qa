@@ -5,6 +5,10 @@ description: Use when an agent needs to answer questions from scientific papers 
 
 # PaperQA Skill
 
+## Maintenance Note
+
+`docs/skills/paper-qa/SKILL.md` is the source of truth for this skill. `claude-code/paper-qa/skills/paper-qa/SKILL.md` vendors the same content for Claude Code plugin packaging and should be kept in sync when the source skill changes.
+
 ## Overview
 
 Use PaperQA for evidence-grounded question answering over scientific documents. This skill tells an agent how to prepare sources, choose settings, run searches, and report answers with citations.
