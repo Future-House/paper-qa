@@ -30,7 +30,7 @@ classifiers = [
 dependencies = [
     "anyio",
     "fhaviary[llm]>=0.34",  # For type(action)=Message
-    "fhlmi>=0.45.0",  # For type(action)=Message
+    "fhlmi~=1.0",  # For LLMConfig-based model configuration
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "httpx-aiohttp",
@@ -60,7 +60,7 @@ requires-python = ">=3.11"
 
 [project.optional-dependencies]
 dev = [
-    "fhlmi>=0.44.0",  # Lower pin for update from Haiku 3.5 to 4.5
+    "fhlmi~=1.0",  # For LLMConfig-based model configuration
     "httpx-aiohttp>=0.1.11",  # Pin for raw headers fix
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
@@ -89,7 +89,7 @@ dev = [
 docling = ["paper-qa-docling"]
 image = ["fhlmi[image]"]
 ldp = [
-    "ldp>=0.45.0,<1",  # Lower pin for type(action)=Message, upper pin if v1 introduces breaks
+    "ldp~=1.0",  # For LLMConfig-based agents
 ]
 local = [
     "sentence-transformers",

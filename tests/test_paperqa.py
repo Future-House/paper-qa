@@ -38,6 +38,7 @@ from lmi import (
     LLMResult,
     SparseEmbeddingModel,
 )
+from lmi.exceptions import AllModelsExhaustedError
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
 from paperqa_docling import parse_pdf_to_pages as docling_parse_pdf_to_pages
@@ -3560,8 +3561,9 @@ async def test_timeout_resilience() -> None:
     )
 
     # Make sure we've configured timeout low enough for this test to be useful
-    with pytest.raises(litellm.Timeout):
+    with pytest.raises(AllModelsExhaustedError) as exc_info:
         await llm.call_single("The duck says")
+    assert isinstance(exc_info.value.last_exc, litellm.Timeout)
 
     text = Text(
         text="The duck says",

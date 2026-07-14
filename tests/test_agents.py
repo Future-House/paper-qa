@@ -845,6 +845,34 @@ def test_settings_model_config() -> None:
     )
 
 
+@pytest.mark.asyncio
+async def test_make_ldp_agent_carries_agent_llm() -> None:
+    """Ensure the configured agent_llm actually lands in the ldp agent's llm_config."""
+    agent_llm = CommonLLMNames.ANTHROPIC_TEST.value  # Non-default model
+    settings = Settings(
+        agent={"agent_type": "ldp.agent.SimpleAgent", "agent_llm": agent_llm},
+        temperature=0.5,
+    )
+    for agent_type in ("ldp.agent.SimpleAgent", "ldp.agent.ReActAgent"):
+        agent = await settings.make_ldp_agent(agent_type)
+        assert agent is not None
+        primary = agent.llm_config.models[0]  # type: ignore[attr-defined]
+        assert primary.name == agent_llm
+        assert primary.extra_params["temperature"] == 0.5
+
+    # An old-style llm_model key in a stored agent_config
+    # gets translated to llm_config, not silently dropped
+    settings = Settings(
+        agent={
+            "agent_type": "ldp.agent.SimpleAgent",
+            "agent_config": {"llm_model": {"name": agent_llm}},
+        }
+    )
+    agent = await settings.make_ldp_agent("ldp.agent.SimpleAgent")
+    assert agent is not None
+    assert agent.llm_config.models[0].name == agent_llm  # type: ignore[attr-defined]
+
+
 def test_tool_schema(agent_test_settings: Settings) -> None:
     """Check the tool schema passed to LLM providers."""
     tools = settings_to_tools(agent_test_settings)

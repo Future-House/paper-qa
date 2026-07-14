@@ -12,6 +12,7 @@ from enum import IntEnum, StrEnum
 from itertools import starmap
 from pydoc import locate
 from typing import (
+    TYPE_CHECKING,
     Any,
     ClassVar,
     Protocol,
@@ -31,6 +32,8 @@ from lmi import (
     LiteLLMModel,
     embedding_model_factory,
 )
+from lmi.cost_tracker import track_costs
+from lmi.exceptions import AllModelsExhaustedError
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -82,6 +85,9 @@ from paperqa.utils import (
     parse_enrichment_irrelevance,
     pqa_directory,
 )
+
+if TYPE_CHECKING:
+    from lmi.config import LLMConfig
 
 logger = logging.getLogger(__name__)
 
@@ -358,10 +364,12 @@ class ParsingSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the enrichment_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
+            " with entries matching the model_list format here:"
+            " https://docs.litellm.ai/docs/routing. It can optionally include a"
+            " top-level `fallbacks` key (a list of {model name: [fallback model"
+            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
+            " and 'num_retries' are honored (all other keys are ignored)."
         ),
     )
     enrichment_page_radius: int = Field(
@@ -625,10 +633,12 @@ class AgentSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the agent_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
+            " with entries matching the model_list format here:"
+            " https://docs.litellm.ai/docs/routing. It can optionally include a"
+            " top-level `fallbacks` key (a list of {model name: [fallback model"
+            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
+            " and 'num_retries' are honored (all other keys are ignored)."
         ),
     )
 
@@ -768,10 +778,12 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
+            " with entries matching the model_list format here:"
+            " https://docs.litellm.ai/docs/routing. It can optionally include a"
+            " top-level `fallbacks` key (a list of {model name: [fallback model"
+            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
+            " and 'num_retries' are honored (all other keys are ignored)."
         ),
     )
     summary_llm: str = Field(
@@ -785,10 +797,12 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the summary_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
+            " with entries matching the model_list format here:"
+            " https://docs.litellm.ai/docs/routing. It can optionally include a"
+            " top-level `fallbacks` key (a list of {model name: [fallback model"
+            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
+            " and 'num_retries' are honored (all other keys are ignored)."
         ),
     )
     embedding: str = Field(
@@ -973,9 +987,19 @@ class Settings(BaseSettings):
                 )
             )
         ):
+            agent_llm = self.get_agent_llm()
+            primary = cast("LLMConfig", agent_llm.llm_config).models[0]
+
+            async def _acompletion(_model_name: str, **kwargs) -> Any:
+                # ToolSelector binds its model_name as the first positional
+                # argument, but the primary ModelSpec already supplies 'model'
+                return await litellm.acompletion(
+                    **primary.to_litellm_kwargs(), **kwargs
+                )
+
             return ToolSelector(
                 model_name=self.agent.agent_llm,
-                acompletion=self.get_agent_llm().get_router().acompletion,
+                acompletion=track_costs(_acompletion),
                 **(self.agent.agent_config or {}),
             )
         return None
@@ -998,6 +1022,13 @@ class Settings(BaseSettings):
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
+        if "llm_model" in config:
+            # ldp>=1.0 renamed llm_model to llm_config, and silently ignores
+            # unknown kwargs
+            config["llm_config"] = config.pop("llm_model")
+        llm_config = config.pop(
+            "llm_config", {"name": agent_llm, "temperature": self.temperature}
+        )
         if issubclass(agent_cls, ReActAgent | MemoryAgent):
             if (
                 issubclass(agent_cls, MemoryAgent)
@@ -1031,13 +1062,10 @@ class Settings(BaseSettings):
                         )
                     )
                 )
-            return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
-                **config,
-            )
+            return agent_cls(llm_config=llm_config, **config)
         if issubclass(agent_cls, SimpleAgent):
             return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
+                llm_config=llm_config,
                 sys_prompt=agent_settings.agent_system_prompt,
                 **config,
             )
@@ -1141,7 +1169,11 @@ class Settings(BaseSettings):
                             media.info["is_irrelevant"],
                             media.info["enriched_description"],
                         ) = parse_enrichment_irrelevance(result.text)
-                except (litellm.InternalServerError, litellm.BadRequestError) as exc:
+                except (
+                    litellm.InternalServerError,
+                    litellm.BadRequestError,
+                    AllModelsExhaustedError,
+                ) as exc:
                     # Handle image > 5-MB failure mode 1:
                     # > litellm.BadRequestError: AnthropicException -
                     # > {"type":"error","error":{"type":"invalid_request_error",
@@ -1153,12 +1185,17 @@ class Settings(BaseSettings):
                     # > "message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 5690780 bytes > 5242880 bytes"},  # noqa: E501, W505
                     # > "request_id":"req_abc123"}.
                     # And the image being corrupt (but a reasonable size)
+                    root_exc = (
+                        exc.last_exc
+                        if isinstance(exc, AllModelsExhaustedError)
+                        else exc
+                    )
                     if (
-                        isinstance(exc, litellm.InternalServerError)
+                        isinstance(root_exc, litellm.InternalServerError)
                         and re.search(
                             r"image exceeds .+ maximum", str(exc), re.IGNORECASE
                         )
-                    ) or isinstance(exc, litellm.BadRequestError):
+                    ) or isinstance(root_exc, litellm.BadRequestError):
                         logger.warning(
                             f"Skipping enrichment for media index {media.index}"
                             f" on page {page_num} with metadata {media.info} because"
