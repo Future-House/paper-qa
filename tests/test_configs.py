@@ -103,10 +103,13 @@ def test_index_naming(subtests: SubTests) -> None:
         assert settings.agent.index.get_named_index_directory().name == "test"
 
 
-def test_router_kwargs_present_in_models() -> None:
+def test_retries_and_timeout_present_in_models() -> None:
     settings = Settings()
-    assert settings.get_llm().config["router_kwargs"] is not None
-    assert settings.get_summary_llm().config["router_kwargs"] is not None
+    for llm_model in (settings.get_llm(), settings.get_summary_llm()):
+        assert llm_model.llm_config is not None
+        for model_spec in llm_model.llm_config.models:
+            assert model_spec.timeout is not None
+            assert model_spec.max_retries is not None
 
 
 @pytest.mark.parametrize(
