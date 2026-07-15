@@ -1390,6 +1390,23 @@ async def test_custom_llm_custom_media(stub_data_dir: Path) -> None:
     class StubLLMModel(LLMModel):
         name: str = "custom/myllm"
 
+        # lmi>=1.0's LLMModel.call dispatches through these two hooks,
+        # but lmi only defines them on LiteLLMModel
+        async def _run_with_fallbacks(self, attempt, /, *args, **kwargs):
+            return await attempt(None, *args, **kwargs)
+
+        async def _dispatch(
+            self,
+            spec,  # noqa: ARG002
+            *,
+            messages: list[Message],
+            streaming: bool = False,
+            **chat_kwargs,
+        ):
+            if streaming:
+                return self.acompletion_iter(messages, **chat_kwargs)
+            return await self.acompletion(messages, **chat_kwargs)
+
         async def acompletion(
             self,
             messages: list[Message],
@@ -2278,7 +2295,8 @@ async def test_image_enrichment_invalid_image(caplog) -> None:
     with caplog.at_level("WARNING", logger="paperqa.settings"):
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
-    (record_tuple,) = caplog.record_tuples
+    # Filter to paperqa's logger, since lmi also logs each failed attempt
+    (record_tuple,) = [rt for rt in caplog.record_tuples if rt[0] == "paperqa.settings"]
     assert (
         "rejected by the LLM provider" in record_tuple[2]
     ), "Expected rejection to be documented"
@@ -2316,7 +2334,8 @@ async def test_image_enrichment_with_oversized_image(caplog) -> None:
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
     assert mock_acompletion_function.await_count >= 1
-    (record_tuple,) = caplog.record_tuples
+    # Filter to paperqa's logger, since lmi also logs each failed attempt
+    (record_tuple,) = [rt for rt in caplog.record_tuples if rt[0] == "paperqa.settings"]
     assert (
         "rejected by the LLM provider" in record_tuple[2]
     ), "Expected rejection to be documented"

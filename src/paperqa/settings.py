@@ -12,7 +12,6 @@ from enum import IntEnum, StrEnum
 from itertools import starmap
 from pydoc import locate
 from typing import (
-    TYPE_CHECKING,
     Any,
     ClassVar,
     Protocol,
@@ -32,7 +31,6 @@ from lmi import (
     LiteLLMModel,
     embedding_model_factory,
 )
-from lmi.cost_tracker import track_costs
 from lmi.exceptions import AllModelsExhaustedError
 from pydantic import (
     BaseModel,
@@ -61,6 +59,7 @@ from paperqa._ldp_shims import (
     _Memories,
     set_training_mode,
 )
+from paperqa.llms import make_tool_selector
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
@@ -85,9 +84,6 @@ from paperqa.utils import (
     parse_enrichment_irrelevance,
     pqa_directory,
 )
-
-if TYPE_CHECKING:
-    from lmi.config import LLMConfig
 
 logger = logging.getLogger(__name__)
 
@@ -987,20 +983,8 @@ class Settings(BaseSettings):
                 )
             )
         ):
-            agent_llm = self.get_agent_llm()
-            primary = cast("LLMConfig", agent_llm.llm_config).models[0]
-
-            async def _acompletion(_model_name: str, **kwargs) -> Any:
-                # ToolSelector binds its model_name as the first positional
-                # argument, but the primary ModelSpec already supplies 'model'
-                return await litellm.acompletion(
-                    **primary.to_litellm_kwargs(), **kwargs
-                )
-
-            return ToolSelector(
-                model_name=self.agent.agent_llm,
-                acompletion=track_costs(_acompletion),
-                **(self.agent.agent_config or {}),
+            return make_tool_selector(
+                self.get_agent_llm(), **(self.agent.agent_config or {})
             )
         return None
 
