@@ -12,16 +12,20 @@ from collections.abc import (
 )
 from typing import TYPE_CHECKING, Any, cast
 
+import litellm
 import numpy as np
+from aviary.core import ToolSelector
 from lmi import (
     Embeddable,
     EmbeddingModel,
     EmbeddingModes,
     HybridEmbeddingModel,
     LiteLLMEmbeddingModel,
+    LiteLLMModel,
     SentenceTransformerEmbeddingModel,
     SparseEmbeddingModel,
 )
+from lmi.cost_tracker import track_costs
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -33,6 +37,7 @@ from typing_extensions import override
 from paperqa.types import AUTOPOPULATE_VALUE, Doc, Text
 
 if TYPE_CHECKING:
+    from lmi.config import LLMConfig
     from qdrant_client.http.models import Record
 
     from paperqa.docs import Docs
@@ -45,6 +50,27 @@ except ImportError:
     qdrant_installed = False
 
 logger = logging.getLogger(__name__)
+
+
+def make_tool_selector(llm_model: LiteLLMModel, **selector_kwargs) -> ToolSelector:
+    """Create a ToolSelector backed by the given model's primary ModelSpec.
+
+    Use this over lmi's LiteLLMModel.select_tool, which is incompatible with
+    aviary's ToolSelector as of fhlmi 1.0.1 and fhaviary 0.35.0.
+    """
+    primary = cast("LLMConfig", llm_model.llm_config).models[0]
+
+    async def _acompletion(_model_name: str | None = None, **kwargs) -> Any:
+        # ToolSelector (fhaviary<=0.35) binds its model_name as the first
+        # positional argument, but the primary ModelSpec already supplies
+        # 'model', so accept and ignore it
+        return await litellm.acompletion(**primary.to_litellm_kwargs(), **kwargs)
+
+    return ToolSelector(
+        model_name=llm_model.name,
+        acompletion=track_costs(_acompletion),
+        **selector_kwargs,
+    )
 
 
 def cosine_similarity(a, b):

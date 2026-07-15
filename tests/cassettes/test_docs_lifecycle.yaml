@@ -354,7 +354,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1205,7 +1205,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1448,7 +1448,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":null}'
+      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"float"}'
       headers:
         accept:
           - application/json
