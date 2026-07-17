@@ -1387,25 +1387,10 @@ async def test_hybrid_embedding(
 async def test_custom_llm_custom_media(stub_data_dir: Path) -> None:
     captured_messages: list[list[Message]] = []
 
-    class StubLLMModel(LLMModel):
+    # NOTE: subclass LiteLLMModel over LLMModel since lmi>=1.0's LLMModel.call
+    # dispatches through hooks lmi only defines on LiteLLMModel
+    class StubLLMModel(LiteLLMModel):
         name: str = "custom/myllm"
-
-        # lmi>=1.0's LLMModel.call dispatches through these two hooks,
-        # but lmi only defines them on LiteLLMModel
-        async def _run_with_fallbacks(self, attempt, /, *args, **kwargs):
-            return await attempt(None, *args, **kwargs)
-
-        async def _dispatch(
-            self,
-            spec,  # noqa: ARG002
-            *,
-            messages: list[Message],
-            streaming: bool = False,
-            **chat_kwargs,
-        ):
-            if streaming:
-                return self.acompletion_iter(messages, **chat_kwargs)
-            return await self.acompletion(messages, **chat_kwargs)
 
         async def acompletion(
             self,
