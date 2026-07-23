@@ -696,7 +696,39 @@ Its design of using a keyword search initially reduces the number of chunks
 needed for each answer to a relatively small number < 1k.
 Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
 However, if a larger-than-memory vector store is needed,
-you can an external vector database like [Qdrant](https://qdrant.tech/) via the `QdrantVectorStore` class.
+you can use an external vector database like [Qdrant](https://qdrant.tech/)
+via the `QdrantVectorStore` class or [Milvus](https://milvus.io/)
+via the `MilvusVectorStore` class.
+
+To use Milvus, install the optional dependency:
+
+```bash
+pip install "paper-qa[milvus]"
+```
+
+Milvus Lite stores data in a local file and requires no server configuration:
+
+```python
+from paperqa import Docs, MilvusVectorStore
+
+docs = Docs(texts_index=MilvusVectorStore(uri="./paperqa_milvus.db"))
+```
+
+For Milvus Server or Zilliz Cloud, pass the remote URI and token directly,
+or set `MILVUS_URI` and `MILVUS_TOKEN` before constructing the vector store:
+
+```python
+import os
+
+from paperqa import Docs, MilvusVectorStore
+
+docs = Docs(
+    texts_index=MilvusVectorStore(
+        uri=os.environ["MILVUS_URI"],
+        token=os.environ["MILVUS_TOKEN"],
+    )
+)
+```
 
 The hybrid embeddings can be customized:
 

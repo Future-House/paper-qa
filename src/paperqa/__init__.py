@@ -14,6 +14,7 @@ from paperqa.agents import ask
 from paperqa.agents.main import agent_query
 from paperqa.docs import Docs, PQASession
 from paperqa.llms import (
+    MilvusVectorStore,
     NumpyVectorStore,
     QdrantVectorStore,
     VectorStore,
@@ -33,6 +34,7 @@ __all__ = [
     "LLMResult",
     "LiteLLMEmbeddingModel",
     "LiteLLMModel",
+    "MilvusVectorStore",
     "NumpyVectorStore",
     "PQASession",
     "QdrantVectorStore",

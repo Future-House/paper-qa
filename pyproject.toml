@@ -66,7 +66,7 @@ dev = [
     "ipython>=8",  # Pin to keep recent
     "litellm>=1.81.14",  # Lower pin for Anthropic empty system messages fix in https://github.com/BerriAI/litellm/pull/21630
     "mypy>=1.19",  # Pin for zip default detection
-    "paper-qa[docling,image,ldp,memory,nemotron,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
+    "paper-qa[docling,image,ldp,local,memory,milvus,nemotron,office,pymupdf,pypdf-media,qdrant,typing,zotero]",
     "prek<0.2.15",  # Downpin for https://github.com/j178/prek/issues/1104
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-per-file-ignores",
@@ -97,6 +97,9 @@ local = [
 memory = [
     "paper-qa[ldp]",
     "usearch>=2.16.4",  # Pin for Python 3.13 support
+]
+milvus = [
+    "pymilvus[milvus-lite]>=3.0.0",
 ]
 nemotron = ["paper-qa-nemotron"]
 office = [
