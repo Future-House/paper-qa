@@ -310,23 +310,22 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             **parse_config.reader_config,
         )
         # loose check to see if document was loaded
-        if metadata.name != "image" and (
-            not texts
-            or len(texts[0].text) < 10  # noqa: PLR2004
-            or (
-                not parse_config.disable_doc_valid_check
-                and (
-                    (
-                        # Quick sanity check the text is not just some terse one-page
-                        # 404 message interspersed with newlines. Check here
-                        # instead of maybe_is_text because a 404 HTML page is text
-                        sum(len(t.text.replace("\n", "")) for t in texts[:2])
-                        < 20  # noqa: PLR2004
-                    )
-                    # Use the first few text chunks to avoid potential issues with
-                    # title page parsing in the first chunk
-                    or not maybe_is_text("".join(t.text for t in texts[:5]))
+        if (
+            metadata.name != "image"
+            and not parse_config.disable_doc_valid_check
+            and (
+                not texts
+                or len(texts[0].text) < 10  # noqa: PLR2004
+                or (
+                    # Quick sanity check the text is not just some terse one-page
+                    # 404 message interspersed with newlines. Check here
+                    # instead of maybe_is_text because a 404 HTML page is text
+                    sum(len(t.text.replace("\n", "")) for t in texts[:2])
+                    < 20  # noqa: PLR2004
                 )
+                # Use the first few text chunks to avoid potential issues with
+                # title page parsing in the first chunk
+                or not maybe_is_text("".join(t.text for t in texts[:5]))
             )
         ):
             raise ValueError(
