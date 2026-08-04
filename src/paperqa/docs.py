@@ -329,8 +329,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             )
         ):
             raise ValueError(
-                f"This does not look like a text document: {path}. Pass disable_check"
-                " to ignore this error."
+                f"This does not look like a text document: {path}. Set"
+                " ParsingSettings.disable_doc_valid_check=True to ignore this error."
             )
         if await self.aadd_texts(texts, doc, all_settings, embedding_model):
             return doc.docname
