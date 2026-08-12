@@ -2334,6 +2334,33 @@ async def test_code() -> None:
     assert "test_paperqa.py" in session.answer
 
 
+@pytest.mark.parametrize(
+    ("filename", "contents"),
+    [("py.typed", ""), (".python-version", "3.13\n")],
+)
+@pytest.mark.asyncio
+async def test_disable_doc_valid_check_allows_short_code_files(
+    tmp_path: Path, filename: str, contents: str
+) -> None:
+    settings = Settings.from_name("fast")
+    settings.parsing.disable_doc_valid_check = True
+    settings.parsing.defer_embedding = True
+    settings.parsing.use_doc_details = False
+    path = tmp_path / filename
+    path.write_text(contents)
+
+    docs = Docs()
+    docname = await docs.aadd(
+        path,
+        citation=filename,
+        docname=filename,
+        settings=settings,
+    )
+
+    assert docname == filename
+    assert docs.texts[0].text == contents
+
+
 @pytest.mark.asyncio
 async def test_querying_tables(stub_data_dir: Path) -> None:
     settings = Settings.from_name("fast")
