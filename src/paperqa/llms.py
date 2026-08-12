@@ -1,6 +1,8 @@
 import asyncio
 import itertools
+import json
 import logging
+import os
 import threading
 import uuid
 from abc import ABC, abstractmethod
@@ -10,6 +12,8 @@ from collections.abc import (
     Sequence,
     Sized,
 )
+from importlib import import_module
+from importlib.metadata import PackageNotFoundError, version
 from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
@@ -521,6 +525,282 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
                 continue
 
         return docs
+
+
+class MilvusVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
+    """Milvus-backed vector store using the synchronous ``MilvusClient`` API."""
+
+    client: Any = Field(
+        default=None,
+        exclude=True,
+        description=(
+            "Instance of `pymilvus.MilvusClient`. Defaults to a client configured"
+            " from `uri`, `token`, and `db_name`."
+        ),
+    )
+    uri: str = Field(
+        default_factory=lambda: os.getenv("MILVUS_URI", "./milvus.db"),
+        description="Milvus Lite database path or remote Milvus URI.",
+    )
+    token: str | None = Field(
+        default_factory=lambda: os.getenv("MILVUS_TOKEN"),
+        description="Token for a remote Milvus deployment.",
+        repr=False,
+    )
+    db_name: str = Field(default="", description="Milvus database name.")
+    collection_name: str = Field(default_factory=lambda: f"paper_qa_{uuid.uuid4().hex}")
+    consistency_level: str = Field(
+        default="Session",
+        description="Milvus consistency level used when creating the collection.",
+    )
+    _entity_ids: set[str] | None = None
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, type(self)):
+            return NotImplemented
+
+        return (
+            self.texts_hashes == other.texts_hashes
+            and self.mmr_lambda == other.mmr_lambda
+            and self.uri == other.uri
+            and self.token == other.token
+            and self.db_name == other.db_name
+            and self.collection_name == other.collection_name
+            and self.consistency_level == other.consistency_level
+            and self._entity_ids == other._entity_ids
+        )
+
+    def __deepcopy__(self, memo: dict[int, Any] | None = None) -> "MilvusVectorStore":
+        copied = type(self)(client=self.client, **self.model_dump())
+        if memo is not None:
+            memo[id(self)] = copied
+        copied._entity_ids = None if self._entity_ids is None else set(self._entity_ids)
+        return copied
+
+    @staticmethod
+    def _pymilvus():
+        try:
+            return import_module("pymilvus")
+        except ImportError as exc:
+            msg = (
+                "`MilvusVectorStore` requires the `pymilvus` package. "
+                "Install it with `pip install 'paper-qa[milvus]'`"
+            )
+            raise ImportError(msg) from exc
+
+    @model_validator(mode="after")
+    def validate_client(self):
+        pymilvus = self._pymilvus()
+        if self.client and not isinstance(self.client, pymilvus.MilvusClient):
+            raise TypeError(
+                "'client' should be an instance of MilvusClient. Got"
+                f" `{type(self.client)}`"
+            )
+
+        if not self.client:
+            self.client = pymilvus.MilvusClient(
+                uri=self.uri,
+                token=self.token or "",
+                db_name=self.db_name,
+            )
+
+        return self
+
+    async def _collection_exists(self) -> bool:
+        return await asyncio.to_thread(
+            self.client.has_collection, collection_name=self.collection_name
+        )
+
+    def _ensure_collection(self, dimension: int) -> None:
+        pymilvus = self._pymilvus()
+        if self.client.has_collection(collection_name=self.collection_name):
+            self._validate_collection(dimension, pymilvus.DataType)
+            return
+
+        schema = self.client.create_schema(auto_id=False, enable_dynamic_field=False)
+        schema.add_field(
+            field_name="id",
+            datatype=pymilvus.DataType.VARCHAR,
+            is_primary=True,
+            max_length=64,
+        )
+        schema.add_field(
+            field_name="vector",
+            datatype=pymilvus.DataType.FLOAT_VECTOR,
+            dim=dimension,
+        )
+        schema.add_field(field_name="payload", datatype=pymilvus.DataType.JSON)
+
+        index_params = self.client.prepare_index_params()
+        index_params.add_index(
+            field_name="vector",
+            index_type="AUTOINDEX",
+            metric_type="COSINE",
+        )
+        self.client.create_collection(
+            collection_name=self.collection_name,
+            schema=schema,
+            index_params=index_params,
+            consistency_level=self.consistency_level,
+        )
+
+    def _validate_collection(self, dimension: int, data_type: Any) -> None:
+        description = self.client.describe_collection(
+            collection_name=self.collection_name
+        )
+        fields = {field["name"]: field for field in description.get("fields", [])}
+        id_field = fields.get("id")
+        vector_field = fields.get("vector")
+        payload_field = fields.get("payload")
+        schema_flags_valid = all(
+            value is False
+            for value in (
+                description.get("auto_id"),
+                description.get("enable_dynamic_field"),
+            )
+        )
+        vector_dimension = -1
+        if vector_field is not None:
+            try:
+                vector_dimension = int(vector_field.get("params", {}).get("dim", -1))
+            except (TypeError, ValueError):
+                vector_dimension = -1
+
+        valid_schema = (
+            schema_flags_valid
+            and id_field is not None
+            and id_field.get("type") == data_type.VARCHAR
+            and id_field.get("is_primary") is True
+            and vector_field is not None
+            and vector_field.get("type") == data_type.FLOAT_VECTOR
+            and vector_dimension == dimension
+            and payload_field is not None
+            and payload_field.get("type") == data_type.JSON
+        )
+        if not valid_schema:
+            raise ValueError(
+                f"Milvus collection {self.collection_name!r} has an incompatible schema."
+            )
+
+        if "vector" not in self.client.list_indexes(
+            collection_name=self.collection_name
+        ):
+            raise ValueError(
+                f"Milvus collection {self.collection_name!r} requires a COSINE"
+                " AUTOINDEX on the vector field."
+            )
+
+        index = self.client.describe_index(
+            collection_name=self.collection_name, index_name="vector"
+        )
+        if (
+            index.get("index_type") != "AUTOINDEX"
+            or index.get("metric_type") != "COSINE"
+        ):
+            raise ValueError(
+                f"Milvus collection {self.collection_name!r} requires a COSINE"
+                " AUTOINDEX on the vector field."
+            )
+
+    @staticmethod
+    def _prepare_embedding(embedding: Any) -> list[float]:
+        if embedding is None:
+            raise ValueError("Cannot add a text without an embedding to Milvus.")
+        vector = np.asarray(embedding, dtype=float)
+        if vector.ndim != 1 or vector.size == 0:
+            raise ValueError(
+                "Milvus embeddings must be non-empty one-dimensional vectors."
+            )
+        return vector.tolist()
+
+    @staticmethod
+    def _entity_id(payload: dict[str, Any], vector: list[float]) -> str:
+        serialized = json.dumps(
+            {"payload": payload, "vector": vector},
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        return uuid.uuid5(uuid.NAMESPACE_URL, serialized).hex
+
+    @staticmethod
+    def _normalize_score(uri: str, score: float) -> float:
+        if uri.startswith(("http://", "https://")):
+            return score
+        try:
+            milvus_lite_version = version("milvus-lite").split("+", maxsplit=1)[0]
+        except PackageNotFoundError:
+            return score
+        # Milvus Lite 3.0 reports COSINE distance instead of similarity.
+        # https://github.com/milvus-io/milvus-lite/issues/343
+        if milvus_lite_version in {"3.0", "3.0.0"}:
+            return 1.0 - score
+        return score
+
+    @override
+    def clear(self) -> None:
+        super().clear()
+        if self.client.has_collection(collection_name=self.collection_name):
+            self.client.drop_collection(collection_name=self.collection_name)
+        self._entity_ids = None
+
+    async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        texts_list = list(texts)
+        if not texts_list:
+            return
+
+        vectors = [self._prepare_embedding(text.embedding) for text in texts_list]
+        dimension = len(vectors[0])
+        if any(len(vector) != dimension for vector in vectors[1:]):
+            raise ValueError("All Milvus embeddings must have the same dimension.")
+
+        await asyncio.to_thread(self._ensure_collection, dimension)
+        entities: list[dict[str, Any]] = []
+        for text, vector in zip(texts_list, vectors, strict=True):
+            payload = text.model_dump(mode="json", exclude={"embedding"})
+            entity_id = self._entity_id(payload, vector)
+            entities.append({"id": entity_id, "vector": vector, "payload": payload})
+
+        await asyncio.to_thread(
+            self.client.upsert,
+            collection_name=self.collection_name,
+            data=entities,
+        )
+        await super().add_texts_and_embeddings(texts_list)
+        if self._entity_ids is None:
+            self._entity_ids = set()
+        self._entity_ids.update(str(entity["id"]) for entity in entities)
+
+    async def similarity_search(
+        self, query: str, k: int, embedding_model: EmbeddingModel
+    ) -> tuple[Sequence[Embeddable], list[float]]:
+        if k <= 0 or not await self._collection_exists():
+            return ([], [])
+
+        embedding_model.set_mode(EmbeddingModes.QUERY)
+        query_vector = self._prepare_embedding(
+            (await embedding_model.embed_documents([query]))[0]
+        )
+        embedding_model.set_mode(EmbeddingModes.DOCUMENT)
+
+        results = await asyncio.to_thread(
+            self.client.search,
+            collection_name=self.collection_name,
+            data=[query_vector],
+            limit=k,
+            output_fields=["payload", "vector"],
+            search_params={"metric_type": "COSINE"},
+        )
+        hits = results[0] if results else []
+        return (
+            [
+                Text(
+                    **hit["entity"]["payload"],
+                    embedding=hit["entity"]["vector"],
+                )
+                for hit in hits
+            ],
+            [self._normalize_score(self.uri, float(hit["distance"])) for hit in hits],
+        )
 
 
 def embedding_model_factory(embedding: str, **kwargs) -> EmbeddingModel:
