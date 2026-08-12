@@ -1707,7 +1707,7 @@ interactions:
         pineapple parts. Molecules 2011, 16, 5104\u20135112.\\n\\n\\n\\n                                       40(149)
         Stumpfe, D.; Bajorath, J. Exploring Activity Cliffs in Medicinal Chemistry.
         Journal\\n\\n       of Medicinal Chemistry 2012, 55, 2932\u20132942, PMID: 22236250.\\n\\n\\n\\n\\n\\n
-        \                  \"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        \                  \"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -3945,7 +3945,7 @@ interactions:
         "{\"input\":[\"es 2011, 16, 5104\u20135112.\\n\\n\\n\\n                                       40(149)
         Stumpfe, D.; Bajorath, J. Exploring Activity Cliffs in Medicinal Chemistry.
         Journal\\n\\n       of Medicinal Chemistry 2012, 55, 2932\u20132942, PMID: 22236250.\\n\\n\\n\\n\\n\\n
-        \                                      41\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        \                                      41\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -4186,7 +4186,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: '{"input":["Are counterfactuals actionable? [yes/no]"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":null}'
+      body: '{"input":["Are counterfactuals actionable? [yes/no]"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"float"}'
       headers:
         accept:
           - application/json

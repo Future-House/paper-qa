@@ -7,6 +7,7 @@ from typing import Any, ClassVar
 import litellm
 from aviary.core import Message
 from lmi import LLMModel, LLMResult
+from lmi.exceptions import AllModelsExhaustedError
 from pydantic import JsonValue
 
 from paperqa.prompts import text_with_tables_prompt_template
@@ -164,7 +165,8 @@ class LLMContextRequestFailedError(LLMContextError):
     """Non-retryable exception for when the LLM provider fails to respond.
 
     Kind of a catch-all for intermittent failures, safety refusals, etc.
-    Catches all litellm.BadRequestErrors and litellm.MidStreamFallbackErrors.
+    Catches all litellm.BadRequestErrors and non-timeout
+    lmi.exceptions.AllModelsExhaustedErrors.
     """
 
     retryable = False
@@ -267,7 +269,13 @@ async def _map_fxn_summary(  # noqa: PLR0912
                     callbacks=callbacks,
                     name="evidence:" + text.name,
                 )
-            except litellm.BadRequestError as exc:
+            except (litellm.BadRequestError, AllModelsExhaustedError) as exc:
+                # Provider-specific 400s (e.g. Anthropic's 100-image limit)
+                # arrive wrapped in AllModelsExhaustedError
+                if isinstance(exc, AllModelsExhaustedError) and not isinstance(
+                    exc.last_exc, litellm.BadRequestError
+                ):
+                    raise
                 if not evidence_text_only_fallback:
                     raise
                 logger.warning(
@@ -286,17 +294,19 @@ async def _map_fxn_summary(  # noqa: PLR0912
                     name="evidence:" + text.name,
                 )
                 used_text_only_fallback = True
-        except litellm.Timeout as exc:
-            raise LLMContextTimeoutError(
-                f"LLM call to create a context timed out on text named {text.name!r}.",
+        except (litellm.Timeout, AllModelsExhaustedError) as exc:
+            root_exc = exc.last_exc if isinstance(exc, AllModelsExhaustedError) else exc
+            if isinstance(root_exc, litellm.Timeout):
+                raise LLMContextTimeoutError(
+                    f"LLM call to create a context timed out"
+                    f" on text named {text.name!r}.",
+                    llm_results=llm_results,
+                ) from exc
+            raise LLMContextRequestFailedError(
+                f"LLM call to create a context failed on text named {text.name!r}.",
                 llm_results=llm_results,
             ) from exc
-        except (
-            litellm.exceptions.MidStreamFallbackError,
-            litellm.BadRequestError,
-        ) as exc:
-            # BadRequestError: what is thrown if you directly call an LLM with a bad request
-            # MidStreamFallbackError: what litellm throws if there are fallbacks configured
+        except litellm.BadRequestError as exc:
             raise LLMContextRequestFailedError(
                 f"LLM call to create a context failed on text named {text.name!r}.",
                 llm_results=llm_results,

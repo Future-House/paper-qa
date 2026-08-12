@@ -24,6 +24,7 @@ from tenacity import (
 
 from paperqa._ldp_shims import Callback, RolloutManager
 from paperqa.docs import Docs
+from paperqa.llms import make_tool_selector
 from paperqa.settings import AgentSettings, Settings
 from paperqa.types import PQASession
 
@@ -243,7 +244,7 @@ async def run_fake_agent(
         await step([ToolCall.from_tool(gather_evidence_tool, question=question)])
         await step([ToolCall.from_tool(generate_answer_tool)])
         # Complete with an LLM-proposed complete call
-        complete_action = await llm_model.select_tool(
+        complete_action = await make_tool_selector(llm_model)(
             messages=agent_messages, tools=tools, tool_choice=complete_tool
         )
         await step(complete_action)

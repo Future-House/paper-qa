@@ -38,6 +38,7 @@ from lmi import (
     LLMResult,
     SparseEmbeddingModel,
 )
+from lmi.exceptions import AllModelsExhaustedError
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
 from paperqa_docling import parse_pdf_to_pages as docling_parse_pdf_to_pages
@@ -1386,7 +1387,9 @@ async def test_hybrid_embedding(
 async def test_custom_llm_custom_media(stub_data_dir: Path) -> None:
     captured_messages: list[list[Message]] = []
 
-    class StubLLMModel(LLMModel):
+    # NOTE: subclass LiteLLMModel over LLMModel since lmi>=1.0's LLMModel.call
+    # dispatches through hooks lmi only defines on LiteLLMModel
+    class StubLLMModel(LiteLLMModel):
         name: str = "custom/myllm"
 
         async def acompletion(
@@ -2277,7 +2280,8 @@ async def test_image_enrichment_invalid_image(caplog) -> None:
     with caplog.at_level("WARNING", logger="paperqa.settings"):
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
-    (record_tuple,) = caplog.record_tuples
+    # Filter to paperqa's logger, since lmi also logs each failed attempt
+    (record_tuple,) = [rt for rt in caplog.record_tuples if rt[0] == "paperqa.settings"]
     assert (
         "rejected by the LLM provider" in record_tuple[2]
     ), "Expected rejection to be documented"
@@ -2315,7 +2319,8 @@ async def test_image_enrichment_with_oversized_image(caplog) -> None:
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
     assert mock_acompletion_function.await_count >= 1
-    (record_tuple,) = caplog.record_tuples
+    # Filter to paperqa's logger, since lmi also logs each failed attempt
+    (record_tuple,) = [rt for rt in caplog.record_tuples if rt[0] == "paperqa.settings"]
     assert (
         "rejected by the LLM provider" in record_tuple[2]
     ), "Expected rejection to be documented"
@@ -3560,8 +3565,9 @@ async def test_timeout_resilience() -> None:
     )
 
     # Make sure we've configured timeout low enough for this test to be useful
-    with pytest.raises(litellm.Timeout):
+    with pytest.raises(AllModelsExhaustedError) as exc_info:
         await llm.call_single("The duck says")
+    assert isinstance(exc_info.value.last_exc, litellm.Timeout)
 
     text = Text(
         text="The duck says",
