@@ -780,6 +780,51 @@ async def test_docs_lifecycle(subtests: SubTests, stub_data_dir: Path) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
+async def test_delete_invalidates_texts_index(
+    vector_store: type[VectorStore],
+) -> None:
+    class TestEmbeddingModel(EmbeddingModel):
+        name: str = "test_embedding"
+
+        async def embed_documents(self, texts):
+            return [[0.0, 1.0] for _ in texts]
+
+    deleted_doc = Doc(docname="deleted", citation="Deleted, 2026", dockey="deleted")
+    retained_doc = Doc(docname="retained", citation="Retained, 2026", dockey="retained")
+    deleted_text = Text(
+        text="Delete this text.",
+        name="deleted text",
+        doc=deleted_doc,
+        embedding=[1.0, 0.0],
+    )
+    retained_text = Text(
+        text="Retain this text.",
+        name="retained text",
+        doc=retained_doc,
+        embedding=[0.0, 1.0],
+    )
+    docs = Docs(
+        docs={deleted_doc.dockey: deleted_doc, retained_doc.dockey: retained_doc},
+        texts=[deleted_text, retained_text],
+        docnames={deleted_doc.docname, retained_doc.docname},
+        texts_index=vector_store(),
+    )
+    await docs.texts_index.add_texts_and_embeddings(docs.texts)
+
+    docs.delete(dockey=deleted_doc.dockey)
+
+    assert len(docs.texts_index) == 0
+    assert "deleted_dockeys" not in Docs.model_fields
+    matches = await docs.retrieve_texts(
+        "Retain this text.", k=1, embedding_model=TestEmbeddingModel()
+    )
+    assert deleted_text not in docs.texts_index
+    assert retained_text in docs.texts_index
+    assert matches == [retained_text]
+
+
+@pytest.mark.asyncio
 async def test_evidence(stub_data_dir: Path) -> None:
     debug_settings = Settings.from_name("debug")
     debug_settings.parsing.multimodal = False

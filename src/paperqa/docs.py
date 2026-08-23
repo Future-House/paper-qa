@@ -53,7 +53,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     docnames: set[str] = Field(default_factory=set)
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = Field(default="default", description="Name of this docs collection")
-    deleted_dockeys: set[DocKey] = Field(default_factory=set)
 
     def __eq__(self, other) -> bool:
         if (
@@ -72,7 +71,6 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             and self.docnames == other.docnames
             and self.texts_index == other.texts_index
             and self.name == other.name
-            # NOTE: ignoring deleted_dockeys
         )
 
     def clear_docs(self) -> None:
@@ -431,8 +429,8 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 self.docnames.remove(doc.docname)
                 dockey = doc.dockey
         del self.docs[dockey]
-        self.deleted_dockeys.add(dockey)
         self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
+        self.texts_index.clear()
 
     async def _build_texts_index(
         self, embedding_model: EmbeddingModel, with_enrichment: bool = False
@@ -473,20 +471,18 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             embedding_model,
             with_enrichment=settings.parsing.should_parse_and_enrich_media[1],
         )
-        _k = k + len(self.deleted_dockeys)
         matches: list[Text] = cast(
             "list[Text]",
             (
                 await self.texts_index.max_marginal_relevance_search(
                     query,
-                    k=_k,
-                    fetch_k=2 * _k,
+                    k=k,
+                    fetch_k=2 * k,
                     embedding_model=embedding_model,
                     partitioning_fn=partitioning_fn,
                 )
             )[0],
         )
-        matches = [m for m in matches if m.doc.dockey not in self.deleted_dockeys]
         return matches[:k]
 
     async def aget_evidence(
