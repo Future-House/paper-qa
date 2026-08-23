@@ -19,7 +19,7 @@ from aviary.core import Message
 from lmi import Embeddable, EmbeddingModel, LLMModel
 from lmi.types import set_llm_session_ids
 from lmi.utils import gather_with_concurrency
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
 from paperqa.core import llm_parse_json, map_fxn_summary
@@ -53,6 +53,19 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     docnames: set[str] = Field(default_factory=set)
     texts_index: VectorStore = Field(default_factory=NumpyVectorStore)
     name: str = Field(default="default", description="Name of this docs collection")
+    legacy_deleted_dockeys: set[DocKey] = Field(
+        default_factory=set,
+        validation_alias="deleted_dockeys",
+        exclude=True,
+        repr=False,
+    )
+
+    @model_validator(mode="after")
+    def rebuild_legacy_deleted_index(self) -> Docs:
+        if self.legacy_deleted_dockeys:
+            self.texts_index.clear()
+            self.legacy_deleted_dockeys.clear()
+        return self
 
     def __eq__(self, other) -> bool:
         if (
@@ -428,9 +441,13 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             if doc.docname and doc.dockey:
                 self.docnames.remove(doc.docname)
                 dockey = doc.dockey
+        doc = self.docs[dockey]
+        if doc.docname:
+            self.docnames.discard(doc.docname)
         del self.docs[dockey]
-        self.texts = list(filter(lambda x: x.doc.dockey != dockey, self.texts))
-        self.texts_index.clear()
+        deleted_texts = [text for text in self.texts if text.doc.dockey == dockey]
+        self.texts = [text for text in self.texts if text.doc.dockey != dockey]
+        self.texts_index.remove_texts_and_embeddings(deleted_texts)
 
     async def _build_texts_index(
         self, embedding_model: EmbeddingModel, with_enrichment: bool = False
