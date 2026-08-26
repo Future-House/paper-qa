@@ -140,7 +140,7 @@ We've been working hard on fundamental upgrades for a while
 and mostly followed [SemVer](https://semver.org/), until [December 2025](#paperqa2-goes-calver-in-december-2025).
 Meaning we've incremented the major version number on each breaking change.
 This brings us to the current major version number v5.
-So why call is the repo now called PaperQA2?
+So why is the repo now called PaperQA2?
 We wanted to remark on the fact though that we've
 exceeded human performance on [many important metrics](https://paper.wikicrow.ai).
 So we arbitrarily call version 5 and onward PaperQA2,
@@ -187,7 +187,7 @@ Version 5 added:
 - Removed much of the statefulness from the `Docs` object
 - A migration to LiteLLM for compatibility with many LLM providers
   as well as centralized rate limits and cost tracking
-- A bundled set of configurations (read [this section here](#bundled-settings)))
+- A bundled set of configurations (read [this section here](#bundled-settings))
   containing known-good hyperparameters
 
 Note that `Docs` objects pickled from prior versions of `PaperQA` are incompatible with version 5,
@@ -257,7 +257,7 @@ please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file.
 PaperQA2 uses an LLM to operate,
 so you'll need to either set an appropriate [API key environment variable][LiteLLM providers]
 (i.e. `export OPENAI_API_KEY=sk-...`)
-or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile).
+or set up an open source LLM server (i.e. using [llamafile](https://github.com/Mozilla-Ocho/llamafile)).
 Any LiteLLM compatible model can be configured to use with PaperQA2.
 
 If you need to index a large set of papers (100+),
@@ -326,7 +326,7 @@ a new index will automatically be created for you.
 pqa --parsing.chunk_size 5000 ask 'What is PaperQA2?'
 ```
 
-You can also use `pqa` to do full-text search with use of LLMs view the search command.
+You can also use `pqa` to do full-text search with use of LLMs via the search command.
 For example, let's save the index from a directory and give it a name:
 
 ```bash
@@ -696,7 +696,7 @@ Its design of using a keyword search initially reduces the number of chunks
 needed for each answer to a relatively small number < 1k.
 Therefore, `NumpyVectorStore` is a good place to start, it's a simple in-memory store, without an index.
 However, if a larger-than-memory vector store is needed,
-you can an external vector database like [Qdrant](https://qdrant.tech/) via the `QdrantVectorStore` class.
+you can use an external vector database like [Qdrant](https://qdrant.tech/) via the `QdrantVectorStore` class.
 
 The hybrid embeddings can be customized:
 
@@ -1142,7 +1142,7 @@ and [LlamaIndex](https://github.com/run-llama/llama_index)
 are both frameworks for working with LLM applications,
 with abstractions made for agentic workflows and retrieval augmented generation.
 
-Over time, the PaperQA team over time chose to become framework-agnostic,
+Over time, the PaperQA team chose to become framework-agnostic,
 instead outsourcing LLM drivers to [LiteLLM][LiteLLM general docs]
 and no framework besides Pydantic for its tools.
 PaperQA focuses on scientific papers and their metadata.
@@ -1209,7 +1209,7 @@ Please read and cite the following papers if you use this software:
  Sam Cox and
  Samuel G. Rodriques and
  Andrew D. White},
-      journal = {arXiv preprent arXiv:2412.21154},
+      journal = {arXiv preprint arXiv:2412.21154},
       year = {2024},
       url = {https://doi.org/10.48550/arXiv.2412.21154},
 }
@@ -1228,7 +1228,7 @@ Please read and cite the following papers if you use this software:
  Manvitha Ponnapati and
  Samuel G. Rodriques and
  Andrew D. White},
-    journal = {arXiv preprent arXiv:2409.13740},
+    journal = {arXiv preprint arXiv:2409.13740},
     year = {2024},
     url = {https://doi.org/10.48550/arXiv.2409.13740}
 }
