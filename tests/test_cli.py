@@ -1,3 +1,4 @@
+import logging
 import os
 import sys
 import zlib
@@ -8,7 +9,7 @@ import pytest
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
 from paperqa import Docs
-from paperqa.agents import ask, build_index, main, search_query
+from paperqa.agents import ask, build_index, list_built_indexes, main, search_query
 from paperqa.agents.models import AnswerResponse
 from paperqa.settings import Settings
 from paperqa.utils import pqa_directory
@@ -46,6 +47,44 @@ def test_can_modify_settings(capsys, stub_data_dir: Path) -> None:
     finally:
         sys.argv = old_argv
         os.unlink(pqa_directory("settings") / "unit_test.json")
+
+
+def test_cli_where_prints_pqa_directory_and_indexes(
+    caplog: pytest.LogCaptureFixture,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("PQA_HOME", str(tmp_path))
+    index_dir = tmp_path / ".pqa" / "indexes"
+    (index_dir / "answers").mkdir(parents=True)
+    (index_dir / "nanomaterials").mkdir()
+    (index_dir / "notes.txt").write_text("not an index\n")
+
+    old_argv = sys.argv
+    try:
+        sys.argv = ["paperqa", "where"]
+        with caplog.at_level(logging.INFO, logger="paperqa.agents"):
+            main()
+    finally:
+        sys.argv = old_argv
+
+    text = "\n".join(caplog.messages)
+    assert f"PQA directory: {tmp_path / '.pqa'}" in text
+    assert f"Index directory: {index_dir}" in text
+    assert "Indexes:" in text
+    assert "  answers" in text
+    assert "  nanomaterials" in text
+    assert "notes.txt" not in text
+
+
+def test_list_built_indexes_skips_files_and_missing_dirs(tmp_path: Path) -> None:
+    missing = tmp_path / "missing"
+    assert list_built_indexes(missing) == []
+
+    (tmp_path / "alpha").mkdir()
+    (tmp_path / "zeta").mkdir()
+    (tmp_path / "readme.txt").write_text("skip\n")
+    assert list_built_indexes(tmp_path) == ["alpha", "zeta"]
 
 
 def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:

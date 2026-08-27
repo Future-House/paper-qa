@@ -149,6 +149,37 @@ def build_index(
     return run_or_ensure(coro=get_directory_index(settings=settings))
 
 
+def pqa_root() -> Path:
+    """Return the `.pqa` directory used for indexes and saved settings."""
+    if pqa_home := os.environ.get("PQA_HOME"):
+        return Path(pqa_home) / ".pqa"
+    return Path.home() / ".pqa"
+
+
+def list_built_indexes(index_directory: str | os.PathLike) -> list[str]:
+    """Return sorted names of built indexes under `index_directory`."""
+    directory = Path(index_directory)
+    if not directory.is_dir():
+        return []
+    return sorted(path.name for path in directory.iterdir() if path.is_dir())
+
+
+def show_pqa_paths(settings: Settings) -> None:
+    """Print the `.pqa` directory, index directory, and built index names."""
+    configure_cli_logging(settings)
+    root = pqa_root()
+    index_directory = Path(settings.agent.index.index_directory)
+    logger.info(f"PQA directory: {root}")
+    logger.info(f"Index directory: {index_directory}")
+    indexes = list_built_indexes(index_directory)
+    if indexes:
+        logger.info("Indexes:")
+        for name in indexes:
+            logger.info(f"  {name}")
+    else:
+        logger.info("Indexes: (none)")
+
+
 def save_settings(settings: Settings, settings_path: str | os.PathLike) -> None:
     """Save the settings to a file."""
     configure_cli_logging(settings)
@@ -216,6 +247,11 @@ def main() -> None:
     )
     build_parser.add_argument("directory", help="Directory to build index from")
 
+    subparsers.add_parser(
+        "where",
+        help="Print the `.pqa` directory, index directory, and built indexes",
+    )
+
     # Create CliSettingsSource instance
     cli_settings = CliSettingsSource[argparse.ArgumentParser](
         Settings, root_parser=parser
@@ -241,8 +277,10 @@ def main() -> None:
             search_query(args.query, args.index, settings)
         case "index":
             build_index(args.index, args.directory, settings)
+        case "where":
+            show_pqa_paths(settings)
         case _:
-            commands = ", ".join({"view", "ask", "search", "index"})
+            commands = ", ".join({"view", "ask", "search", "index", "where"})
             brief_help = f"\nRun with commands: {{{commands}}}\n\n"
             brief_help += "For more information, run with --help"
             print(brief_help)
