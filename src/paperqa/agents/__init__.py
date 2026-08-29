@@ -152,16 +152,20 @@ def build_index(
 def pqa_root() -> Path:
     """Return the `.pqa` directory used for indexes and saved settings."""
     if pqa_home := os.environ.get("PQA_HOME"):
-        return Path(pqa_home) / ".pqa"
+        return Path(pqa_home).expanduser() / ".pqa"
     return Path.home() / ".pqa"
 
 
 def list_built_indexes(index_directory: str | os.PathLike) -> list[str]:
     """Return sorted names of built indexes under `index_directory`."""
     directory = Path(index_directory)
-    if not directory.is_dir():
+    try:
+        if not directory.is_dir():
+            return []
+        return sorted(path.name for path in directory.iterdir() if path.is_dir())
+    except OSError as exc:
+        logger.warning("Could not list indexes in %s: %s", directory, exc)
         return []
-    return sorted(path.name for path in directory.iterdir() if path.is_dir())
 
 
 def show_pqa_paths(settings: Settings) -> None:
@@ -280,7 +284,7 @@ def main() -> None:
         case "where":
             show_pqa_paths(settings)
         case _:
-            commands = ", ".join({"view", "ask", "search", "index", "where"})
+            commands = ", ".join(("view", "ask", "search", "index", "where"))
             brief_help = f"\nRun with commands: {{{commands}}}\n\n"
             brief_help += "For more information, run with --help"
             print(brief_help)

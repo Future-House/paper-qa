@@ -9,7 +9,14 @@ import pytest
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
 
 from paperqa import Docs
-from paperqa.agents import ask, build_index, list_built_indexes, main, search_query
+from paperqa.agents import (
+    ask,
+    build_index,
+    list_built_indexes,
+    main,
+    pqa_root,
+    search_query,
+)
 from paperqa.agents.models import AnswerResponse
 from paperqa.settings import Settings
 from paperqa.utils import pqa_directory
@@ -85,6 +92,42 @@ def test_list_built_indexes_skips_files_and_missing_dirs(tmp_path: Path) -> None
     (tmp_path / "zeta").mkdir()
     (tmp_path / "readme.txt").write_text("skip\n")
     assert list_built_indexes(tmp_path) == ["alpha", "zeta"]
+
+
+def test_pqa_root_expands_tilde_in_pqa_home(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setenv("HOME", str(tmp_path))
+    nested = tmp_path / "pqa-parent"
+    nested.mkdir()
+    monkeypatch.setenv("PQA_HOME", "~/pqa-parent")
+    assert pqa_root() == nested / ".pqa"
+    assert pqa_directory("indexes") == nested / ".pqa" / "indexes"
+
+
+def test_list_built_indexes_returns_empty_on_oserror(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    directory = tmp_path / "indexes"
+    directory.mkdir()
+
+    def boom(self: Path) -> None:
+        raise PermissionError("denied")
+
+    monkeypatch.setattr(Path, "iterdir", boom)
+    assert list_built_indexes(directory) == []
+
+
+def test_cli_missing_command_prints_stable_help(capsys) -> None:
+    old_argv = sys.argv
+    try:
+        sys.argv = ["paperqa"]
+        main()
+    finally:
+        sys.argv = old_argv
+
+    captured = capsys.readouterr()
+    assert "view, ask, search, index, where" in captured.out
 
 
 def test_cli_ask(agent_index_dir: Path, stub_data_dir: Path) -> None:
