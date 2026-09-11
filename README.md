@@ -623,6 +623,7 @@ answer_response = ask(
 
 Models hosted with `ollama` are also supported.
 To run the example below make sure you have downloaded llama3.2 and mxbai-embed-large via ollama.
+Use the `ollama_chat/` prefix, not `ollama/`, for `llm`, `summary_llm`, and `agent_llm`: PaperQA2's agents end a turn with a forced tool call, and litellm's `ollama/` provider (the `/api/generate` endpoint) does not carry tool calls, while `ollama_chat/` (`/api/chat`) does. Embeddings stay on `ollama/`.
 
 ```python
 from paperqa import Settings, ask
@@ -630,9 +631,9 @@ from paperqa import Settings, ask
 local_llm_config = {
     "model_list": [
         {
-            "model_name": "ollama/llama3.2",
+            "model_name": "ollama_chat/llama3.2",
             "litellm_params": {
-                "model": "ollama/llama3.2",
+                "model": "ollama_chat/llama3.2",
                 "api_base": "http://localhost:11434",
             },
         }
@@ -642,9 +643,9 @@ local_llm_config = {
 answer_response = ask(
     "What is PaperQA2?",
     settings=Settings(
-        llm="ollama/llama3.2",
+        llm="ollama_chat/llama3.2",
         llm_config=local_llm_config,
-        summary_llm="ollama/llama3.2",
+        summary_llm="ollama_chat/llama3.2",
         summary_llm_config=local_llm_config,
         embedding="ollama/mxbai-embed-large",
     ),
