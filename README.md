@@ -627,6 +627,7 @@ Use the `ollama_chat/` prefix, not `ollama/`, for `llm`, `summary_llm`, and `age
 
 ```python
 from paperqa import Settings, ask
+from paperqa.settings import AgentSettings
 
 local_llm_config = {
     "model_list": [
@@ -647,6 +648,10 @@ answer_response = ask(
         llm_config=local_llm_config,
         summary_llm="ollama_chat/llama3.2",
         summary_llm_config=local_llm_config,
+        agent=AgentSettings(
+            agent_llm="ollama_chat/llama3.2",
+            agent_llm_config=local_llm_config,
+        ),
         embedding="ollama/mxbai-embed-large",
     ),
 )
