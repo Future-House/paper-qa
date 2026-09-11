@@ -382,6 +382,24 @@ async def test_client_os_error() -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("provider", [CrossrefProvider, SemanticScholarProvider])
+async def test_client_http_status_error(provider: type[MetadataProvider]) -> None:
+    """Confirm a provider answering with an error status, like a 429, does not crash us."""
+    async with httpx_aiohttp.HttpxAiohttpClient() as http_client:
+        client = DocMetadataClient(http_client, metadata_clients=[provider])
+        with patch.object(
+            http_client,
+            "get",
+            return_value=httpx.Response(
+                httpx.codes.TOO_MANY_REQUESTS,
+                request=httpx.Request("GET", "https://example.com"),
+            ),
+        ) as mock_get:
+            assert not await client.query(doi="placeholder")
+        assert mock_get.call_count >= 1, "Expected the request to have been made"
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     ("return_value", "match"),
     [
