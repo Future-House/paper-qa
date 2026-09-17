@@ -56,7 +56,7 @@ def make_tool_selector(llm_model: LiteLLMModel, **selector_kwargs) -> ToolSelect
     """Create a ToolSelector backed by the given model's primary ModelSpec.
 
     Use this over lmi's LiteLLMModel.select_tool, which is incompatible with
-    aviary's ToolSelector as of fhlmi 1.0.1 and fhaviary 0.35.0.
+    aviary's ToolSelector as of fhlmi 1.0.1 and fhaviary 0.34.0.
     """
     primary = cast("LLMConfig", llm_model.llm_config).models[0]
 

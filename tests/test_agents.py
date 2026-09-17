@@ -868,9 +868,10 @@ async def test_make_ldp_agent_carries_agent_llm() -> None:
             "agent_config": {"llm_model": {"name": agent_llm}},
         }
     )
-    agent = await settings.make_ldp_agent("ldp.agent.SimpleAgent")
-    assert agent is not None
-    assert agent.llm_config.models[0].name == agent_llm  # type: ignore[attr-defined]
+    for _ in range(2):  # Twice, to confirm agent_config wasn't consumed
+        agent = await settings.make_ldp_agent("ldp.agent.SimpleAgent")
+        assert agent is not None
+        assert agent.llm_config.models[0].name == agent_llm  # type: ignore[attr-defined]
 
 
 def test_tool_schema(agent_test_settings: Settings) -> None:

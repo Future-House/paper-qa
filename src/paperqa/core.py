@@ -165,8 +165,8 @@ class LLMContextRequestFailedError(LLMContextError):
     """Non-retryable exception for when the LLM provider fails to respond.
 
     Kind of a catch-all for intermittent failures, safety refusals, etc.
-    Catches all litellm.BadRequestErrors and non-timeout
-    lmi.exceptions.AllModelsExhaustedErrors.
+    Catches litellm.BadRequestErrors, bare or wrapped in an
+    lmi.exceptions.AllModelsExhaustedError; other exhaustion causes propagate.
     """
 
     retryable = False
@@ -302,6 +302,9 @@ async def _map_fxn_summary(  # noqa: PLR0912
                     f" on text named {text.name!r}.",
                     llm_results=llm_results,
                 ) from exc
+            if not isinstance(root_exc, litellm.BadRequestError):
+                # Rate limits, 5xx, auth: propagate rather than drop the context
+                raise
             raise LLMContextRequestFailedError(
                 f"LLM call to create a context failed on text named {text.name!r}.",
                 llm_results=llm_results,

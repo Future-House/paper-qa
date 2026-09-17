@@ -360,12 +360,13 @@ class ParsingSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the enrichment_llm model. More specifically, it's"
-            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
-            " with entries matching the model_list format here:"
-            " https://docs.litellm.ai/docs/routing. It can optionally include a"
-            " top-level `fallbacks` key (a list of {model name: [fallback model"
-            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
-            " and 'num_retries' are honored (all other keys are ignored)."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
     enrichment_page_radius: int = Field(
@@ -629,12 +630,13 @@ class AgentSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the agent_llm model. More specifically, it's"
-            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
-            " with entries matching the model_list format here:"
-            " https://docs.litellm.ai/docs/routing. It can optionally include a"
-            " top-level `fallbacks` key (a list of {model name: [fallback model"
-            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
-            " and 'num_retries' are honored (all other keys are ignored)."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
 
@@ -753,6 +755,16 @@ def make_default_litellm_model_list_settings(
     }
 
 
+def make_llm_model(
+    llm: str, config: dict | None, temperature: float = 0.0
+) -> LiteLLMModel:
+    """Build a LiteLLMModel, routing a `models` chain to lmi's typed LLMConfig."""
+    config = dict(config or make_default_litellm_model_list_settings(llm, temperature))
+    if models := config.pop("models", None):
+        return LiteLLMModel(name=llm, llm_config={"models": models}, config=config)
+    return LiteLLMModel(name=llm, config=config)
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
@@ -774,12 +786,13 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the llm model. More specifically, it's"
-            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
-            " with entries matching the model_list format here:"
-            " https://docs.litellm.ai/docs/routing. It can optionally include a"
-            " top-level `fallbacks` key (a list of {model name: [fallback model"
-            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
-            " and 'num_retries' are honored (all other keys are ignored)."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
     summary_llm: str = Field(
@@ -793,12 +806,13 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the summary_llm model. More specifically, it's"
-            " a config dict passed to LiteLLMModel. It must have a `model_list` key"
-            " with entries matching the model_list format here:"
-            " https://docs.litellm.ai/docs/routing. It can optionally include a"
-            " top-level `fallbacks` key (a list of {model name: [fallback model"
-            " names]} mappings) and a `router_kwargs` key, of which only 'timeout'"
-            " and 'num_retries' are honored (all other keys are ignored)."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
     embedding: str = Field(
@@ -933,40 +947,26 @@ class Settings(BaseSettings):
         )
 
     def get_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.llm,
-            config=self.llm_config
-            or make_default_litellm_model_list_settings(self.llm, self.temperature),
-        )
+        return make_llm_model(self.llm, self.llm_config, self.temperature)
 
     def get_summary_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.summary_llm,
-            config=self.summary_llm_config
-            or make_default_litellm_model_list_settings(
-                self.summary_llm, self.temperature
-            ),
+        return make_llm_model(
+            self.summary_llm, self.summary_llm_config, self.temperature
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.agent.agent_llm,
-            config=self.agent.agent_llm_config
-            or make_default_litellm_model_list_settings(
-                self.agent.agent_llm, self.temperature
-            ),
+        return make_llm_model(
+            self.agent.agent_llm, self.agent.agent_llm_config, self.temperature
         )
 
     def get_embedding_model(self) -> EmbeddingModel:
         return embedding_model_factory(self.embedding, **(self.embedding_config or {}))
 
     def get_enrichment_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.parsing.enrichment_llm,
-            config=self.parsing.enrichment_llm_config
-            or make_default_litellm_model_list_settings(
-                self.parsing.enrichment_llm, self.temperature
-            ),
+        return make_llm_model(
+            self.parsing.enrichment_llm,
+            self.parsing.enrichment_llm_config,
+            self.temperature,
         )
 
     def make_aviary_tool_selector(self, agent_type: str | type) -> ToolSelector | None:
@@ -1005,7 +1005,11 @@ class Settings(BaseSettings):
         # TODO: support general agents
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
-        agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
+        # Copy: the pops below must not mutate the caller's Settings
+        agent_llm, config = (
+            agent_settings.agent_llm,
+            dict(agent_settings.agent_config or {}),
+        )
         if "llm_model" in config:
             # ldp>=1.0 renamed llm_model to llm_config, and silently ignores
             # unknown kwargs

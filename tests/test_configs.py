@@ -103,6 +103,27 @@ def test_index_naming(subtests: SubTests) -> None:
         assert settings.agent.index.get_named_index_directory().name == "test"
 
 
+def test_typed_models_config() -> None:
+    """A `models` chain must reach lmi, the only way to set responses_api."""
+    settings = Settings(
+        llm="gpt-4o",
+        llm_config={
+            "models": [
+                {"name": "gpt-4o", "responses_api": True},
+                {"name": "gpt-4o-mini"},
+            ],
+            "rate_limit": {"gpt-4o": "30000 per 1 minute"},
+        },
+    )
+    llm_model = settings.get_llm()
+    assert llm_model.llm_config is not None
+    assert [(m.name, m.responses_api) for m in llm_model.llm_config.models] == [
+        ("gpt-4o", True),
+        ("gpt-4o-mini", False),
+    ]
+    assert llm_model.config["rate_limit"], "Expected non-models keys to stay on config"
+
+
 def test_retries_and_timeout_present_in_models() -> None:
     settings = Settings()
     for llm_model in (settings.get_llm(), settings.get_summary_llm()):

@@ -3590,6 +3590,33 @@ async def test_timeout_resilience() -> None:
     assert not llm_results
 
 
+@pytest.mark.asyncio
+async def test_exhaustion_resilience() -> None:
+    """Exhausted rate limits should surface, not silently drop the context."""
+
+    class ExhaustedLLM(LiteLLMModel):
+        async def call_single(self, *_args, **_kwargs) -> LLMResult:
+            raise AllModelsExhaustedError(
+                litellm.RateLimitError(
+                    "rate limited", llm_provider="anthropic", model=self.name
+                )
+            )
+
+    kw = {
+        "text": Text(
+            text="The duck says",
+            name="test",
+            doc=Doc(docname="test", dockey="test", citation="test"),
+        ),
+        "question": "The duck says",
+        "summary_llm_model": ExhaustedLLM(name=CommonLLMNames.ANTHROPIC_TEST.value),
+        "prompt_templates": ("", ""),
+    }
+    for fxn in (_map_fxn_summary, map_fxn_summary):
+        with pytest.raises(AllModelsExhaustedError):
+            await fxn(**kw)  # type: ignore[arg-type]
+
+
 TEST_STUB_LAMBDA = lambda: 1  # noqa: E731
 
 
