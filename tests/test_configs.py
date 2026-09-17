@@ -105,7 +105,7 @@ def test_index_naming(subtests: SubTests) -> None:
 
 def test_typed_models_config() -> None:
     """A `models` chain must reach lmi, the only way to set responses_api."""
-    settings = Settings(
+    llm_model = Settings(
         llm="gpt-4o",
         llm_config={
             "models": [
@@ -114,8 +114,7 @@ def test_typed_models_config() -> None:
             ],
             "rate_limit": {"gpt-4o": "30000 per 1 minute"},
         },
-    )
-    llm_model = settings.get_llm()
+    ).get_llm()
     assert llm_model.llm_config is not None
     assert [(m.name, m.responses_api) for m in llm_model.llm_config.models] == [
         ("gpt-4o", True),
