@@ -103,10 +103,33 @@ def test_index_naming(subtests: SubTests) -> None:
         assert settings.agent.index.get_named_index_directory().name == "test"
 
 
-def test_router_kwargs_present_in_models() -> None:
+def test_typed_models_config() -> None:
+    """A `models` chain must reach lmi, the only way to set responses_api."""
+    llm_model = Settings(
+        llm="gpt-4o",
+        llm_config={
+            "models": [
+                {"name": "gpt-4o", "responses_api": True},
+                {"name": "gpt-4o-mini"},
+            ],
+            "rate_limit": {"gpt-4o": "30000 per 1 minute"},
+        },
+    ).get_llm()
+    assert llm_model.llm_config is not None
+    assert [(m.name, m.responses_api) for m in llm_model.llm_config.models] == [
+        ("gpt-4o", True),
+        ("gpt-4o-mini", False),
+    ]
+    assert llm_model.config["rate_limit"], "Expected non-models keys to stay on config"
+
+
+def test_retries_and_timeout_present_in_models() -> None:
     settings = Settings()
-    assert settings.get_llm().config["router_kwargs"] is not None
-    assert settings.get_summary_llm().config["router_kwargs"] is not None
+    for llm_model in (settings.get_llm(), settings.get_summary_llm()):
+        assert llm_model.llm_config is not None
+        for model_spec in llm_model.llm_config.models:
+            assert model_spec.timeout is not None
+            assert model_spec.max_retries is not None
 
 
 @pytest.mark.parametrize(
