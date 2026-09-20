@@ -9,7 +9,7 @@ import random
 import re
 import string
 import sys
-from collections.abc import AsyncIterable, Sequence
+from collections.abc import AsyncIterable, Callable, Sequence
 from copy import deepcopy
 from datetime import datetime, timedelta
 from functools import partial
@@ -70,7 +70,9 @@ from paperqa.prompts import CANNOT_ANSWER_PHRASE, summary_json_multimodal_system
 from paperqa.prompts import qa_prompt as default_qa_prompt
 from paperqa.readers import (
     PDFParserFn,
+    chunk_code_text,
     chunk_pdf,
+    chunk_text,
     parse_image,
     read_doc,
     resolve_page_range,
@@ -2558,6 +2560,43 @@ async def test_equations(stub_data_dir: Path, parser: PDFParserFn) -> None:
         "Failed to find enrichment for the target equation,"
         f" all enrichments: {enrichments}"
     )
+
+
+@pytest.mark.timeout(5)
+@pytest.mark.parametrize(
+    ("chunk_chars", "overlap"),
+    [(100, 100), (100, 101), (100, -1), (0, 0)],
+    ids=["equal", "overlap-larger", "negative-overlap", "zero-size"],
+)
+@pytest.mark.parametrize(
+    ("chunker", "content"),
+    [
+        (chunk_pdf, {"1": "x" * 500}),
+        (chunk_text, "x" * 500),
+        (chunk_code_text, "x" * 500),
+    ],
+    ids=["pdf", "text", "code"],
+)
+def test_chunkers_reject_non_progressing_parameters(
+    chunker: Callable, content: str | dict[str, str], chunk_chars: int, overlap: int
+) -> None:
+    parsed_text = ParsedText(
+        content=content,
+        metadata=ParsedMetadata(
+            parsing_libraries=["stub"], total_parsed_text_length=500
+        ),
+    )
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "chunk_chars must be greater than 0"
+            if chunk_chars <= 0
+            else "overlap must be greater than or equal to 0 and less than chunk_chars"
+        ),
+    ):
+        chunker(parsed_text, doc, chunk_chars=chunk_chars, overlap=overlap)
 
 
 def test_missing_page_doesnt_crash_us() -> None:
