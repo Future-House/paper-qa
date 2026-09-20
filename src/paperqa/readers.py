@@ -89,6 +89,16 @@ async def parse_image(
     return ParsedText(content={"1": ("", [parsed_media])}, metadata=metadata)
 
 
+def _validate_chunk_parameters(chunk_chars: int, overlap: int) -> None:
+    """Validate that iterative chunking always makes forward progress."""
+    if chunk_chars <= 0:
+        raise ValueError("chunk_chars must be greater than 0 when chunking.")
+    if overlap < 0 or overlap >= chunk_chars:
+        raise ValueError(
+            "overlap must be greater than or equal to 0 and less than chunk_chars."
+        )
+
+
 def _make_chunk(
     parsed_text: ParsedText, doc: Doc, text: str, lower_page: str, upper_page: str
 ) -> Text:
@@ -105,6 +115,7 @@ def _make_chunk(
 def chunk_pdf(
     parsed_text: ParsedText, doc: Doc, chunk_chars: int, overlap: int
 ) -> list[Text]:
+    _validate_chunk_parameters(chunk_chars, overlap)
     pages: list[str] = []
     texts: list[Text] = []
     split: str = ""
@@ -267,6 +278,7 @@ def chunk_text(
     NOTE: We get some byte continuation errors.
     Currently ignored, but should explore more to make sure we don't miss anything.
     """
+    _validate_chunk_parameters(chunk_chars, overlap)
     texts: list[Text] = []
     enc = tiktoken.get_encoding("cl100k_base")
 
@@ -319,6 +331,7 @@ def chunk_code_text(
     parsed_text: ParsedText, doc: Doc, chunk_chars: int, overlap: int
 ) -> list[Text]:
     """Parse a document into chunks, based on line numbers (for code)."""
+    _validate_chunk_parameters(chunk_chars, overlap)
     text_buffer = ""
     texts: list[Text] = []
     line_i = last_line_i = 0
