@@ -16,9 +16,11 @@ from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import ldp.agent
+import litellm
 import pytest
 from aviary.core import (
     Environment,
+    Message,
     Tool,
     ToolRequestMessage,
     ToolResponseMessage,
@@ -28,6 +30,8 @@ from aviary.core import (
 from ldp.agent import MemoryAgent, SimpleAgent
 from ldp.graph.memory import Memory, UIndexMemoryModel
 from ldp.graph.ops import OpResult
+from litellm.types.llms.openai import ResponsesAPIResponse
+from litellm.types.utils import ModelResponse
 from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
 from pytest_subtests import SubTests
 from tantivy import Index
@@ -872,6 +876,132 @@ async def test_make_ldp_agent_carries_agent_llm() -> None:
         agent = await settings.make_ldp_agent("ldp.agent.SimpleAgent")
         assert agent is not None
         assert agent.llm_config.models[0].name == agent_llm  # type: ignore[attr-defined]
+
+
+@pytest.mark.parametrize("agent_type", ["SimpleAgent", "ReActAgent", "MemoryAgent"])
+@pytest.mark.parametrize("override", [None, "llm_config", "llm_model", "both"])
+@pytest.mark.asyncio
+async def test_make_ldp_agent_model_chain(
+    agent_type: str, override: str | None
+) -> None:
+    chain = {
+        "models": [
+            {
+                "name": "gpt-4o-mini",
+                "responses_api": True,
+                "timeout": 12,
+                "max_retries": 0,
+                "extra_params": {"temperature": 0.5},
+            },
+            {"name": "gpt-4o"},
+        ]
+    }
+    agent_config: dict = {}
+    if override is not None:
+        agent_config["llm_config" if override == "both" else override] = chain
+    if override == "both":
+        agent_config["llm_model"] = {"name": "gpt-4o"}
+    settings = Settings(
+        agent={
+            "agent_llm_config": chain if override is None else {"models": []},
+            "agent_config": agent_config,
+        }
+    )
+    before = settings.model_dump()
+    for _ in range(2):
+        agent = await settings.make_ldp_agent(f"ldp.agent.{agent_type}")
+        assert isinstance(agent, ldp.agent.ReActAgent | SimpleAgent)
+        primary, fallback = agent.llm_config.models
+        assert primary.name == "gpt-4o-mini"
+        assert primary.responses_api
+        assert primary.timeout == 12
+        assert primary.max_retries == 0
+        assert primary.extra_params == {"temperature": 0.5}
+        assert fallback.name == "gpt-4o"
+        assert not fallback.responses_api
+        assert settings.model_dump() == before
+
+
+@pytest.mark.parametrize("fallback", [False, True])
+@pytest.mark.asyncio
+async def test_ldp_agent_responses_dispatch_and_tool_fallback(fallback: bool) -> None:
+    settings = Settings(
+        agent={
+            "agent_llm_config": {
+                "models": [
+                    {
+                        "name": "gpt-4o-mini",
+                        "responses_api": True,
+                        "max_retries": 0,
+                    },
+                    {"name": "gpt-4o", "max_retries": 0},
+                ]
+            }
+        }
+    )
+    agent = await settings.make_ldp_agent("ldp.agent.SimpleAgent")
+    assert isinstance(agent, SimpleAgent)
+    tool = Tool.from_function(Reset().reset, exclude_parameters={"state"})
+    function = {"name": tool.info.name, "arguments": "{}"}
+    response = ResponsesAPIResponse(
+        id="resp_agent",
+        created_at=0,
+        model="gpt-4o-mini",
+        status="completed",
+        output=[{"type": "function_call", "call_id": "call_1", **function}],
+        usage={"input_tokens": 5, "output_tokens": 3, "total_tokens": 8},
+    )
+    chat_response = ModelResponse(
+        model="gpt-4o",
+        choices=[
+            {
+                "finish_reason": "tool_calls",
+                "message": {
+                    "role": "assistant",
+                    "tool_calls": [
+                        {"id": "call_1", "type": "function", "function": function}
+                    ],
+                },
+            }
+        ],
+        usage={"prompt_tokens": 5, "completion_tokens": 3, "total_tokens": 8},
+    )
+    with (
+        patch(
+            "litellm.aresponses",
+            new_callable=AsyncMock,
+            return_value=response,
+            side_effect=(
+                litellm.ContextWindowExceededError(
+                    "too long", model="gpt-4o-mini", llm_provider="openai"
+                )
+                if fallback
+                else None
+            ),
+        ) as responses,
+        patch(
+            "litellm.acompletion", new_callable=AsyncMock, return_value=chat_response
+        ) as chat,
+    ):
+        state = await agent.init_state([tool])
+        action, _, _ = await agent.get_asv(
+            state, [Message(content="Reset the search.")]
+        )
+
+    responses.assert_awaited_once()
+    assert responses.call_args.kwargs["model"] == "gpt-4o-mini"
+    assert responses.call_args.kwargs["tools"][0]["name"] == tool.info.name
+    assert responses.call_args.kwargs["tool_choice"] == "required"
+    if fallback:
+        chat.assert_awaited_once()
+        assert chat.call_args.kwargs["model"] == "gpt-4o"
+    else:
+        chat.assert_not_awaited()
+        assert action.value.info is not None
+        assert action.value.info["response_id"] == "resp_agent"
+    assert isinstance(action.value, ToolRequestMessage)
+    assert action.value.tool_calls[0].function.name == tool.info.name
+    assert action.value.tool_calls[0].function.arguments == {}
 
 
 def test_tool_schema(agent_test_settings: Settings) -> None:

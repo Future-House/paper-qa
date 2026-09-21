@@ -123,6 +123,23 @@ def test_typed_models_config() -> None:
     assert llm_model.config["rate_limit"], "Expected non-models keys to stay on config"
 
 
+@pytest.mark.parametrize(
+    ("config", "getter"),
+    [
+        ({"llm_config": {"models": []}}, "get_llm"),
+        ({"summary_llm_config": {"models": []}}, "get_summary_llm"),
+        ({"agent": {"agent_llm_config": {"models": []}}}, "get_agent_llm"),
+        (
+            {"parsing": {"enrichment_llm_config": {"models": []}}},
+            "get_enrichment_llm",
+        ),
+    ],
+)
+def test_empty_model_chain_rejected(config: dict, getter: str) -> None:
+    with pytest.raises(ValidationError, match="at least 1 item"):
+        getattr(Settings(**config), getter)()
+
+
 def test_retries_and_timeout_present_in_models() -> None:
     settings = Settings()
     for llm_model in (settings.get_llm(), settings.get_summary_llm()):

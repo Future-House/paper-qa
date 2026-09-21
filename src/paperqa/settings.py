@@ -760,7 +760,8 @@ def make_llm_model(
 ) -> LiteLLMModel:
     """Build a LiteLLMModel, routing a `models` chain to lmi's typed LLMConfig."""
     config = dict(config or make_default_litellm_model_list_settings(llm, temperature))
-    if models := config.pop("models", None):
+    if "models" in config:
+        models = config.pop("models")
         return LiteLLMModel(name=llm, llm_config={"models": models}, config=config)
     return LiteLLMModel(name=llm, config=config)
 
@@ -1006,17 +1007,16 @@ class Settings(BaseSettings):
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         # Copy: the pops below must not mutate the caller's Settings
-        agent_llm, config = (
-            agent_settings.agent_llm,
-            dict(agent_settings.agent_config or {}),
-        )
+        config = dict(agent_settings.agent_config or {})
         if "llm_model" in config:
             # ldp>=1.0 renamed llm_model to llm_config, and silently ignores
             # unknown kwargs
-            config["llm_config"] = config.pop("llm_model")
-        llm_config = config.pop(
-            "llm_config", {"name": agent_llm, "temperature": self.temperature}
-        )
+            config.setdefault("llm_config", config.pop("llm_model"))
+        if (
+            issubclass(agent_cls, ReActAgent | SimpleAgent)
+            and "llm_config" not in config
+        ):
+            config["llm_config"] = self.get_agent_llm().llm_config
         if issubclass(agent_cls, ReActAgent | MemoryAgent):
             if (
                 issubclass(agent_cls, MemoryAgent)
@@ -1050,10 +1050,9 @@ class Settings(BaseSettings):
                         )
                     )
                 )
-            return agent_cls(llm_config=llm_config, **config)
+            return agent_cls(**config)
         if issubclass(agent_cls, SimpleAgent):
             return agent_cls(
-                llm_config=llm_config,
                 sys_prompt=agent_settings.agent_system_prompt,
                 **config,
             )
