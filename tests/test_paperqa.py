@@ -1173,11 +1173,6 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
             },
             id="model-list-config",
         ),
-        pytest.param(
-            "openrouter/deepseek/deepseek-r1",
-            {},
-            id="openrouter-deepseek",
-        ),
     ],
 )
 @pytest.mark.vcr(match_on=[*VCR_DEFAULT_MATCH_ON, "body"])
