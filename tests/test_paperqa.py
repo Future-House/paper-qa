@@ -1159,19 +1159,19 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
     ("llm", "llm_settings"),
     [
         pytest.param(
-            "deepseek/deepseek-reasoner",
+            "openrouter/deepseek/deepseek-r1",
             {
                 "model_list": [
                     {
-                        "model_name": "deepseek/deepseek-reasoner",
+                        "model_name": "openrouter/deepseek/deepseek-r1",
                         "litellm_params": {
-                            "model": "deepseek/deepseek-reasoner",
-                            "api_base": "https://api.deepseek.com/v1",
+                            "model": "openrouter/deepseek/deepseek-r1",
+                            "api_base": "https://openrouter.ai/api/v1",
                         },
                     }
                 ]
             },
-            id="deepseek-reasoner",
+            id="model-list-config",
         ),
         pytest.param(
             "openrouter/deepseek/deepseek-r1",
