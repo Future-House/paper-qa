@@ -8,7 +8,6 @@ import anyio
 import httpx
 import httpx_aiohttp
 from aviary.core import Message
-from lmi import LiteLLMModel
 from pydantic import BaseModel, Field
 
 from paperqa import Docs, Settings
@@ -59,9 +58,7 @@ class OpenReviewPaperHelper:
             password=password or os.getenv("OPENREVIEW_PASSWORD"),
         )
         self.venue_id = venue_id
-        self.llm_model = LiteLLMModel(
-            name=self.settings.llm, config=self.settings.llm_config
-        )
+        self.llm_model = settings.get_llm()
 
     def get_venues(self) -> list[str]:
         """Get list of available venues."""

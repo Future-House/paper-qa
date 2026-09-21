@@ -9,6 +9,7 @@ from pydantic import BaseModel, ValidationError
 from pytest_subtests import SubTests
 
 import paperqa.configs
+from paperqa.contrib.openreview_paper_helper import OpenReviewPaperHelper
 from paperqa.prompts import citation_prompt
 from paperqa.settings import (
     AgentSettings,
@@ -121,6 +122,33 @@ def test_typed_models_config() -> None:
         ("gpt-4o-mini", False),
     ]
     assert llm_model.config["rate_limit"], "Expected non-models keys to stay on config"
+
+
+@pytest.mark.parametrize("typed_config", [False, True])
+def test_openreview_model_config(tmp_path: pathlib.Path, typed_config: bool) -> None:
+    settings = Settings(
+        llm="gpt-4o",
+        llm_config=(
+            {
+                "models": [
+                    {"name": "gpt-4o-mini", "responses_api": True},
+                    {"name": "gpt-4o"},
+                ]
+            }
+            if typed_config
+            else None
+        ),
+        agent={"index": {"paper_directory": tmp_path}},
+    )
+    with patch("paperqa.contrib.openreview_paper_helper.openreview"):
+        helper = OpenReviewPaperHelper(settings)
+
+    assert helper.llm_model.llm_config is not None
+    assert [(m.name, m.responses_api) for m in helper.llm_model.llm_config.models] == (
+        [("gpt-4o-mini", True), ("gpt-4o", False)]
+        if typed_config
+        else [("gpt-4o", False)]
+    )
 
 
 @pytest.mark.parametrize(

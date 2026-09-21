@@ -44,6 +44,7 @@ from paperqa.agents.env import (
     clinical_trial_status,
     settings_to_tools,
 )
+from paperqa.agents.helpers import litellm_get_search_query
 from paperqa.agents.main import FAKE_AGENT_TYPE, run_agent
 from paperqa.agents.models import AgentStatus, AnswerResponse
 from paperqa.agents.search import (
@@ -846,6 +847,38 @@ def test_settings_model_config() -> None:
     assert (
         embedding_model.config["rate_limit"]
         == raw_settings["embedding_config"]["rate_limit"]
+    )
+
+
+@pytest.mark.parametrize("use_model_instance", [False, True])
+@pytest.mark.asyncio
+async def test_search_query_temperature(use_model_instance: bool) -> None:
+    llm = (
+        LiteLLMModel(name="gpt-4o-mini", config={"temperature": 0.7})
+        if use_model_instance
+        else "gpt-4o-mini"
+    )
+    response = ModelResponse(
+        model="gpt-4o-mini",
+        choices=[
+            {
+                "finish_reason": "stop",
+                "message": {"role": "assistant", "content": "XAI, 2020-2026"},
+            }
+        ],
+        usage={"prompt_tokens": 5, "completion_tokens": 3, "total_tokens": 8},
+    )
+    with patch(
+        "litellm.acompletion", new_callable=AsyncMock, return_value=response
+    ) as completion:
+        queries = await litellm_get_search_query(
+            "What is XAI?", count=1, llm=llm, temperature=0.2
+        )
+
+    assert queries == ["XAI, 2020-2026"]
+    completion.assert_awaited_once()
+    assert completion.call_args.kwargs["temperature"] == (
+        0.7 if use_model_instance else 0.2
     )
 
 
