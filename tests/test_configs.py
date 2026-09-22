@@ -124,6 +124,64 @@ def test_typed_models_config() -> None:
     assert llm_model.config["rate_limit"], "Expected non-models keys to stay on config"
 
 
+@pytest.mark.parametrize(
+    "getter", ["get_llm", "get_summary_llm", "get_agent_llm", "get_enrichment_llm"]
+)
+@pytest.mark.parametrize("fallback_location", [None, "top_level", "router_kwargs"])
+def test_legacy_model_catalog(getter: str, fallback_location: str | None) -> None:
+    config: dict = {
+        "model_list": [
+            {"model_name": "fallback", "litellm_params": {"model": "gpt-4o"}},
+            {"model_name": "unused", "litellm_params": {"model": "gpt-4.1"}},
+            {
+                "model_name": "primary",
+                "litellm_params": {"model": "gpt-4o-mini", "temperature": 0.2},
+            },
+        ],
+        "router_kwargs": {"timeout": 123, "num_retries": 0},
+        "rate_limit": {"primary": "30000 per 1 minute"},
+    }
+    if fallback_location is not None:
+        target = config if fallback_location == "top_level" else config["router_kwargs"]
+        target["fallbacks"] = [{"primary": ["fallback"]}]
+    settings = Settings(
+        llm="primary",
+        llm_config=config,
+        summary_llm="primary",
+        summary_llm_config=config,
+        agent={"agent_llm": "primary", "agent_llm_config": config},
+        parsing={"enrichment_llm": "primary", "enrichment_llm_config": config},
+    )
+    before = settings.model_dump()
+    for _ in range(2):
+        model = getattr(settings, getter)()
+        assert model.llm_config is not None
+        assert [m.name for m in model.llm_config.models] == (
+            ["gpt-4o-mini", "gpt-4o"] if fallback_location else ["gpt-4o-mini"]
+        )
+        primary = model.llm_config.models[0]
+        assert primary.timeout == 123
+        assert primary.max_retries == 0
+        assert primary.extra_params["temperature"] == 0.2
+        assert model.config["rate_limit"] == config["rate_limit"]
+        assert settings.model_dump() == before
+
+
+@pytest.mark.parametrize("primary", ["missing", "gpt-4o"])
+def test_legacy_model_catalog_rejects_missing_models(primary: str) -> None:
+    settings = Settings(
+        llm=primary,
+        llm_config={
+            "model_list": [
+                {"model_name": "gpt-4o", "litellm_params": {"model": "gpt-4o"}}
+            ],
+            "fallbacks": [{"gpt-4o": ["missing"]}],
+        },
+    )
+    with pytest.raises(ValueError, match="absent from model_list"):
+        settings.get_llm()
+
+
 @pytest.mark.parametrize("typed_config", [False, True])
 def test_openreview_model_config(tmp_path: pathlib.Path, typed_config: bool) -> None:
     settings = Settings(

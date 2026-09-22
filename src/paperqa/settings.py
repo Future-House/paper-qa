@@ -31,6 +31,7 @@ from lmi import (
     LiteLLMModel,
     embedding_model_factory,
 )
+from lmi.config import LLMConfig
 from lmi.exceptions import AllModelsExhaustedError
 from pydantic import (
     BaseModel,
@@ -762,6 +763,24 @@ def make_llm_model(
     if "models" in config:
         models = config.pop("models")
         return LiteLLMModel(name=llm, llm_config={"models": models}, config=config)
+    if "model_list" in config:
+        entries = {entry["model_name"]: entry for entry in config["model_list"]}
+        if llm not in entries:
+            raise ValueError(f"Primary model {llm!r} is absent from model_list")
+        fallbacks = config.get(
+            "fallbacks", (config.get("router_kwargs") or {}).get("fallbacks", [])
+        )
+        fallback_map = {
+            key: value for entry in fallbacks or [] for key, value in entry.items()
+        }
+        names = list(dict.fromkeys([llm, *fallback_map.get(llm, [])]))
+        if missing := set(names) - entries.keys():
+            raise ValueError(
+                f"Fallback models are absent from model_list: {sorted(missing)}"
+            )
+        # A Router catalog is not an implicit fallback chain.
+        config["model_list"] = [entries[name] for name in names]
+        config["fallbacks"] = [{llm: names[1:]}]
     return LiteLLMModel(name=llm, config=config)
 
 
@@ -1013,10 +1032,20 @@ class Settings(BaseSettings):
         agent_settings = self.agent
         # Copy: the pops below must not mutate the caller's Settings
         config = dict(agent_settings.agent_config or {})
-        if "llm_model" in config:
+        if "llm_model" in config and "llm_config" not in config:
             # ldp>=1.0 renamed llm_model to llm_config, and silently ignores
             # unknown kwargs
-            config.setdefault("llm_config", config.pop("llm_model"))
+            legacy = config["llm_model"]
+            if isinstance(legacy, dict) and "config" in legacy:
+                legacy = dict(legacy)
+                llm_config = make_llm_model(
+                    legacy.pop("name", agent_settings.agent_llm),
+                    legacy.pop("config"),
+                    self.temperature,
+                ).llm_config
+                legacy = cast("LLMConfig", llm_config).with_extra_params(**legacy)
+            config["llm_config"] = legacy
+        config.pop("llm_model", None)
         if (
             issubclass(agent_cls, ReActAgent | SimpleAgent)
             and "llm_config" not in config

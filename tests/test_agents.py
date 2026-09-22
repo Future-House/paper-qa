@@ -914,7 +914,9 @@ async def test_make_ldp_agent_carries_agent_llm() -> None:
 
 
 @pytest.mark.parametrize("agent_type", ["SimpleAgent", "ReActAgent", "MemoryAgent"])
-@pytest.mark.parametrize("override", [None, "llm_config", "llm_model", "both"])
+@pytest.mark.parametrize(
+    "override", [None, "llm_config", "llm_model", "legacy_envelope", "both"]
+)
 @pytest.mark.asyncio
 async def test_make_ldp_agent_model_chain(
     agent_type: str, override: str | None
@@ -932,10 +934,12 @@ async def test_make_ldp_agent_model_chain(
         ]
     }
     agent_config: dict = {}
-    if override is not None:
+    if override == "legacy_envelope":
+        agent_config["llm_model"] = {"name": "gpt-4o", "config": chain}
+    elif override is not None:
         agent_config["llm_config" if override == "both" else override] = chain
     if override == "both":
-        agent_config["llm_model"] = {"name": "gpt-4o"}
+        agent_config["llm_model"] = {"name": "gpt-4o", "config": {"models": []}}
     settings = Settings(
         agent={
             "agent_llm_config": chain if override is None else {"models": []},
@@ -954,6 +958,48 @@ async def test_make_ldp_agent_model_chain(
         assert primary.extra_params == {"temperature": 0.5}
         assert fallback.name == "gpt-4o"
         assert not fallback.responses_api
+        assert settings.model_dump() == before
+
+
+@pytest.mark.parametrize("agent_type", ["SimpleAgent", "ReActAgent", "MemoryAgent"])
+@pytest.mark.asyncio
+async def test_make_ldp_agent_legacy_model_config(agent_type: str) -> None:
+    settings = Settings(
+        agent={
+            "agent_config": {
+                "llm_model": {
+                    "name": "gpt-4o-mini",
+                    "temperature": 0.7,
+                    "config": {
+                        "model_list": [
+                            {
+                                "model_name": "gpt-4o",
+                                "litellm_params": {"model": "gpt-4o"},
+                            },
+                            {
+                                "model_name": "gpt-4o-mini",
+                                "litellm_params": {
+                                    "model": "gpt-4o-mini",
+                                    "temperature": 0.2,
+                                },
+                            },
+                        ],
+                        "router_kwargs": {"timeout": 123, "num_retries": 0},
+                        "fallbacks": [{"gpt-4o-mini": ["gpt-4o"]}],
+                    },
+                }
+            }
+        }
+    )
+    before = settings.model_dump()
+    for _ in range(2):
+        agent = await settings.make_ldp_agent(f"ldp.agent.{agent_type}")
+        assert isinstance(agent, ldp.agent.ReActAgent | SimpleAgent)
+        assert [m.name for m in agent.llm_config.models] == ["gpt-4o-mini", "gpt-4o"]
+        for model in agent.llm_config.models:
+            assert model.timeout == 123
+            assert model.max_retries == 0
+            assert model.extra_params == {"temperature": 0.7}
         assert settings.model_dump() == before
 
 
