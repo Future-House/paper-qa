@@ -20,8 +20,10 @@ import litellm
 import pytest
 from aviary.core import (
     Environment,
+    MalformedMessageError,
     Message,
     Tool,
+    ToolCall,
     ToolRequestMessage,
     ToolResponseMessage,
     ToolsAdapter,
@@ -956,8 +958,11 @@ async def test_make_ldp_agent_model_chain(
 
 
 @pytest.mark.parametrize("fallback", [False, True])
+@pytest.mark.parametrize("agent_type", ["ldp.agent.SimpleAgent", "ToolSelector"])
 @pytest.mark.asyncio
-async def test_ldp_agent_responses_dispatch_and_tool_fallback(fallback: bool) -> None:
+async def test_agent_responses_dispatch_and_tool_fallback(
+    fallback: bool, agent_type: str
+) -> None:
     settings = Settings(
         agent={
             "agent_llm_config": {
@@ -972,8 +977,6 @@ async def test_ldp_agent_responses_dispatch_and_tool_fallback(fallback: bool) ->
             }
         }
     )
-    agent = await settings.make_ldp_agent("ldp.agent.SimpleAgent")
-    assert isinstance(agent, SimpleAgent)
     tool = Tool.from_function(Reset().reset, exclude_parameters={"state"})
     function = {"name": tool.info.name, "arguments": "{}"}
     response = ResponsesAPIResponse(
@@ -1016,10 +1019,18 @@ async def test_ldp_agent_responses_dispatch_and_tool_fallback(fallback: bool) ->
             "litellm.acompletion", new_callable=AsyncMock, return_value=chat_response
         ) as chat,
     ):
-        state = await agent.init_state([tool])
-        action, _, _ = await agent.get_asv(
-            state, [Message(content="Reset the search.")]
-        )
+        messages = [Message(content="Reset the search.")]
+        selection: Message
+        if agent_type == "ToolSelector":
+            model = settings.get_tool_selector_model(agent_type)
+            assert model is not None
+            selection = await model.select_tool(messages, [tool])
+        else:
+            agent = await settings.make_ldp_agent(agent_type)
+            assert isinstance(agent, SimpleAgent)
+            state = await agent.init_state([tool])
+            action, _, _ = await agent.get_asv(state, messages)
+            selection = action.value
 
     responses.assert_awaited_once()
     assert responses.call_args.kwargs["model"] == "gpt-4o-mini"
@@ -1030,11 +1041,66 @@ async def test_ldp_agent_responses_dispatch_and_tool_fallback(fallback: bool) ->
         assert chat.call_args.kwargs["model"] == "gpt-4o"
     else:
         chat.assert_not_awaited()
-        assert action.value.info is not None
-        assert action.value.info["response_id"] == "resp_agent"
-    assert isinstance(action.value, ToolRequestMessage)
-    assert action.value.tool_calls[0].function.name == tool.info.name
-    assert action.value.tool_calls[0].function.arguments == {}
+        assert selection.info is not None
+        assert selection.info["response_id"] == "resp_agent"
+    assert isinstance(selection, ToolRequestMessage)
+    assert selection.tool_calls[0].function.name == tool.info.name
+    assert selection.tool_calls[0].function.arguments == {}
+
+
+@pytest.mark.parametrize(
+    "agent_type", [ToolSelector, "ToolSelector", "aviary.core.ToolSelector"]
+)
+@pytest.mark.parametrize("accum_messages", [False, True])
+@pytest.mark.asyncio
+async def test_tool_selector_runner_history_and_retry(
+    agent_type: str | type, accum_messages: bool
+) -> None:
+    settings = Settings(
+        embedding="sparse",
+        agent={
+            "tool_names": [Reset.TOOL_FN_NAME, Complete.TOOL_FN_NAME],
+            "agent_config": {"accum_messages": accum_messages},
+        },
+    )
+    reset = Tool.from_function(Reset().reset, exclude_parameters={"state"})
+    complete = Tool.from_function(Complete().complete, exclude_parameters={"state"})
+    reset_action = ToolRequestMessage(tool_calls=[ToolCall.from_tool(reset)])
+    complete_action = ToolRequestMessage(
+        tool_calls=[ToolCall.from_tool(complete, has_successful_answer=True)]
+    )
+
+    async def seed_answer(state: EnvironmentState) -> None:  # noqa: RUF029
+        state.session.answer = "An existing answer."
+        state.session.tool_history = [[GenerateAnswer.TOOL_FN_NAME]]
+
+    with patch.object(
+        LiteLLMModel,
+        "select_tool",
+        new_callable=AsyncMock,
+        side_effect=[MalformedMessageError("retry"), reset_action, complete_action],
+    ) as select_tool:
+        response = await run_agent(
+            Docs(),
+            "Finish the answer.",
+            settings,
+            agent_type,
+            on_env_reset_callback=seed_answer,
+        )
+
+    assert response.status == AgentStatus.SUCCESS
+    assert select_tool.await_count == 3
+    messages = select_tool.await_args_list[-1].args[0]
+    assert sum(isinstance(m, ToolRequestMessage) for m in messages) == 1
+    assert sum(isinstance(m, ToolResponseMessage) for m in messages) == 1
+    assert response.session.tool_history == [
+        [GenerateAnswer.TOOL_FN_NAME],
+        [Reset.TOOL_FN_NAME],
+        [Complete.TOOL_FN_NAME],
+    ]
+    settings.agent.agent_config = {"unsupported": True}
+    with pytest.raises(TypeError, match="Unsupported ToolSelector options"):
+        settings.get_tool_selector_model(agent_type)
 
 
 def test_tool_schema(agent_test_settings: Settings) -> None:

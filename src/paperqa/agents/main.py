@@ -9,7 +9,6 @@ from aviary.core import (
     Tool,
     ToolCall,
     ToolRequestMessage,
-    ToolSelector,
     ToolSelectorLedger,
 )
 from aviary.utils import MultipleChoiceQuestion
@@ -24,7 +23,6 @@ from tenacity import (
 
 from paperqa._ldp_shims import Callback, RolloutManager
 from paperqa.docs import Docs
-from paperqa.llms import make_tool_selector
 from paperqa.settings import AgentSettings, Settings
 from paperqa.types import PQASession
 
@@ -45,6 +43,7 @@ if TYPE_CHECKING:
     from aviary.core import Environment
     from ldp.agent import Agent, SimpleAgentState
     from ldp.graph.ops import OpResult
+    from lmi import LiteLLMModel
 
 logger = logging.getLogger(__name__)
 agent_logger = logging.getLogger(__name__ + ".agent_callers")
@@ -128,9 +127,9 @@ async def run_agent(
         session, agent_status = await run_fake_agent(
             query, settings, docs, **runner_kwargs
         )
-    elif tool_selector_or_none := settings.make_aviary_tool_selector(agent_type):
+    elif tool_selector_model := settings.get_tool_selector_model(agent_type):
         session, agent_status = await run_aviary_agent(
-            query, settings, docs, tool_selector_or_none, **runner_kwargs
+            query, settings, docs, tool_selector_model, **runner_kwargs
         )
     elif ldp_agent_or_none := await settings.make_ldp_agent(agent_type):
         session, agent_status = await run_ldp_agent(
@@ -244,7 +243,7 @@ async def run_fake_agent(
         await step([ToolCall.from_tool(gather_evidence_tool, question=question)])
         await step([ToolCall.from_tool(generate_answer_tool)])
         # Complete with an LLM-proposed complete call
-        complete_action = await make_tool_selector(llm_model)(
+        complete_action = await llm_model.select_tool(
             messages=agent_messages, tools=tools, tool_choice=complete_tool
         )
         await step(complete_action)
@@ -261,7 +260,7 @@ async def run_aviary_agent(
     query: str | MultipleChoiceQuestion,
     settings: Settings,
     docs: Docs,
-    agent: ToolSelector,
+    llm_model: "LiteLLMModel",
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
     on_agent_action_callback: Callable[[Message, BaseModel], Awaitable] | None = None,
@@ -309,8 +308,8 @@ async def run_aviary_agent(
                 before_sleep=before_sleep_log(logger, logging.WARNING),
                 reraise=True,
             ):
-                with attempt:  # Retrying if ToolSelector fails to select a tool
-                    action = await agent(agent_state.messages, tools)
+                with attempt:  # Retry malformed tool selections
+                    action = await llm_model.select_tool(agent_state.messages, tools)
             agent_state.messages = [*agent_state.messages, action]
             if on_agent_action_callback:
                 await on_agent_action_callback(action, agent_state)

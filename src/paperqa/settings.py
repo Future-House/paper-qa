@@ -59,7 +59,6 @@ from paperqa._ldp_shims import (
     _Memories,
     set_training_mode,
 )
-from paperqa.llms import make_tool_selector
 from paperqa.prompts import (
     CONTEXT_INNER_PROMPT,
     CONTEXT_OUTER_PROMPT,
@@ -970,8 +969,8 @@ class Settings(BaseSettings):
             self.temperature,
         )
 
-    def make_aviary_tool_selector(self, agent_type: str | type) -> ToolSelector | None:
-        """Attempt to convert the input agent type to an aviary ToolSelector."""
+    def get_tool_selector_model(self, agent_type: str | type) -> LiteLLMModel | None:
+        """Resolve the legacy ToolSelector agent type to its LMI model."""
         if agent_type is ToolSelector or (
             isinstance(agent_type, str)
             and (
@@ -984,9 +983,15 @@ class Settings(BaseSettings):
                 )
             )
         ):
-            return make_tool_selector(
-                self.get_agent_llm(), **(self.agent.agent_config or {})
-            )
+            # The runner already maintains message history for both values of
+            # ToolSelector's legacy accum_messages option.
+            if unsupported := (self.agent.agent_config or {}).keys() - {
+                "accum_messages"
+            }:
+                raise TypeError(
+                    f"Unsupported ToolSelector options: {sorted(unsupported)}"
+                )
+            return self.get_agent_llm()
         return None
 
     async def make_ldp_agent(
