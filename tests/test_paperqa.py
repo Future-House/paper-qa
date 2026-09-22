@@ -38,6 +38,7 @@ from lmi import (
     LLMResult,
     SparseEmbeddingModel,
 )
+from lmi.exceptions import AllModelsExhaustedError
 from lmi.llms import rate_limited
 from lmi.utils import VCR_DEFAULT_MATCH_ON, validate_image
 from paperqa_docling import parse_pdf_to_pages as docling_parse_pdf_to_pages
@@ -1158,24 +1159,19 @@ async def test_llmresult_callback(docs_fixture: Docs) -> None:
     ("llm", "llm_settings"),
     [
         pytest.param(
-            "deepseek/deepseek-reasoner",
+            "openrouter/deepseek/deepseek-r1",
             {
                 "model_list": [
                     {
-                        "model_name": "deepseek/deepseek-reasoner",
+                        "model_name": "openrouter/deepseek/deepseek-r1",
                         "litellm_params": {
-                            "model": "deepseek/deepseek-reasoner",
-                            "api_base": "https://api.deepseek.com/v1",
+                            "model": "openrouter/deepseek/deepseek-r1",
+                            "api_base": "https://openrouter.ai/api/v1",
                         },
                     }
                 ]
             },
-            id="deepseek-reasoner",
-        ),
-        pytest.param(
-            "openrouter/deepseek/deepseek-r1",
-            {},
-            id="openrouter-deepseek",
+            id="model-list-config",
         ),
     ],
 )
@@ -1386,7 +1382,9 @@ async def test_hybrid_embedding(
 async def test_custom_llm_custom_media(stub_data_dir: Path) -> None:
     captured_messages: list[list[Message]] = []
 
-    class StubLLMModel(LLMModel):
+    # NOTE: subclass LiteLLMModel over LLMModel since lmi>=1.0's LLMModel.call
+    # dispatches through hooks lmi only defines on LiteLLMModel
+    class StubLLMModel(LiteLLMModel):
         name: str = "custom/myllm"
 
         async def acompletion(
@@ -2277,7 +2275,8 @@ async def test_image_enrichment_invalid_image(caplog) -> None:
     with caplog.at_level("WARNING", logger="paperqa.settings"):
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
-    (record_tuple,) = caplog.record_tuples
+    # Filter to paperqa's logger, since lmi also logs each failed attempt
+    (record_tuple,) = [rt for rt in caplog.record_tuples if rt[0] == "paperqa.settings"]
     assert (
         "rejected by the LLM provider" in record_tuple[2]
     ), "Expected rejection to be documented"
@@ -2315,7 +2314,8 @@ async def test_image_enrichment_with_oversized_image(caplog) -> None:
         result = await enricher(parsed_text)
     assert "enriched=0" in result, "Expected no enrichment to have occurred"
     assert mock_acompletion_function.await_count >= 1
-    (record_tuple,) = caplog.record_tuples
+    # Filter to paperqa's logger, since lmi also logs each failed attempt
+    (record_tuple,) = [rt for rt in caplog.record_tuples if rt[0] == "paperqa.settings"]
     assert (
         "rejected by the LLM provider" in record_tuple[2]
     ), "Expected rejection to be documented"
@@ -3560,8 +3560,9 @@ async def test_timeout_resilience() -> None:
     )
 
     # Make sure we've configured timeout low enough for this test to be useful
-    with pytest.raises(litellm.Timeout):
+    with pytest.raises(AllModelsExhaustedError) as exc_info:
         await llm.call_single("The duck says")
+    assert isinstance(exc_info.value.last_exc, litellm.Timeout)
 
     text = Text(
         text="The duck says",
@@ -3582,6 +3583,33 @@ async def test_timeout_resilience() -> None:
     context, llm_results = await map_fxn_summary(**kw)
     assert context is None
     assert not llm_results
+
+
+@pytest.mark.asyncio
+async def test_exhaustion_resilience() -> None:
+    """Exhausted rate limits should surface, not silently drop the context."""
+
+    class ExhaustedLLM(LiteLLMModel):
+        async def call_single(self, *_args, **_kwargs) -> LLMResult:
+            raise AllModelsExhaustedError(
+                litellm.RateLimitError(
+                    "rate limited", llm_provider="anthropic", model=self.name
+                )
+            )
+
+    kw = {
+        "text": Text(
+            text="The duck says",
+            name="test",
+            doc=Doc(docname="test", dockey="test", citation="test"),
+        ),
+        "question": "The duck says",
+        "summary_llm_model": ExhaustedLLM(name=CommonLLMNames.ANTHROPIC_TEST.value),
+        "prompt_templates": ("", ""),
+    }
+    for fxn in (_map_fxn_summary, map_fxn_summary):
+        with pytest.raises(AllModelsExhaustedError):
+            await fxn(**kw)  # type: ignore[arg-type]
 
 
 TEST_STUB_LAMBDA = lambda: 1  # noqa: E731

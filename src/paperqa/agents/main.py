@@ -9,7 +9,6 @@ from aviary.core import (
     Tool,
     ToolCall,
     ToolRequestMessage,
-    ToolSelector,
     ToolSelectorLedger,
 )
 from aviary.utils import MultipleChoiceQuestion
@@ -44,6 +43,7 @@ if TYPE_CHECKING:
     from aviary.core import Environment
     from ldp.agent import Agent, SimpleAgentState
     from ldp.graph.ops import OpResult
+    from lmi import LiteLLMModel
 
 logger = logging.getLogger(__name__)
 agent_logger = logging.getLogger(__name__ + ".agent_callers")
@@ -127,9 +127,9 @@ async def run_agent(
         session, agent_status = await run_fake_agent(
             query, settings, docs, **runner_kwargs
         )
-    elif tool_selector_or_none := settings.make_aviary_tool_selector(agent_type):
+    elif tool_selector_model := settings.get_tool_selector_model(agent_type):
         session, agent_status = await run_aviary_agent(
-            query, settings, docs, tool_selector_or_none, **runner_kwargs
+            query, settings, docs, tool_selector_model, **runner_kwargs
         )
     elif ldp_agent_or_none := await settings.make_ldp_agent(agent_type):
         session, agent_status = await run_ldp_agent(
@@ -260,7 +260,7 @@ async def run_aviary_agent(
     query: str | MultipleChoiceQuestion,
     settings: Settings,
     docs: Docs,
-    agent: ToolSelector,
+    llm_model: "LiteLLMModel",
     env_class: type[PaperQAEnvironment] = PaperQAEnvironment,
     on_env_reset_callback: Callable[[EnvironmentState], Awaitable] | None = None,
     on_agent_action_callback: Callable[[Message, BaseModel], Awaitable] | None = None,
@@ -308,8 +308,8 @@ async def run_aviary_agent(
                 before_sleep=before_sleep_log(logger, logging.WARNING),
                 reraise=True,
             ):
-                with attempt:  # Retrying if ToolSelector fails to select a tool
-                    action = await agent(agent_state.messages, tools)
+                with attempt:  # Retry malformed tool selections
+                    action = await llm_model.select_tool(agent_state.messages, tools)
             agent_state.messages = [*agent_state.messages, action]
             if on_agent_action_callback:
                 await on_agent_action_callback(action, agent_state)

@@ -55,10 +55,7 @@ async def litellm_get_search_query(
         )
 
     if isinstance(llm, str):
-        model: LLMModel = LiteLLMModel(name=llm)
-        model.config["model_list"][0]["litellm_params"].update(
-            {"temperature": temperature}
-        )
+        model: LLMModel = LiteLLMModel(name=llm, config={"temperature": temperature})
     else:
         model = llm
     messages = [

@@ -354,7 +354,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1205,7 +1205,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1448,7 +1448,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":null}'
+      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"float"}'
       headers:
         accept:
           - application/json
@@ -2527,6 +2527,860 @@ interactions:
           - 3ms
         x-request-id:
           - req_7c2c55fc034349a4b8562cf44c36ef7c
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
+        the relevant information that could help answer the question based on the excerpt.
+        Your summary, combined with many others, will be given to the model to generate
+        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
+        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
+        information from the text - about 100 words. `relevance_score` is an integer
+        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
+        may not contain relevant information. If not, leave `summary` empty, and make
+        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
+        chunk 4: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
+        now\\n\\n---\\n\\n2010.\\n  8. **^** [Dept. of Canadian Heritage news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        February 15, 2010. Retrieved February 15, 2011.\\n  9. **^** [PM pays tribute
+        to outstanding Canadians on Flag Day](http://www.pm.gc.ca/eng/media.asp?category=1&id=3958&featureId=6&pageId=26)
+        [Archived](https://web.archive.org/web/20110706181811/http://www.pm.gc.ca/eng/media.asp?category=1&id=3958&featureId=6&pageId=26)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        Prime Minister's Office news release. Retrieved February 16, 2011.\\n\\n## External
+        links\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=6\\n\\\"Edit
+        section: External links\\\")]\\n\\n![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/30px-\\nCommons-logo.svg.png)\\n\\nWikimedia
+        Commons has media related to [National Flag of Canada\\nDay](https://commons.wikimedia.org/wiki/Category:National_Flag_of_Canada_Day\\n\\\"commons:Category:National
+        Flag of Canada Day\\\").\\n\\n  * [Flag of Canada Song (1965) Freddie Grant](https://www.youtube.com/watch?v=2IkqmkTK46E)\\n
+        \ * [Flag Day](http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm), Dept. of
+        Canadian Heritage \\n  * [The famous Canadian Flag Collection, at Settlers,
+        Rails & Trails Inc, Argyle, Manitoba](http://argylemuseum.wixsite.com/argylemuseum/canadian-flag-collection)\\n\\n![](https://login.wikimedia.org/wiki/Special:CentralAutoLogin/start?type=1x1)\\n\\nRetrieved
+        from\\n\\\"[https://en.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994](https://en.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994)\\\"\\n\\n[Categories](/wiki/Help:Category
+        \\\"Help:Category\\\"):\\n\\n  * [1996 establishments in Canada](/wiki/Category:1996_establishments_in_Canada
+        \\\"Category:1996 establishments in Canada\\\")\\n  * [Public holidays in Canada](/wiki/Category:Public_holidays_in_Canada
+        \\\"Category:Public holidays in Canada\\\")\\n  * [February observances](/wiki/Category:February_observances
+        \\\"Category:February observances\\\")\\n  * [Flag days](/wiki/Category:Flag_days
+        \\\"Category:Flag days\\\")\\n  * [Winter events in Canada](/wiki/Category:Winter_events_in_Canada
+        \\\"Category:Winter events in Canada\\\")\\n\\nHidden categories:\\n\\n  * [Webarchive
+        template wayback links](/wiki/Category:Webarchive_template_wayback_links \\\"Category:Webarchive
+        template wayback links\\\")\\n  * [Articles with short description](/wiki/Category:Articles_with_short_description
+        \\\"Category:Articles with short description\\\")\\n  * [Short description matches
+        Wikidata](/wiki/Category:Short_description_matches_Wikidata \\\"Category:Short
+        description matches Wikidata\\\")\\n  * [Use mdy dates from February 2018](/wiki/Category:Use_mdy_dates_from_February_2018
+        \\\"Category:Use mdy dates from February 2018\\\")\\n  * [Infobox holiday with
+        missing field](/wiki/Category:Infobox_holiday_with_missing_field \\\"Category:Infobox
+        holiday with missing field\\\")\\n  * [Infobox holiday fixed day](/wiki/Category:Infobox_holiday_fixed_day
+        \\\"Category:Infobox holiday fixed day\\\")\\n  * [Articles containing French-language
+        text](/wiki/Category:Articles_containing_French-language_text \\\"Category:Articles
+        containing French-language text\\\")\\n  * [Commons category link is on Wikidata](/wiki/Category:Commons_category_link_is_on_Wikidata
+        \\\"Category:Commons category link is on Wikidata\\\")\\n\\n  * This page was
+        last edited on 1 July 2024, at 03:41 (UTC). \\n  * Text is available under the
+        [Creative Commons Attribution-ShareAlike License 4.0](//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License)[](//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License);
+        additional terms may apply. By using this site, you agree to the [Terms of Use](//foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use)
+        and [Privacy Policy](//foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy).
+        Wikipedia\xAE is a registered trademark of the [Wikimedia Foundation, Inc.](//wikimediafoundation.org/),
+        a non-profit organization. \\n\\n  * [Privacy policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)\\n
+        \ * [About Wikipedia](/wiki/Wikipedia:About)\\n  * [Disclaimers](/wiki/Wikipedia:General_disclaimer)\\n
+        \ * [Contact Wikipedia](//en.wikipedia.org/wiki/Wikipedia:Contact_us)\\n  *
+        [Code of Conduct](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct)\\n
+        \ * [Developers](https://developer.wikimedia.org)\\n  * [Statistics](https://stats.wikimedia.org/#/en.wikipedia.org)\\n
+        \ * [Cookie statement](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement)\\n
+        \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
+        \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
+        \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
+        \ * \\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-4o-2024-11-20\",\"n\":1,\"temperature\":0.0}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6216"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.13
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/6rmUlBQykxRslJQSs5ILEnOLcjRdQ1MjYj0SwIAAAD//4xTTW/bMAy951cIOieF
+          4zorciw2rMAOxQ7DMGAuDEWiba2yZIhykLTIfx8lJ7WzdcAu/uDje+IjqS+HhzBk8PiSmfz7/Vd4
+          ecjb+gdfRobb/QIZLqwb6YgHQTs7wtKDCBBV13fbLMvX2V2egM4pMJHW9GFVuFWe5cVqvab3mdg6
+          LQEp4yf9MvaanrFEq+BA4Wx5iXSAKBqg2CWJgt6ZGOECUWMQNvDlBEpnA9hU9WtpGSs5Dl0n/LGk
+          UMm/tcDgIMH3gSkHyKyjD+3JqDkyBSi93gELlGZF9CoMq41omKvZR2GFEmw3BNZ7t9eUzYy2z8iE
+          VcxDDR4sGaNPEzvDgmOPF5HP1yKfxDGxyIOTOmV7QDd44t+UfDmWTkKwF6RZoXQeooW8tKe5Xzp2
+          QBHbbQdjZoCwZC2dnjr9dEZOb701riEbO/yDymttNbYVTRdp1NRHDK7nCT3R8ynNcLgaCyehrg9V
+          cM+Qjlt/yLajIJ/WZoKL2zMYqEQzp23y5TuKlYIgtMHZHnApZAtq4k5LIwal3QxYzHz/Xc572qN3
+          bZv/kZ8AKaGnSVa9B6XlteUpzUO8Vv9Ke+tzKpgj+D1dlipo8HEWCmoxmHHjOR4xQFfRwBpaaK/H
+          ta/7alPUm+1msytu+eK0+A0AAP//AwD73Fl5/wMAAA==
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a3ebadee1d52cf1e-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 21 Sep 2026 20:04:32 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=xfFNBo1_y4b.YA5qphRTe5whs.6d6NbOnHP3xGsRAog-1790021071.0610714-1.0.1.1-m4Oi_lZ5duadEIcakA9U0uJC8_fXtZwXoHKlPCCz8eWZWhD.wAGiys34zR7OJZCZACbmMj.0932XapZAgFl1cmP.TpzNZXu4gZSQ0ZcbmSjDAHGFqVecXFUmk3dD5kfI;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon,
+            21 Sep 2026 20:34:32 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "856"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998505"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 2ms
+        x-request-id:
+          - req_012bf2e2bc88434f83909d189aad4573
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
+        the relevant information that could help answer the question based on the excerpt.
+        Your summary, combined with many others, will be given to the model to generate
+        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
+        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
+        information from the text - about 100 words. `relevance_score` is an integer
+        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
+        may not contain relevant information. If not, leave `summary` empty, and make
+        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
+        chunk 1: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
+        now\\n\\n---\\n\\nJump to content\\n\\nMain menu\\n\\nMain menu\\n\\nmove to
+        sidebar  hide\\n\\nNavigation\\n\\n  * [Main page](/wiki/Main_Page \\\"Visit
+        the main page \\\\[z\\\\]\\\")\\n  * [Contents](/wiki/Wikipedia:Contents \\\"Guides
+        to browsing Wikipedia\\\")\\n  * [Current events](/wiki/Portal:Current_events
+        \\\"Articles related to current events\\\")\\n  * [Random article](/wiki/Special:Random
+        \\\"Visit a randomly selected article \\\\[x\\\\]\\\")\\n  * [About Wikipedia](/wiki/Wikipedia:About
+        \\\"Learn about Wikipedia and how it works\\\")\\n  * [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us
+        \\\"How to contact Wikipedia\\\")\\n  * [Donate](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en
+        \\\"Support us by donating to the Wikimedia Foundation\\\")\\n\\nContribute\\n\\n
+        \ * [Help](/wiki/Help:Contents \\\"Guidance on how to use and edit Wikipedia\\\")\\n
+        \ * [Learn to edit](/wiki/Help:Introduction \\\"Learn how to edit Wikipedia\\\")\\n
+        \ * [Community portal](/wiki/Wikipedia:Community_portal \\\"The hub for editors\\\")\\n
+        \ * [Recent changes](/wiki/Special:RecentChanges \\\"A list of recent changes
+        to Wikipedia \\\\[r\\\\]\\\")\\n  * [Upload file](/wiki/Wikipedia:File_upload_wizard
+        \\\"Add images or other media for use on Wikipedia\\\")\\n\\n[ ![](/static/images/icons/wikipedia.png)\\n![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
+        ![The\\nFree Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)\\n](/wiki/Main_Page)\\n\\n[
+        Search ](/wiki/Special:Search \\\"Search Wikipedia \\\\[f\\\\]\\\")\\n\\nSearch\\n\\nAppearance\\n\\n
+        \ * [Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \\\"You are encouraged to create an account and log in; however, it is not mandatory\\\")\\n
+        \ * [Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \\\"You're encouraged to log in; however, it's not mandatory. \\\\[o\\\\]\\\")\\n\\nPersonal
+        tools\\n\\n  * [ Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \\\"You are encouraged to create an account and log in; however, it is not mandatory\\\")\\n
+        \ * [ Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \\\"You're encouraged to log in; however, it's not mandatory. \\\\[o\\\\]\\\")\\n\\nPages
+        for logged out editors [learn more](/wiki/Help:Introduction)\\n\\n  * [Contributions](/wiki/Special:MyContributions
+        \\\"A list of edits made from this IP address \\\\[y\\\\]\\\")\\n  * [Talk](/wiki/Special:MyTalk
+        \\\"Discussion about edits from this IP address \\\\[n\\\\]\\\")\\n\\n## Contents\\n\\nmove
+        to sidebar  hide\\n\\n  * (Top)\\n  * 1 History Toggle History subsection\\n
+        \   * 1.1 Background\\n    * 1.2 Flag Day\\n  * 2 See also\\n  * 3 Footnotes\\n
+        \ * 4 External links\\n\\nToggle the table of contents\\n\\n#  National Flag
+        of Canada Day\\n\\n7 languages\\n\\n  * [\u0627\u0644\u0639\u0631\u0628\u064A\u0629](https://ar.wikipedia.org/wiki/%D9%8A%D9%88%D9%85_%D8%B9%D9%84%D9%85_%D9%83%D9%86%D8%AF%D8%A7_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A
+        \\\"\u064A\u0648\u0645 \u0639\u0644\u0645 \u0643\u0646\u062F\u0627 \u0627\u0644\u0648\u0637\u0646\u064A
+        \u2013 Arabic\\\")\\n  * [Espa\xF1ol](https://es.wikipedia.org/wiki/D%C3%ADa_de_la_Bandera_Nacional_de_Canad%C3%A1
+        \\\"D\xEDa de la Bandera Nacional de Canad\xE1 \u2013 Spanish\\\")\\n  * [Fran\xE7ais](https://fr.wikipedia.org/wiki/Jour_du_drapeau_national_du_Canada
+        \\\"Jour du drapeau national du Canada \u2013 French\\\")\\n  * [\u0540\u0561\u0575\u0565\u0580\u0565\u0576](https://hy.wikipedia.org/wiki/%D4%BF%D5%A1%D5%B6%D5%A1%D5%A4%D5%A1%D5%B5%D5%AB_%D5%A1%D5%A6%D5%A3%D5%A1%D5%B5%D5%AB%D5%B6_%D5%A4%D6%80%D5%B8%D5%B7%D5%AB_%D6%85%D6%80
+        \\\"\u053F\u0561\u0576\u0561\u0564\u0561\u0575\u056B \u0561\u0566\u0563\u0561\u0575\u056B\u0576
+        \u0564\u0580\u0578\u0577\u056B \u0585\u0580 \u2013 Armenian\\\")\\n  * [\u05E2\u05D1\u05E8\u05D9\u05EA](https://he.wikipedia.org/wiki/%D7%99%D7%95%D7%9D_%D7%94%D7%93%D7%92%D7%9C_%D7%94%D7%9C%D7%90%D7%95%D7%9E%D7%99_%D7%A9%D7%9C_%D7%A7%D7%A0%D7%93%D7%94
+        \\\"\u05D9\u05D5\u05DD \u05D4\u05D3\u05D2\u05DC \u05D4\u05DC\u05D0\u05D5\u05DE\u05D9
+        \u05E9\u05DC \u05E7\u05E0\u05D3\u05D4 \u2013 Hebrew\\\")\\n  * [Bahasa Melayu](https://ms.wikipedia.org/wiki/Hari_Bendera_Kebangsaan_Kanada
+        \\\"Hari Bendera Kebangsaan Kanada \u2013 Malay\\\")\\n  * [Polski](https://pl.wikipedia.org/wiki/Narodowy_dzie%C5%84_flagi_Kanady
+        \\\"Narodowy dzie\u0144 flagi Kanady \u2013 Polish\\\")\\n\\n[Edit\\nlinks](https://www.wikidata.org/wiki/Special:EntityPage/Q6972703#sitelinks-\\nwikipedia
+        \\\"Edit interlanguage links\\\")\\n\\n  * [Article](/wiki/National_Flag_of_Canada_Day
+        \\\"View the content page \\\\[c\\\\]\\\")\\n  * [Talk](/wiki/Talk:National_Flag_of_Canada_Day
+        \\\"Discuss improvements to the content page \\\\[t\\\\]\\\")\\n\\nEnglish\\n\\n
+        \ * [Read](/wiki/National_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
+        \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
+        \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
+        to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title\\n\\n---\\n\\nQuestion:
+        What is the national flag of Canada?\"}],\"model\":\"gpt-4o-2024-11-20\",\"n\":1,\"temperature\":0.0}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "5769"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.13
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/6rmUlBQykxRslJQSs5ILEnOLcjRdQ1MjYh0SgIAAAD//4xSXWuDQBB8z68I92yK
+          JpqQX5BCC4WWQqEGuZyruea8k9szNIT89+5pUk2bQl8UZ3bG2Y/ZW/y4uk+qV/XyMFvZ6omj3D2z
+          wCvM5gOEu6juhCEdOGl0RwsL3IF3jRbLMJxG4WLaEpXJQXlZWbtJbCbTcBpPoojeZ+HWSAFIFe/0
+          OR4f26ePqHP4JDgMLkgFiLwEwi5FBFqjPMI4okTHtWNBTwqjHeg29THV43HKsKkqbg8pQSlLWdCh
+          FhTsuRaQoTAWPBum+jS0slA0yH0nulFqQHCtjeN+Em0T6zNz+o6tTFlbs8EfUlZILXGb0eCQpkgR
+          0ZmateyJnut2PM1Vx4yMqtplzuyg/V00T2adIes3MqTPpKOIaojPl8ENxywHx6XCwYiZ4GILea/t
+          98GbXJoBMRr0/TvOLe+ud6nL/9j3hBBQ07FltYVciuuW+zIL/mL/KvuecxuYIdg93WHmJFi/ixwK
+          3qjumBge0EGV0cJKsLWV3UUVdZbERbJMkk08Y6PT6AsAAP//AwBRbiupWgMAAA==
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a3ebadee1ad58ea2-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 21 Sep 2026 20:04:32 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=xDDY4oK0a6UipzuhTnbKa9KaI1y_bXVShsG7bvWqz6w-1790021071.0595875-1.0.1.1-00GarelGe30pHr6ny2j470jVnZ49bDhx4wsY5cOhD6kJEWAXmhPEIev0nW8j9XQFD5smwyM9dyBKYTvMk2EwkwJ9to4_o6guXRwaIeV8NSmsJKyveIP0uDeHpb4CRSAY;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon,
+            21 Sep 2026 20:34:32 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "563"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998639"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 2ms
+        x-request-id:
+          - req_ef3f6af6a0414a57a9a48eb4d82da40d
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
+        the relevant information that could help answer the question based on the excerpt.
+        Your summary, combined with many others, will be given to the model to generate
+        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
+        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
+        information from the text - about 100 words. `relevance_score` is an integer
+        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
+        may not contain relevant information. If not, leave `summary` empty, and make
+        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
+        chunk 3: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
+        now\\n\\n---\\n\\n an [Order in\\nCouncil](/wiki/Order_in_Council \\\"Order
+        in Council\\\") from [Governor\\nGeneral](/wiki/Governor_General_of_Canada \\\"Governor
+        General of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc \\\"Rom\xE9o
+        LeBlanc\\\"), on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
+        \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
+        proposed cuts to the\\n[unemployment insurance](/wiki/Unemployment_insurance
+        \\\"Unemployment\\ninsurance\\\") system, and while walking through the crowd
+        he was [grabbed by the\\nneck and pushed aside](/wiki/Shawinigan_Handshake \\\"Shawinigan
+        Handshake\\\") a\\nprotester who had approached him.\\n\\nIn 2010, on the flag's
+        45th anniversary, federal ceremonies were held to mark\\nFlag Day at [Ottawa](/wiki/Ottawa
+        \\\"Ottawa\\\"), [Winnipeg](/wiki/Winnipeg\\n\\\"Winnipeg\\\"), [St. John's](/wiki/St._John%27s,_Newfoundland_and_Labrador
+        \\\"St.\\nJohn's, Newfoundland and Labrador\\\"), and at\\n[Whistler](/wiki/Whistler,_British_Columbia
+        \\\"Whistler, British Columbia\\\") and\\n[Vancouver](/wiki/Vancouver \\\"Vancouver\\\")
+        in conjunction with the [2010 Winter\\nOlympics](/wiki/2010_Winter_Olympics
+        \\\"2010 Winter Olympics\\\") in Vancouver.[8]\\nIn 2011, Prime Minister [Stephen
+        Harper](/wiki/Stephen_Harper \\\"Stephen\\nHarper\\\") observed Flag Day by
+        presenting two citizens, whose work honoured the\\n[military](/wiki/Canadian_Armed_Forces
+        \\\"Canadian Armed Forces\\\"), with Canadian\\nflags that had flown over the
+        [Peace Tower](/wiki/Peace_Tower \\\"Peace Tower\\\").\\nIt was announced as
+        inaugurating an annual recognition of patriotism.[9]\\n\\n## See also\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=4\\n\\\"Edit
+        section: See also\\\")]\\n\\n  * ![flag](//upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Maple_Leaf_%28from_roundel%29.svg/25px-Maple_Leaf_%28from_roundel%29.svg.png)[Canada
+        portal](/wiki/Portal:Canada \\\"Portal:Canada\\\")\\n\\n  * [Flag Day](/wiki/Flag_Day
+        \\\"Flag Day\\\")\\n  * [List of Canadian flags](/wiki/List_of_Canadian_flags
+        \\\"List of Canadian flags\\\")\\n  * [National flag](/wiki/National_flag \\\"National
+        flag\\\")\\n\\n## Footnotes\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=5\\n\\\"Edit
+        section: Footnotes\\\")]\\n\\n  1. **^** [Department of Canadian Heritage](/wiki/Department_of_Canadian_Heritage
+        \\\"Department of Canadian Heritage\\\"). [\\\"Ceremonial and Canadian Symbols
+        Promotion > The National Flag of Canada\\\"](https://web.archive.org/web/20100423114158/http://www.canadianheritage.gc.ca/progs/cpsc-ccsp/sc-cs/df1_e.cfm).
+        Queen's Printer for Canada. Archived from [the original](http://www.canadianheritage.gc.ca/progs/cpsc-ccsp/sc-cs/df1_e.cfm)
+        on April 23, 2010. Retrieved March 21, 2010.\\n  2. ^ _**a**_ _**b**_ Government
+        of Canada, Public Services and Procurement Canada (July 31, 2015). [\\\"Infographic:
+        National Flag of Canada Day \u2013 February 15 \u2013 Canada's Parliamentary
+        Precinct \u2013 PWGSC\\\"](https://www.tpsgc-pwgsc.gc.ca/citeparlementaire-parliamentaryprecinct/decouvrez-discover/jour-drap-flag-day-eng.html).
+        _www.tpsgc-pwgsc.gc.ca_. Retrieved February 5, 2022.\\n  3. ^ _**a**_ _**b**_
+        [\\\"What is the National Flag Day of Canada?\\\"](http://westernfinancialgroup.ca/What-is-the-National-Flag-of-Canada-Day).
+        _westernfinancialgroup.ca_. Retrieved February 5, 2022.\\n  4. **^** [Department
+        of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department of
+        Canadian Heritage\\\"). [\\\"Ceremonial and Canadian Symbols Promotion > The
+        National Flag of Canada > Birth of the Canadian flag\\\"](http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm).
+        Queen's Printer for Canada. [Archived](https://web.archive.org/web/20100224005050/http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm)
+        from the original on February 24, 2010. Retrieved March 21, 2010.\\n  5. **^**
+        [\\\"Birth of the Canadian flag\\\"](http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm).
+        [Department of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department
+        of Canadian Heritage\\\"). [Archived](https://web.archive.org/web/20081220170253/http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm)
+        from the original on December 20, 2008. Retrieved December 16, 2008.\\n  6.
+        **^** [Conserving the Proclamation of the Canadian Flag](http://www.collectionscanada.gc.ca/publications/archivist-magazine/015002-2021-e.html)
+        [Archived](https://web.archive.org/web/20121021133944/http://www.collectionscanada.gc.ca/publications/archivist-magazine/015002-2021-e.html)
+        October 21, 2012, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback
+        Machine\\\"), Library and Archives of Canada, from John Grace in The Archivist,
+        National Archives, Ottawa, 1990. Retrieved February 15, 2011.\\n  7. **^** [Department
+        of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department of
+        Canadian Heritage\\\"). [\\\"National Flag of Canada Day\\\"](http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm).
+        Queen's Printer for Canada. [Archived](https://web.archive.org/web/20100217042202/http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm)
+        from the original on February 17, 2010. Retrieved March 21, 2010.\\n  8. **^**
+        [Dept. of Canadian Heritage news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        February 15, 2010. Retrieved February 15, 2011.\\n \\n\\n---\\n\\nQuestion:
+        What is the national flag of Canada?\"}],\"model\":\"gpt-4o-2024-11-20\",\"n\":1,\"temperature\":0.0}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6464"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.13
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/6rmUlBQykxRslJQSs5ILEnOLcjRdQ1MjYj0DgIAAAD//41U227bMAx971cQfk6L
+          OE3Q9nFr0Q7buhXD3pbCkCXa1iqLhihnDYp8UL+jP1bKSZpkF2AvTsxDHh6KR9YlXU3enZFz13e3
+          4VN5ox9iFbNRqqDyJ+q4rTrRJHUYLfk1rAOqiIk1P7sYjyf5+GwyAC0ZdKms7uLxlI4n48n0OM/l
+          d1PYkNXIkvFDXgGehmeS6A0+Sng82kZaZFY1SmybJMFALkUyxWw5Kr+WuwE1+Yh+UP009wDzjPu2
+          VWE5l9A8+94g4KPG0EUwlnXPjAxRol9UGk05uHaqBqrgUnllFFyp5QhsZEDpVTrLTSv8UC5Befga
+          DAawHi6p99o6qAK1cEMLDJ4C3KDHIJTfqH15JviM753yGsgPHa230UrXBaZ2d8G2CLcS5CicH1Ho
+          L5vw8hwt+pE0M7BQwVLPIPKxJW9FeYPOQCSQ5bQSC7KRgbuSIU7gA/1CkZL0gyFJ9yR/kHWw5TrP
+          b6euDqeWgdFVI+BeN6B4OAAptLUHmauSzfcB+WSejdaHHNDhQmbDgjUFTId9Over/c0ErHpWyRi+
+          d24PUF5kDToGT9xvkNWbCxzVXaCSfyvNqnRYTSE+ZDGlbJwjddmAruR5P7itPzBQJkRtF4tIDzi0
+          y8/zjd2yncF38Hm+AaNIdPtlF1vkgLEwGJV1vOfYTCvdoNnV7uytemNpDzjam/tPOX/jXs9uff0/
+          9DtAa+zk7hZdQGP14ci7tIDpA/CvtLdzHgRnjGEh17oQu4a0C4OV6t3mU8JLMXVbyMJquXrBri9o
+          1RWzaTW7mM3K6Wl2tDp6BXCqtgepBAAA
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a3ebadee1a83d116-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 21 Sep 2026 20:04:33 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=96GgnQX7QYh..yoOdU5Dij8c02n.1_1ezBr8alOhRto-1790021071.0575328-1.0.1.1-cNp8eGexJQQk7vJwhVSR1EXfRF0WJItCVm1I4yxF9dpY9G29nv3ltVqSWBLTCh6y8ykLaJEYKLW3oqgE7.niRkP.1frE67O_oPRCpJ9vIJPf.yUStrZq1aV0KlCOpiLg;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon,
+            21 Sep 2026 20:34:33 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1312"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998448"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 3ms
+        x-request-id:
+          - req_38716ca0874d469788992420ca6a3581
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
+        the relevant information that could help answer the question based on the excerpt.
+        Your summary, combined with many others, will be given to the model to generate
+        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
+        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
+        information from the text - about 100 words. `relevance_score` is an integer
+        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
+        may not contain relevant information. If not, leave `summary` empty, and make
+        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from National2023
+        chunk 2: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation, 2023, Accessed
+        now\\n\\n---\\n\\n_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
+        \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
+        \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
+        to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history)\\n\\nGeneral\\n\\n
+        \ * [What links here](/wiki/Special:WhatLinksHere/National_Flag_of_Canada_Day
+        \\\"List of all English Wikipedia pages containing links to this page \\\\[j\\\\]\\\")\\n
+        \ * [Related changes](/wiki/Special:RecentChangesLinked/National_Flag_of_Canada_Day
+        \\\"Recent changes in pages linked from this page \\\\[k\\\\]\\\")\\n  * [Upload
+        file](/wiki/Wikipedia:File_Upload_Wizard \\\"Upload files \\\\[u\\\\]\\\")\\n
+        \ * [Special pages](/wiki/Special:SpecialPages \\\"A list of all special pages
+        \\\\[q\\\\]\\\")\\n  * [Permanent link](/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994
+        \\\"Permanent link to this revision of this page\\\")\\n  * [Page information](/w/index.php?title=National_Flag_of_Canada_Day&action=info
+        \\\"More information about this page\\\")\\n  * [Cite this page](/w/index.php?title=Special:CiteThisPage&page=National_Flag_of_Canada_Day&id=1231946994&wpFormIdentifier=titleform
+        \\\"Information on how to cite this page\\\")\\n  * [Get shortened URL](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNational_Flag_of_Canada_Day)\\n
+        \ * [Download QR code](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNational_Flag_of_Canada_Day)\\n
+        \ * [Wikidata item](https://www.wikidata.org/wiki/Special:EntityPage/Q6972703
+        \\\"Structured data on this page hosted by Wikidata \\\\[g\\\\]\\\")\\n\\nPrint/export\\n\\n
+        \ * [Download as PDF](/w/index.php?title=Special:DownloadAsPdf&page=National_Flag_of_Canada_Day&action=show-download-screen
+        \\\"Download this page as a PDF file\\\")\\n  * [Printable version](/w/index.php?title=National_Flag_of_Canada_Day&printable=yes
+        \\\"Printable version of this page \\\\[p\\\\]\\\")\\n\\nIn other projects\\n\\n
+        \ * [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:National_Flag_of_Canada_Day)\\n\\nAppearance\\n\\nmove
+        to sidebar  hide\\n\\nFrom Wikipedia, the free encyclopedia\\n\\nCanadian holiday\\n\\nNational
+        Flag of Canada Day  \\n---  \\n[![](//upload.wikimedia.org/wikipedia/commons/thumb/6/68/Canada_flag_halifax_9_-04.JPG/250px-\\nCanada_flag_halifax_9_-04.JPG)](/wiki/File:Canada_flag_halifax_9_-04.JPG)
+        The\\nnational flag of Canada  \\nObserved by  |  [Canada](/wiki/Canada \\\"Canada\\\")
+        \ \\nDate |  [February 15](/wiki/February_15 \\\"February 15\\\")  \\nNext time
+        \ |  February 15, 2025 (2025-02-15)  \\nFrequency | Annual  \\n  \\n**National
+        Flag of Canada Day** ([French](/wiki/French_language \\\"French\\nlanguage\\\"):
+        _Jour du drapeau national du Canada_), commonly shortened to\\n**Flag Day**
+        , is observed annually on February 15 to commemorate the\\ninauguration of the
+        [flag of Canada](/wiki/Flag_of_Canada \\\"Flag of Canada\\\") on\\nthat date
+        in 1965.[1] The day is marked by flying the flag, occasional public\\nceremonies
+        and educational programs in schools. It is not a [public\\nholiday](/wiki/Public_holidays_in_Canada
+        \\\"Public holidays in Canada\\\"),\\nalthough there has been discussion about
+        creating one.\\n\\n## History\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=1\\n\\\"Edit
+        section: History\\\")]\\n\\n### Background\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=2\\n\\\"Edit
+        section: Background\\\")]\\n\\nAmid [much controversy](/wiki/Great_Canadian_flag_debate
+        \\\"Great Canadian flag\\ndebate\\\"), the [Parliament of Canada](/wiki/Parliament_of_Canada
+        \\\"Parliament of\\nCanada\\\") in 1964 voted to adopt a new design for the
+        [Canadian\\nflag](/wiki/Flag_of_Canada \\\"Flag of Canada\\\") and issued a
+        call for\\nsubmissions.[2]\\n\\nThis flag would replace the [Canadian Red Ensign](/wiki/Canadian_Red_Ensign\\n\\\"Canadian
+        Red Ensign\\\"), which had been, with various successive alterations,\\nin conventional
+        use as the national flag of [Canada](/wiki/Canada \\\"Canada\\\")\\nsince 1868.
+        Nearly 4,000 designs were submitted by Canadians.[2] On October\\n22, 1964,
+        the [Maple Leaf flag](/wiki/Maple_Leaf_flag \\\"Maple Leaf\\nflag\\\")\u2014designed
+        by historian [George Stanley](/wiki/George_Stanley \\\"George\\nStanley\\\")\u2014won
+        with a unanimous vote.[3] Under the leadership of [Prime\\nMinister](/wiki/Prime_Minister_of_Canada
+        \\\"Prime Minister of Canada\\\") [Lester\\nPearson](/wiki/Lester_B._Pearson
+        \\\"Lester B. Pearson\\\"), resolutions\\nrecommending the new design were passed
+        by the [House of\\nCommons](/wiki/House_of_Commons_of_Canada \\\"House of Commons
+        of Canada\\\") on\\nDecember 15, 1964, and by the [Senate](/wiki/Senate_of_Canada
+        \\\"Senate of\\nCanada\\\") two days later.[4]\\n\\nThe flag was proclaimed
+        by [Elizabeth II](/wiki/Elizabeth_II \\\"Elizabeth II\\\"),\\n[Queen of Canada](/wiki/Monarchy_of_Canada
+        \\\"Monarchy of Canada\\\"), on January\\n28, 1965,[3][5] and took effect \\\"upon,
+        from and after\\\" February 15 that\\nyear.[6]\\n\\n### Flag Day\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=3\\n\\\"Edit
+        section: Flag Day\\\")]\\n\\nNational Flag of Canada Day was instituted in 1996
+        by an [Order in\\nCouncil](/wiki/Order_in_Council \\\"Order in Council\\\")
+        from [Governor\\nGeneral](/wiki/Governor_General_of_Canada \\\"Governor General
+        of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc \\\"Rom\xE9o LeBlanc\\\"),
+        on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
+        \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
+        proposed cuts to the\\n[un\\n\\n---\\n\\nQuestion: What is the national flag
+        of Canada?\"}],\"model\":\"gpt-4o-2024-11-20\",\"n\":1,\"temperature\":0.0}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6697"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.13
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/6rmUlBQykxRslJQSs5ILEnOLcjRdQ1MjYg0dgQAAAD//4xUTW/bMAy991cQPruB
+          nSZNcl7bLUBXoNuAHZYioGXa1ipLniQ3zYb+91Fy07hbB+ziIPx45CMftfh6dWOvM/EhW8weH69v
+          d81FL9dJGjJM8Z2EP2RNhOE88tLowS0soaeAmi9WWTbNs8U0OlpTkgppdedPZ+Z0mk1np3nOv8+J
+          jZGCHEd8478Av+I3tKhLemRzlh4sLTmHNbHtEMRGa1SwJOicdB61T9KjUxjtSceuf200wCZxfdui
+          3W/YtEm+NAQaAwlUUCmswVTwDjWWmAIqZ+Bem50GdOA59CMyZbgmrGJwCjt2lORkramEYg8Nd2Cs
+          RA3vydia4DM3pGgPqEvA0nQ8ITAarqiwPXcB+TyFfHU+n8Dag6VOoeCIUCt2EZA+seFShxpcr5Gi
+          gQa5GJEGqaF3BE5qQZAvz5cTCIwikYrX0VtygIxbQiVJlbCTvmEDw3hO+8EtEKAH6R0IHhPZFMLE
+          UGqpaw50fq/kT04PEG1kr5j9UGYgHmfAO3TcD1YMAZrQqj3M0izLwPVFK3kzRrs4hBDdWSMUynaY
+          2W0fqFxyHSyI21uvJ+P5gHRgCkf2gcNR6x4VgzPKzWFvV6/2Bhe4B2+YR9tSayyLMvKTGvu6tzFp
+          sknSQQ2WFD0gj2/rhLEUVJFnG/001pClqncYJKx7pUYO7sb4CBjVe/fseXrRqzI1cy3cH6lJxfN1
+          zZYvxvH5sDZZNV0SvU/8vYt30b+SesJAbee33txTLJcvZ/MBMDme4sg9PXv2eu5RjRyr82X6BuS2
+          JN67cqPjSgSKhspj7vESsS+lGTlORsT/7uct7IE8y+x/4I8OISgc0bZjRUrxmvMxzFJ4q/4V9jLo
+          2HAStMUv0NZLsmEZJVXYq+EZSdzeeWq3vLGabGfl8JZU3XY+q+ar+byYnSUnTye/AQAA//8DAJbH
+          tldUBQAA
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a3ebadee19619d09-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 21 Sep 2026 20:04:34 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=Niu5ulyVcTV0K67OZmQ1vRe0YbeMQCLThvC7VeC93xs-1790021071.0599487-1.0.1.1-cQpFdLwSGEMCk7ljriSU4Pj2RAPzGCpYhY8eqOBp5s.dngPdX4Wb8o47XSZuP60rZEIkAwyoFM5RnwYcv6OkYCWo8_9fbafKPg6rjiZVV8fWvlTmuXAi.gSDqOPWp_MJ;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Mon,
+            21 Sep 2026 20:34:34 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "2182"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29998413"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 3ms
+        x-request-id:
+          - req_b928383d6c69411c9c2cbd4830c802df
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide a summary of
+        the relevant information that could help answer the question based on the excerpt.
+        Your summary, combined with many others, will be given to the model to generate
+        an answer. Respond with the following JSON format:\\n\\n{\\n  \\\"summary\\\":
+        \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere `summary` is relevant
+        information from the text - about 100 words. `relevance_score` is an integer
+        0-10 for the relevance of `summary` to the question.\\n\\nThe excerpt may or
+        may not contain relevant information. If not, leave `summary` empty, and make
+        `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt from unknownauthorsUnknownyeargravityhill
+        lines 0-44: Unknown author(s). Gravity hill. Poetry in America, pages 15-15,
+        Unknown year. URL: https://doi.org/10.2307/j.ctt5vkfh7.11, doi:10.2307/j.ctt5vkfh7.11.
+        This article has 0 citations.\\n\\n---\\n\\n# Gravity hill\\n\\n> \\\"Magnetic
+        hill\\\" and \\\"Mystery hill\\\" redirect here. For other uses,\\n> see [Magnetic
+        Hill (disambiguation)](<https://en.wikipedia.org/wiki/Magnetic_Hill_(disambiguation)>)\\n>
+        and [Mystery Hill (disambiguation)](https://en.wikipedia.org/wiki/Mystery_Hill).\\n\\nA
+        **gravity hill**, also known as a\\n**magnetic hill**, **mystery hill**, **mystery
+        spot**, **gravity road**, or **anti-gravity hill**,\\nis a place where the layout
+        of the surrounding land produces an [illusion](https://en.wikipedia.org/wiki/Illusion),\\nmaking
+        a slight downhill slope appear to be an uphill slope.\\nThus, a car left out
+        of gear will appear to be rolling uphill against [gravity](https://en.wikipedia.org/wiki/Gravity).\\n\\nAlthough
+        the slope of gravity hills is an illusion,\\nsites are often accompanied by
+        claims that magnetic or supernatural forces are at work.\\nThe most important
+        factor contributing to the illusion is a completely\\nor mostly obstructed horizon.\\nWithout
+        a horizon,\\nit becomes difficult for a person to judge the slope of a surface,\\nas
+        a reliable reference point is missing,\\nand misleading visual cues can adversely
+        affect the sense of balance.\\nObjects which one would normally assume to be
+        more or less perpendicular to the ground,\\nsuch as trees, may be leaning, offsetting
+        the visual reference.\\n\\nA 2003 study looked into how the absence of a horizon
+        can skew the perspective on gravity hills,\\nby recreating a number of antigravity
+        places in the lab to see how volunteers would react.\\nIn conclusion, researchers
+        from the Universities of Padua and Pavia in Italy\\nfound that without a true
+        horizon in sight,\\nthe human brain could be tricked by common landmarks such
+        as trees and signs.\\n\\nThe illusion is similar to the [Ames room](https://en.wikipedia.org/wiki/Ames_room),\\nin
+        which objects can also appear to roll against gravity.\\n\\nThe opposite phenomenon\u2014an
+        uphill road that appears flat\u2014is known in\\n[bicycle racing](https://en.wikipedia.org/wiki/Cycle_sport)\\nas
+        a [\\\"false flat\\\"](https://en.wikipedia.org/wiki/Glossary_of_cycling#F).\\n\\n##
+        See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
+        [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
+        \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
+        External links\\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-4o-2024-11-20\",\"n\":1,\"temperature\":0.0}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "3369"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.13
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/6rmUlBQykxRslJQSs5ILEnOLcjRdQ1MjYhKjwIAAAD//4xSy27CMBC88xXI51Al
+          QEBcK1Uc23uDImNvgotjW16nKq34964TIOlL6iVRZnYms497fXx8eNoeJbg3I5Xavnufc5ZEhd2/
+          gAhX1Z2wpIOgrOlp4YEHiK7ZepOm8yxdLzqisRJ0lNUuzJZ2Nk/ny1mW0fsiPFglAKnimT6n04/u
+          GSMaCW8Ep8kVaQCR10DYtYhAb3VEGEdUGLgJLBlIYU0A06X+KMx0WjBsm4b7U0FQwQqW9KgHDa/c
+          CChRWA+RTQtzHlt5qFrksRPTaj0iuDE28DiJrondhTnfYmtbO2/3+E3KKmUUHkoaHNIUKSIG61jH
+          num568bTfumYkVHjQhnsEbrfrfNF78eGhQxstrqQgRLqkWq1SX7xKyUErjSOBswEFweQg3TYBm+l
+          siNiMur6Z5rfvPvOlan/Yz8QQoCjUyudB6nE146HMg/xXv8qu025C8wQ/CtdYRkU+LgJCRVvdX9K
+          DE8YoClpXTV451V/T5Ur82WVb/J8v1ywyXnyCQAA//8DACi8d7ZYAwAA
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a3ebadf8dba5cf1e-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Mon, 21 Sep 2026 20:04:34 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        alt-svc:
+          - h3=":443"; ma=86400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1287"
+        openai-project:
+          - proj_RpeV6PrPclPHBb5GlExPXSBj
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "10000"
+        x-ratelimit-limit-tokens:
+          - "30000000"
+        x-ratelimit-remaining-requests:
+          - "9999"
+        x-ratelimit-remaining-tokens:
+          - "29999204"
+        x-ratelimit-reset-requests:
+          - 6ms
+        x-ratelimit-reset-tokens:
+          - 1ms
+        x-request-id:
+          - req_bd3dcf9ec9054f8398556d8996e4b14a
       status:
         code: 200
         message: OK

@@ -9,6 +9,7 @@ from pydantic import BaseModel, ValidationError
 from pytest_subtests import SubTests
 
 import paperqa.configs
+from paperqa.contrib.openreview_paper_helper import OpenReviewPaperHelper
 from paperqa.prompts import citation_prompt
 from paperqa.settings import (
     AgentSettings,
@@ -103,10 +104,135 @@ def test_index_naming(subtests: SubTests) -> None:
         assert settings.agent.index.get_named_index_directory().name == "test"
 
 
-def test_router_kwargs_present_in_models() -> None:
+def test_typed_models_config() -> None:
+    """A `models` chain must reach lmi, the only way to set responses_api."""
+    llm_model = Settings(
+        llm="gpt-4o",
+        llm_config={
+            "models": [
+                {"name": "gpt-4o", "responses_api": True},
+                {"name": "gpt-4o-mini"},
+            ],
+            "rate_limit": {"gpt-4o": "30000 per 1 minute"},
+        },
+    ).get_llm()
+    assert llm_model.llm_config is not None
+    assert [(m.name, m.responses_api) for m in llm_model.llm_config.models] == [
+        ("gpt-4o", True),
+        ("gpt-4o-mini", False),
+    ]
+    assert llm_model.config["rate_limit"], "Expected non-models keys to stay on config"
+
+
+@pytest.mark.parametrize(
+    "getter", ["get_llm", "get_summary_llm", "get_agent_llm", "get_enrichment_llm"]
+)
+@pytest.mark.parametrize("fallback_location", [None, "top_level", "router_kwargs"])
+def test_legacy_model_catalog(getter: str, fallback_location: str | None) -> None:
+    config: dict = {
+        "model_list": [
+            {"model_name": "fallback", "litellm_params": {"model": "gpt-4o"}},
+            {"model_name": "unused", "litellm_params": {"model": "gpt-4.1"}},
+            {
+                "model_name": "primary",
+                "litellm_params": {"model": "gpt-4o-mini", "temperature": 0.2},
+            },
+        ],
+        "router_kwargs": {"timeout": 123, "num_retries": 0},
+        "rate_limit": {"primary": "30000 per 1 minute"},
+    }
+    if fallback_location is not None:
+        target = config if fallback_location == "top_level" else config["router_kwargs"]
+        target["fallbacks"] = [{"primary": ["fallback"]}]
+    settings = Settings(
+        llm="primary",
+        llm_config=config,
+        summary_llm="primary",
+        summary_llm_config=config,
+        agent={"agent_llm": "primary", "agent_llm_config": config},
+        parsing={"enrichment_llm": "primary", "enrichment_llm_config": config},
+    )
+    before = settings.model_dump()
+    for _ in range(2):
+        model = getattr(settings, getter)()
+        assert model.llm_config is not None
+        assert [m.name for m in model.llm_config.models] == (
+            ["gpt-4o-mini", "gpt-4o"] if fallback_location else ["gpt-4o-mini"]
+        )
+        primary = model.llm_config.models[0]
+        assert primary.timeout == 123
+        assert primary.max_retries == 0
+        assert primary.extra_params["temperature"] == 0.2
+        assert model.config["rate_limit"] == config["rate_limit"]
+        assert settings.model_dump() == before
+
+
+@pytest.mark.parametrize("primary", ["missing", "gpt-4o"])
+def test_legacy_model_catalog_rejects_missing_models(primary: str) -> None:
+    settings = Settings(
+        llm=primary,
+        llm_config={
+            "model_list": [
+                {"model_name": "gpt-4o", "litellm_params": {"model": "gpt-4o"}}
+            ],
+            "fallbacks": [{"gpt-4o": ["missing"]}],
+        },
+    )
+    with pytest.raises(ValueError, match="absent from model_list"):
+        settings.get_llm()
+
+
+@pytest.mark.parametrize("typed_config", [False, True])
+def test_openreview_model_config(tmp_path: pathlib.Path, typed_config: bool) -> None:
+    settings = Settings(
+        llm="gpt-4o",
+        llm_config=(
+            {
+                "models": [
+                    {"name": "gpt-4o-mini", "responses_api": True},
+                    {"name": "gpt-4o"},
+                ]
+            }
+            if typed_config
+            else None
+        ),
+        agent={"index": {"paper_directory": tmp_path}},
+    )
+    with patch("paperqa.contrib.openreview_paper_helper.openreview"):
+        helper = OpenReviewPaperHelper(settings)
+
+    assert helper.llm_model.llm_config is not None
+    assert [(m.name, m.responses_api) for m in helper.llm_model.llm_config.models] == (
+        [("gpt-4o-mini", True), ("gpt-4o", False)]
+        if typed_config
+        else [("gpt-4o", False)]
+    )
+
+
+@pytest.mark.parametrize(
+    ("config", "getter"),
+    [
+        ({"llm_config": {"models": []}}, "get_llm"),
+        ({"summary_llm_config": {"models": []}}, "get_summary_llm"),
+        ({"agent": {"agent_llm_config": {"models": []}}}, "get_agent_llm"),
+        (
+            {"parsing": {"enrichment_llm_config": {"models": []}}},
+            "get_enrichment_llm",
+        ),
+    ],
+)
+def test_empty_model_chain_rejected(config: dict, getter: str) -> None:
+    with pytest.raises(ValidationError, match="at least 1 item"):
+        getattr(Settings(**config), getter)()
+
+
+def test_retries_and_timeout_present_in_models() -> None:
     settings = Settings()
-    assert settings.get_llm().config["router_kwargs"] is not None
-    assert settings.get_summary_llm().config["router_kwargs"] is not None
+    for llm_model in (settings.get_llm(), settings.get_summary_llm()):
+        assert llm_model.llm_config is not None
+        for model_spec in llm_model.llm_config.models:
+            assert model_spec.timeout is not None
+            assert model_spec.max_retries is not None
 
 
 @pytest.mark.parametrize(

@@ -31,6 +31,8 @@ from lmi import (
     LiteLLMModel,
     embedding_model_factory,
 )
+from lmi.config import LLMConfig
+from lmi.exceptions import AllModelsExhaustedError
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -358,10 +360,13 @@ class ParsingSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the enrichment_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
     enrichment_page_radius: int = Field(
@@ -625,10 +630,13 @@ class AgentSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the agent_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
 
@@ -747,6 +755,35 @@ def make_default_litellm_model_list_settings(
     }
 
 
+def make_llm_model(
+    llm: str, config: dict | None, temperature: float = 0.0
+) -> LiteLLMModel:
+    """Build a LiteLLMModel, routing a `models` chain to lmi's typed LLMConfig."""
+    config = dict(config or make_default_litellm_model_list_settings(llm, temperature))
+    if "models" in config:
+        models = config.pop("models")
+        return LiteLLMModel(name=llm, llm_config={"models": models}, config=config)
+    if "model_list" in config:
+        entries = {entry["model_name"]: entry for entry in config["model_list"]}
+        if llm not in entries:
+            raise ValueError(f"Primary model {llm!r} is absent from model_list")
+        fallbacks = config.get(
+            "fallbacks", (config.get("router_kwargs") or {}).get("fallbacks", [])
+        )
+        fallback_map = {
+            key: value for entry in fallbacks or [] for key, value in entry.items()
+        }
+        names = list(dict.fromkeys([llm, *fallback_map.get(llm, [])]))
+        if missing := set(names) - entries.keys():
+            raise ValueError(
+                f"Fallback models are absent from model_list: {sorted(missing)}"
+            )
+        # A Router catalog is not an implicit fallback chain.
+        config["model_list"] = [entries[name] for name in names]
+        config["fallbacks"] = [{llm: names[1:]}]
+    return LiteLLMModel(name=llm, config=config)
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
@@ -768,10 +805,13 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
     summary_llm: str = Field(
@@ -785,10 +825,13 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the summary_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
-            " `model_list` key (corresponding to model_list inputs here:"
-            " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " a config dict passed to LiteLLMModel, in one of two shapes."
+            " Preferred is a `models` key: an ordered list of lmi ModelSpec dicts"
+            " (first primary, rest fallbacks), the only shape exposing per-model"
+            " settings like `responses_api`. Legacy is a `model_list` key matching"
+            " https://docs.litellm.ai/docs/routing, optionally with `fallbacks` and"
+            " a `router_kwargs` whose 'timeout' and 'num_retries' alone are honored."
+            " Either shape may carry top-level `rate_limit`/`request_limit`."
         ),
     )
     embedding: str = Field(
@@ -923,44 +966,30 @@ class Settings(BaseSettings):
         )
 
     def get_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.llm,
-            config=self.llm_config
-            or make_default_litellm_model_list_settings(self.llm, self.temperature),
-        )
+        return make_llm_model(self.llm, self.llm_config, self.temperature)
 
     def get_summary_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.summary_llm,
-            config=self.summary_llm_config
-            or make_default_litellm_model_list_settings(
-                self.summary_llm, self.temperature
-            ),
+        return make_llm_model(
+            self.summary_llm, self.summary_llm_config, self.temperature
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.agent.agent_llm,
-            config=self.agent.agent_llm_config
-            or make_default_litellm_model_list_settings(
-                self.agent.agent_llm, self.temperature
-            ),
+        return make_llm_model(
+            self.agent.agent_llm, self.agent.agent_llm_config, self.temperature
         )
 
     def get_embedding_model(self) -> EmbeddingModel:
         return embedding_model_factory(self.embedding, **(self.embedding_config or {}))
 
     def get_enrichment_llm(self) -> LiteLLMModel:
-        return LiteLLMModel(
-            name=self.parsing.enrichment_llm,
-            config=self.parsing.enrichment_llm_config
-            or make_default_litellm_model_list_settings(
-                self.parsing.enrichment_llm, self.temperature
-            ),
+        return make_llm_model(
+            self.parsing.enrichment_llm,
+            self.parsing.enrichment_llm_config,
+            self.temperature,
         )
 
-    def make_aviary_tool_selector(self, agent_type: str | type) -> ToolSelector | None:
-        """Attempt to convert the input agent type to an aviary ToolSelector."""
+    def get_tool_selector_model(self, agent_type: str | type) -> LiteLLMModel | None:
+        """Resolve the legacy ToolSelector agent type to its LMI model."""
         if agent_type is ToolSelector or (
             isinstance(agent_type, str)
             and (
@@ -973,11 +1002,15 @@ class Settings(BaseSettings):
                 )
             )
         ):
-            return ToolSelector(
-                model_name=self.agent.agent_llm,
-                acompletion=self.get_agent_llm().get_router().acompletion,
-                **(self.agent.agent_config or {}),
-            )
+            # The runner already maintains message history for both values of
+            # ToolSelector's legacy accum_messages option.
+            if unsupported := (self.agent.agent_config or {}).keys() - {
+                "accum_messages"
+            }:
+                raise TypeError(
+                    f"Unsupported ToolSelector options: {sorted(unsupported)}"
+                )
+            return self.get_agent_llm()
         return None
 
     async def make_ldp_agent(
@@ -997,7 +1030,27 @@ class Settings(BaseSettings):
         # TODO: support general agents
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
-        agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
+        # Copy: the pops below must not mutate the caller's Settings
+        config = dict(agent_settings.agent_config or {})
+        if "llm_model" in config and "llm_config" not in config:
+            # ldp>=1.0 renamed llm_model to llm_config, and silently ignores
+            # unknown kwargs
+            legacy = config["llm_model"]
+            if isinstance(legacy, dict) and "config" in legacy:
+                legacy = dict(legacy)
+                llm_config = make_llm_model(
+                    legacy.pop("name", agent_settings.agent_llm),
+                    legacy.pop("config"),
+                    self.temperature,
+                ).llm_config
+                legacy = cast("LLMConfig", llm_config).with_extra_params(**legacy)
+            config["llm_config"] = legacy
+        config.pop("llm_model", None)
+        if (
+            issubclass(agent_cls, ReActAgent | SimpleAgent)
+            and "llm_config" not in config
+        ):
+            config["llm_config"] = self.get_agent_llm().llm_config
         if issubclass(agent_cls, ReActAgent | MemoryAgent):
             if (
                 issubclass(agent_cls, MemoryAgent)
@@ -1031,13 +1084,9 @@ class Settings(BaseSettings):
                         )
                     )
                 )
-            return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
-                **config,
-            )
+            return agent_cls(**config)
         if issubclass(agent_cls, SimpleAgent):
             return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
                 sys_prompt=agent_settings.agent_system_prompt,
                 **config,
             )
@@ -1141,7 +1190,11 @@ class Settings(BaseSettings):
                             media.info["is_irrelevant"],
                             media.info["enriched_description"],
                         ) = parse_enrichment_irrelevance(result.text)
-                except (litellm.InternalServerError, litellm.BadRequestError) as exc:
+                except (
+                    litellm.InternalServerError,
+                    litellm.BadRequestError,
+                    AllModelsExhaustedError,
+                ) as exc:
                     # Handle image > 5-MB failure mode 1:
                     # > litellm.BadRequestError: AnthropicException -
                     # > {"type":"error","error":{"type":"invalid_request_error",
@@ -1153,12 +1206,17 @@ class Settings(BaseSettings):
                     # > "message":"messages.0.content.0.image.source.base64: image exceeds 5 MB maximum: 5690780 bytes > 5242880 bytes"},  # noqa: E501, W505
                     # > "request_id":"req_abc123"}.
                     # And the image being corrupt (but a reasonable size)
+                    root_exc = (
+                        exc.last_exc
+                        if isinstance(exc, AllModelsExhaustedError)
+                        else exc
+                    )
                     if (
-                        isinstance(exc, litellm.InternalServerError)
+                        isinstance(root_exc, litellm.InternalServerError)
                         and re.search(
                             r"image exceeds .+ maximum", str(exc), re.IGNORECASE
                         )
-                    ) or isinstance(exc, litellm.BadRequestError):
+                    ) or isinstance(root_exc, litellm.BadRequestError):
                         logger.warning(
                             f"Skipping enrichment for media index {media.index}"
                             f" on page {page_num} with metadata {media.info} because"
