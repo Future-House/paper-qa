@@ -180,6 +180,22 @@ async def test_get_directory_index(
 
 
 @pytest.mark.asyncio
+async def test_filecheck_warns_about_previously_failed_documents(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    index = SearchIndex(index_directory=tmp_path)
+    filename = "transient-failure.pdf"
+
+    await index.mark_failed_document(filename)
+
+    with caplog.at_level(logging.WARNING):
+        assert await index.filecheck(filename)
+
+    assert filename in caplog.text
+    assert "previously failed" in caplog.text
+
+
+@pytest.mark.asyncio
 async def test_resuming_crashed_index_build(agent_test_settings: Settings) -> None:
     index_settings = agent_test_settings.agent.index
     crash_threshold, index_settings.concurrency = 3, 2
