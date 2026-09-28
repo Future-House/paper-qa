@@ -883,6 +883,8 @@ class DocDetails(Doc):
     # NOTE: can use a regex starting from the pattern in https://regex101.com/r/lpF1up/1
     DOI_URL_FORMATS: ClassVar[Collection[str]] = {
         "https://doi.org/",
+        "http://doi.org/",
+        "https://dx.doi.org/",
         "http://dx.doi.org/",
     }
     AUTHOR_NAMES_TO_REMOVE: ClassVar[Collection[str]] = {"et al", "et al."}

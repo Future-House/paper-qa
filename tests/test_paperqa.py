@@ -2754,6 +2754,24 @@ def test_dois_resolve_to_correct_journals(doi_journals):
     assert details.journal == doi_journals["journal"]
 
 
+@pytest.mark.parametrize(
+    "doi",
+    [
+        "https://doi.org/10.1101/2024.11.04.621790",
+        "http://doi.org/10.1101/2024.11.04.621790",
+        "https://dx.doi.org/10.1101/2024.11.04.621790",
+        "http://dx.doi.org/10.1101/2024.11.04.621790",
+    ],
+)
+def test_doi_url_prefixes_are_stripped(doi: str) -> None:
+    details = DocDetails(doi=doi)
+    bare_details = DocDetails(doi="10.1101/2024.11.04.621790")
+    assert details.doi == bare_details.doi == "10.1101/2024.11.04.621790"
+    assert details.doi_url == "https://doi.org/10.1101/2024.11.04.621790"
+    assert details.doc_id == bare_details.doc_id
+    assert details.journal == "BioRxiv"
+
+
 def test_none_values() -> None:
     """Check can handle or crash as expected with None inputs."""
     with pytest.raises(
