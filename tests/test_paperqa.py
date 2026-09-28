@@ -247,6 +247,24 @@ def test_maybe_is_text() -> None:
     assert not maybe_is_text(bad_jp_text_high_entropy)
 
 
+@pytest.mark.parametrize(
+    ("content", "expected"),
+    [
+        (b"<!DOCTYPE html><html><body>Hi</body></html>", True),
+        (b"<!doctype html><html><body>Hi</body></html>", True),
+        (b"<HTML><BODY>Hi</BODY></HTML>", True),
+        (b"\n  <html><body>Hi</body></html>", True),
+        (b"\xef\xbb\xbf<!DOCTYPE html><html></html>", True),
+        (b"%PDF-1.7", False),
+        (b"Plain text mentioning <html> later", False),
+    ],
+)
+def test_maybe_is_html(content: bytes, expected: bool) -> None:
+    file = BytesIO(content)
+    assert maybe_is_html(file) == expected
+    assert file.tell() == 0, "Expected file to be rewound"
+
+
 def test_name_in_text() -> None:
     name1 = "FooBar2022"
     name2 = "FooBar2022a"
