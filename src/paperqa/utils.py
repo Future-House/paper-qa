@@ -1,4 +1,5 @@
 import asyncio
+import codecs
 import contextlib
 import hashlib
 import logging
@@ -97,9 +98,10 @@ def maybe_is_pdf(file: BinaryIO) -> bool:
 
 
 def maybe_is_html(file: BinaryIO) -> bool:
-    magic_number = file.read(4)
+    # HTML tags are case-insensitive, and may follow a BOM or leading whitespace
+    magic_number = file.read(1024).removeprefix(codecs.BOM_UTF8).lstrip()[:4].lower()
     file.seek(0)
-    return magic_number in {b"<htm", b"<!DO", b"<xsl", b"<!X"}
+    return magic_number in {b"<htm", b"<!do", b"<xsl", b"<!x"}
 
 
 def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float:
