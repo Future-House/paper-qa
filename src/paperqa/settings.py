@@ -569,6 +569,15 @@ class IndexSettings(BaseModel):
         ge=1,
         description="Number of files to process before committing to the index.",
     )
+    continue_on_error: bool = Field(
+        default=False,
+        description=(
+            "Continue indexing other files after a document processing error."
+            " Failed files are marked in the index and included in the final summary."
+            " Index storage errors still propagate. Previously failed files remain"
+            " skipped on subsequent runs."
+        ),
+    )
     sync_with_paper_directory: bool = Field(
         default=True,
         description=(

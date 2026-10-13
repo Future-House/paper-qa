@@ -870,6 +870,19 @@ By default, we recursively read from subdirectories of the paper directory,
 unless disabled using `IndexSettings.recurse_subdirectories`.
 The paper directory is not modified in any way, it's just read from.
 
+To continue processing other files after a document error, set
+`agent.index.continue_on_error=True` in Python, or run:
+
+```bash
+pqa --agent.index.continue_on_error true index ./papers
+```
+
+The completed build logs a failure summary and exposes it as
+`index.indexing_report` for Python callers. This option defaults to `False`;
+index storage errors still stop the build. See
+[indexing error handling](docs/tutorials/indexing_errors.md) for details,
+including how previously failed files are reported.
+
 [home dir]: https://docs.python.org/3/library/pathlib.html#pathlib.Path.home
 
 #### Manifest Files
@@ -1056,6 +1069,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `agent.index.use_absolute_paper_directory`   | `False`                                | Whether to use absolute paper directory path.                                                                                 |
 | `agent.index.recurse_subdirectories`         | `True`                                 | Whether to recurse into subdirectories when indexing.                                                                         |
 | `agent.index.concurrency`                    | `5`                                    | Number of concurrent filesystem reads.                                                                                        |
+| `agent.index.continue_on_error`              | `False`                                | Continue indexing after document errors and report failures when the batch finishes.                                          |
 | `agent.index.sync_with_paper_directory`      | `True`                                 | Whether to sync index with paper directory on load.                                                                           |
 | `agent.index.batch_size`                     | `1`                                    | Number of files to process before committing to the index.                                                                    |
 | `agent.index.files_filter`                   | `lambda f: f.suffix in {...}`          | Filter function to mark files in the paper directory to index.                                                                |

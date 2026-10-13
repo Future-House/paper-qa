@@ -16,7 +16,7 @@ from enum import StrEnum, auto
 from typing import TYPE_CHECKING, Any, ClassVar, cast
 
 import anyio
-from pydantic import BaseModel, JsonValue
+from pydantic import BaseModel, Field, JsonValue
 from rich.progress import (
     BarColumn,
     MofNCompleteColumn,
@@ -110,8 +110,66 @@ def reap_opened_index_cache() -> None:
             del index
 
 
+class IndexingFailure(BaseModel):
+    """A document that failed in this build or a previous indexing attempt."""
+
+    file_location: str
+    error_type: str | None = None
+    error_message: str | None = None
+    previously_failed: bool = False
+
+
+class IndexingReport(BaseModel):
+    """Results of a completed build, excluding files removed during synchronization."""
+
+    indexed: int = 0
+    skipped: int = 0
+    failures: list[IndexingFailure] = Field(default_factory=list)
+
+    def record_skipped(self, file_location: str, previously_failed: bool) -> None:
+        """Distinguish existing successful entries from persisted failures."""
+        if previously_failed:
+            self.failures.append(
+                IndexingFailure(file_location=file_location, previously_failed=True)
+            )
+        else:
+            self.skipped += 1
+
+    def log_summary(self) -> None:
+        """Report failures after processing and saving the batch."""
+        if self.failures:
+            logger.warning(
+                "Indexing finished with %d failed document(s): %d indexed, %d skipped.",
+                len(self.failures),
+                self.indexed,
+                self.skipped,
+            )
+            for failure in sorted(self.failures, key=lambda f: f.file_location):
+                if failure.previously_failed:
+                    logger.warning(
+                        "Failed document %s: skipped after a previous failure"
+                        " (original error unavailable).",
+                        failure.file_location,
+                    )
+                else:
+                    logger.warning(
+                        "Failed document %s: %s: %s",
+                        failure.file_location,
+                        failure.error_type,
+                        failure.error_message,
+                    )
+        else:
+            logger.info(
+                "Indexing finished: %d indexed, %d skipped.", self.indexed, self.skipped
+            )
+
+
 class SearchIndex:
-    """Wrapper around a tantivy.Index exposing higher-level behaviors for documents."""
+    """Wrapper around a tantivy.Index exposing higher-level behaviors for documents.
+
+    Completed builds expose counts and failed documents in ``indexing_report``.
+    Loading an existing index without building leaves this report unset.
+    """
 
     REQUIRED_FIELDS: ClassVar[list[str]] = ["file_location", "body"]
 
@@ -143,6 +201,7 @@ class SearchIndex:
         self._index_files: dict[str, str] = {}
         self.changed = False
         self.storage = storage
+        self.indexing_report: IndexingReport | None = None
 
     @property
     async def index_directory(  # TODO: rename to index_root_directory
@@ -510,15 +569,19 @@ async def process_file(
         manifest_fallback_location = str(abs_file_path)
 
     async with semaphore:
+        search_index.indexing_report = report = (
+            search_index.indexing_report or IndexingReport()
+        )
         if not await search_index.filecheck(filename=file_location):
             logger.info(f"New file to index: {file_location}...")
 
-            kwargs = fetch_kwargs_from_manifest(
-                file_location, manifest, manifest_fallback_location
-            )
-
-            tmp_docs = Docs()
+            adding_document = False
             try:
+                kwargs = fetch_kwargs_from_manifest(
+                    file_location, manifest, manifest_fallback_location
+                )
+                tmp_docs = Docs()
+                adding_document = True
                 await tmp_docs.aadd(
                     path=abs_file_path,
                     fields=["title", "author", "journal", "year"],
@@ -528,7 +591,23 @@ async def process_file(
                     file_location=kwargs.pop("file_location", file_location),
                     **kwargs,
                 )
+                adding_document = False
+                this_doc = next(iter(tmp_docs.docs.values()))
+                if isinstance(this_doc, DocDetails):
+                    title = this_doc.title or fallback_title
+                    year = this_doc.year or "Unknown year"
+                else:
+                    title, year = fallback_title, "Unknown year"
+                index_doc = {
+                    "title": title,
+                    "year": year,
+                    "file_location": file_location,
+                    "body": "".join(t.text for t in tmp_docs.texts),
+                }
             except Exception as e:
+                # Without opt-in, preserve the original exception boundary around aadd.
+                if not settings.agent.index.continue_on_error and not adding_document:
+                    raise
                 # We handle any exception here because we want to save_index so we
                 # 1. can resume the build without rebuilding this file if a separate
                 # process_file invocation leads to a segfault or crash.
@@ -538,30 +617,26 @@ async def process_file(
                 )
                 await search_index.mark_failed_document(file_location)
                 await search_index.save_index()
+                report.failures.append(
+                    IndexingFailure(
+                        file_location=file_location,
+                        error_type=type(e).__name__,
+                        error_message=str(e),
+                    )
+                )
                 if progress_bar_update:
                     progress_bar_update()
 
-                if not isinstance(e, ValueError | ImpossibleParsingError):
+                if not settings.agent.index.continue_on_error and not isinstance(
+                    e, ValueError | ImpossibleParsingError
+                ):
                     # ImpossibleParsingError: parsing failure, don't retry
                     # ValueError: TODOC
                     raise
                 return
 
-            this_doc = next(iter(tmp_docs.docs.values()))
-
-            if isinstance(this_doc, DocDetails):
-                title = this_doc.title or fallback_title
-                year = this_doc.year or "Unknown year"
-            else:
-                title, year = fallback_title, "Unknown year"
-
             await search_index.add_document(
-                {
-                    "title": title,
-                    "year": year,
-                    "file_location": file_location,
-                    "body": "".join(t.text for t in tmp_docs.texts),
-                },
+                index_doc,
                 document=tmp_docs,
             )
 
@@ -574,6 +649,14 @@ async def process_file(
                 processed_counter["batched_save_counter"] = 0
 
             logger.info(f"Complete ({title}).")
+            report.indexed += 1
+
+        else:
+            report.record_skipped(
+                file_location,
+                (await search_index.index_files)[file_location]
+                == FAILED_DOCUMENT_ADD_ID,
+            )
 
         # Update progress bar for either a new or previously indexed file
         if progress_bar_update:
@@ -686,6 +769,7 @@ async def get_directory_index(
             )
 
     semaphore = anyio.Semaphore(index_settings.concurrency)
+    search_index.indexing_report = report = IndexingReport()
     progress_bar, progress_bar_update_fn = _make_progress_bar_update(
         index_settings.sync_with_paper_directory, total=len(valid_papers_rel_file_paths)
     )
@@ -714,5 +798,7 @@ async def get_directory_index(
         await search_index.save_index()
     else:
         logger.debug("No changes to index.")
+
+    report.log_summary()
 
     return search_index
