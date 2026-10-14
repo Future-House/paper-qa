@@ -12,16 +12,18 @@ if TYPE_CHECKING:
     from tantivy import DocAddress, Searcher
 
 
-def stored_records(index: Index) -> dict[str, dict[str, Any]]:
+def stored_records(index: Index) -> dict[str, dict[str, list[Any]]]:
     index.reload()
     searcher = index.searcher()
-    records = {}
+    records: dict[str, dict[str, list[Any]]] = {}
     if searcher.num_docs:
         for _, address in searcher.search(
             Query.all_query(), limit=searcher.num_docs
         ).hits:
             document = searcher.doc(address)
-            records[document.get_first("file_location")] = document.to_dict()
+            location = document.get_first("file_location")
+            assert isinstance(location, str)
+            records[location] = document.to_dict()
     return records
 
 
