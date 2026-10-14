@@ -41,7 +41,7 @@ dependencies = [
     "pydantic~=2.0,>=2.10.1",  # Pin 2.10 for typing breaks
     "rich",
     "setuptools",  # TODO: remove after release of https://bitbucket.org/pybtex-devs/pybtex/pull-requests/46/replace-pkg_resources-with-importlib
-    "tantivy",
+    "tantivy>=0.25.0",  # Pin for delete_documents_by_query
     "tenacity",
     "tiktoken>=0.4.0",
 ]

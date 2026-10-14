@@ -3194,7 +3194,7 @@ requires-dist = [
     { name = "rich" },
     { name = "sentence-transformers", marker = "extra == 'local'" },
     { name = "setuptools" },
-    { name = "tantivy" },
+    { name = "tantivy", specifier = ">=0.25.0" },
     { name = "tantivy", marker = "extra == 'typing'", specifier = ">=0.22.2" },
     { name = "tenacity" },
     { name = "tiktoken", specifier = ">=0.4.0" },
