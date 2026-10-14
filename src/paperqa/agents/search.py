@@ -29,6 +29,7 @@ from rich.progress import (
 from tantivy import (  # pylint: disable=no-name-in-module
     Document,
     Index,
+    Query,
     Schema,
     SchemaBuilder,
     Searcher,
@@ -49,7 +50,7 @@ from paperqa.utils import ImpossibleParsingError, clean_possessives, hexdigest
 from .models import SupportsPickle
 
 if TYPE_CHECKING:
-    from tantivy import IndexWriter
+    from tantivy import DocAddress, IndexWriter
 
     from paperqa.settings import MaybeSettings, Settings
 
@@ -140,7 +141,7 @@ class SearchIndex:
         self._index: Index | None = None
         self._searcher: Searcher | None = None
         self._writer: IndexWriter | None = None
-        self._index_files: dict[str, str] = {}
+        self._index_files: dict[str, str] | None = None
         self.changed = False
         self.storage = storage
 
@@ -240,7 +241,7 @@ class SearchIndex:
 
     @property
     async def index_files(self) -> dict[str, str]:
-        if not self._index_files:
+        if self._index_files is None:
             file_index_path = await self.file_index_filename
             if await file_index_path.exists():
                 async with await anyio.open_file(file_index_path, "rb") as f:
@@ -254,6 +255,8 @@ class SearchIndex:
                             f"Failed to load index file {file_index_path}."
                         )
                         raise
+            else:
+                self._index_files = {}
         return self._index_files
 
     @staticmethod
@@ -328,6 +331,38 @@ class SearchIndex:
             )
             raise
 
+    @staticmethod
+    def _get_deletion_query(
+        index: Index, file_location: str
+    ) -> tuple[Query, Searcher, list[DocAddress]] | None:
+        """Find a deletion query and preserve matches with different stored paths."""
+        searcher = index.searcher()
+        queries = []
+        # A path need not be valid query syntax.
+        with contextlib.suppress(ValueError):
+            queries.append(
+                index.parse_query(
+                    json.dumps(file_location, ensure_ascii=False), ["file_location"]
+                )
+            )
+        # Unindexed paths (e.g. a token exceeding the tokenizer's length limit)
+        # still need to be removed. Stored paths let us distinguish exact matches.
+        queries.append(Query.all_query())
+        for query in queries:
+            count = searcher.search(query, limit=1).count  # type: ignore[attr-defined] # Missing from tantivy's stubs
+            if count:
+                preserved = []
+                found = False
+                for _, address in searcher.search(query, limit=count).hits:
+                    if file_location in searcher.doc(address).get_all("file_location"):
+                        found = True
+                    else:
+                        preserved.append(address)
+                if found:
+                    # Keep the snapshot alive, but load preserved bodies one at a time.
+                    return query, searcher, preserved
+        return None
+
     @retry(
         stop=stop_after_attempt(1000),
         wait=wait_random_exponential(multiplier=0.25, max=60),
@@ -336,8 +371,27 @@ class SearchIndex:
     )
     async def delete_document(self, file_location: str) -> None:
         try:
+            # Include pending additions before selecting records to delete/restore.
+            if self._writer is not None:
+                await self.save_index()
+            index = await self.index
+            # Hold Tantivy's writer lock while taking the snapshot and applying
+            # the deletion so another process cannot commit a matching record
+            # between those operations.
             async with self.writer() as writer:
-                writer.delete_documents("file_location", file_location)
+                index.reload()
+                deletion = self._get_deletion_query(index, file_location)
+                if deletion is not None:
+                    query, searcher, preserved = deletion
+                    try:
+                        writer.delete_documents_by_query(query)
+                        for address in preserved:
+                            writer.add_document(searcher.doc(address))
+                    except Exception:
+                        writer.rollback()
+                        writer.wait_merging_threads()
+                        self._writer = None
+                        raise
             await self.save_index()
         except ValueError as e:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
@@ -350,11 +404,10 @@ class SearchIndex:
             await self.delete_document(file_location)
             filehash = index_files.pop(file_location)
             docs_index_dir = await self.docs_index_directory
-            # TODO: since the directory is part of the filehash these
-            # are always missing. Unsure of how to get around this.
-            await (docs_index_dir / f"{filehash}.{self.storage.extension()}").unlink(
-                missing_ok=True
-            )
+            if filehash not in index_files.values():
+                await (
+                    docs_index_dir / f"{filehash}.{self.storage.extension()}"
+                ).unlink(missing_ok=True)
 
             self.changed = True
 
@@ -373,9 +426,11 @@ class SearchIndex:
             if "Failed to acquire Lockfile: LockBusy." in str(e):
                 raise AsyncRetryError("Failed to acquire lock") from e
             raise
+        self._searcher = None
         file_index_path = await self.file_index_filename
+        content = zlib.compress(pickle.dumps(await self.index_files))
         async with await anyio.open_file(file_index_path, "wb") as f:
-            await f.write(zlib.compress(pickle.dumps(await self.index_files)))
+            await f.write(content)
         self.changed = False
 
     async def get_saved_object(
