@@ -375,11 +375,14 @@ class SearchIndex:
             if self._writer is not None:
                 await self.save_index()
             index = await self.index
-            index.reload()
-            deletion = self._get_deletion_query(index, file_location)
-            if deletion is not None:
-                query, searcher, preserved = deletion
-                async with self.writer() as writer:
+            # Hold Tantivy's writer lock while taking the snapshot and applying
+            # the deletion so another process cannot commit a matching record
+            # between those operations.
+            async with self.writer() as writer:
+                index.reload()
+                deletion = self._get_deletion_query(index, file_location)
+                if deletion is not None:
+                    query, searcher, preserved = deletion
                     try:
                         writer.delete_documents_by_query(query)
                         for address in preserved:
