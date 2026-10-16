@@ -266,6 +266,9 @@ you will likely want an API key for both
 and [Semantic Scholar](https://www.semanticscholar.org/product/api#api-key),
 which will allow you to avoid hitting public rate limits using these metadata services.
 Those can be exported as `CROSSREF_API_KEY` and `SEMANTIC_SCHOLAR_API_KEY` variables.
+If you also enable the OpenAlex metadata client,
+a free [OpenAlex API key](https://openalex.org/settings/api) does the same;
+export it as `OPENALEX_API_KEY`.
 
 ## CLI Usage
 
