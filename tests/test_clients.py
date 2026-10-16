@@ -27,7 +27,12 @@ from paperqa.clients.journal_quality import (
     DEFAULT_JOURNAL_QUALITY_CSV_PATH,
     JournalQualityPostProcessor,
 )
-from paperqa.clients.openalex import OpenAlexProvider, reformat_name
+from paperqa.clients.openalex import (
+    OpenAlexProvider,
+    get_doc_details_from_openalex,
+    get_openalex_api_key,
+    reformat_name,
+)
 from paperqa.clients.retractions import RetractionDataPostProcessor
 from paperqa.clients.semantic_scholar import s2_title_search
 from paperqa.types import SOURCE_QUALITY_MESSAGES, DocDetails
@@ -829,6 +834,31 @@ async def test_tricky_journal_quality_results(doi: str, score: int) -> None:
         assert (
             crossref_details.source_quality == score
         ), "Should have source quality data"
+
+
+@pytest.mark.asyncio
+async def test_openalex_sends_api_key_as_bearer_header(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(404, json={"error": "not found"})
+
+    monkeypatch.setenv("OPENALEX_API_KEY", "test-key")
+    get_openalex_api_key.cache_clear()
+    try:
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            with pytest.raises(DOINotFoundError):
+                await get_doc_details_from_openalex(client, doi="10.1234/example")
+    finally:
+        get_openalex_api_key.cache_clear()
+    (request,) = seen
+    assert request.headers["Authorization"] == "Bearer test-key"
+    assert "api_key" not in request.headers
+    assert "test-key" not in str(request.url)
+    assert "mailto" not in str(request.url)
 
 
 @pytest.mark.vcr
