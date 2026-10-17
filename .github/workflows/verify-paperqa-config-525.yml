@@ -19,3 +19,4 @@ jobs:
           python-version: "3.11"
       - run: uv sync
       - run: uv run pytest -q tests/test_config_default_inheritance.py tests/test_configs.py
+      - run: uv run pre-commit run --files src/paperqa/configs/clinical_trials.json src/paperqa/configs/high_quality.json src/paperqa/configs/search_only_clinical_trials.json tests/test_config_default_inheritance.py
