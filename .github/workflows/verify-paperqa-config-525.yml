@@ -18,4 +18,4 @@ jobs:
         with:
           python-version: "3.11"
       - run: uv sync
-      - run: uv run pytest -q tests/test_config_default_inheritance.py
+      - run: uv run pytest -q tests/test_config_default_inheritance.py tests/test_configs.py
