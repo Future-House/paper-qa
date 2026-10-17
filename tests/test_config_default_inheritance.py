@@ -29,6 +29,7 @@ def test_presets_inherit_default_answer_max_sources(config_name: str) -> None:
         == Settings().answer.answer_max_sources
     )
 
+
 def test_no_bundled_config_repeats_default_answer_max_sources() -> None:
     """A preset may override the default, but should not restate it."""
     default = Settings().answer.answer_max_sources
