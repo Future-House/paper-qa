@@ -1,0 +1,21 @@
+name: Verify PaperQA config inheritance
+
+on:
+  push:
+    branches:
+      - verification/paperqa-config-525
+
+permissions:
+  contents: read
+
+jobs:
+  focused-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v8.1.0
+        with:
+          python-version: "3.11"
+      - run: uv sync
+      - run: uv run pytest -q tests/test_config_default_inheritance.py
