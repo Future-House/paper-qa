@@ -5,6 +5,10 @@ on:
     branches:
       - verification/paperqa-config-525
 
+concurrency:
+  group: verify-paperqa-config-525
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
@@ -20,4 +24,4 @@ jobs:
       - run: uv sync
       - run: uv run pytest -q tests/test_config_default_inheritance.py tests/test_configs.py
       - run: uv pip install pre-commit
-      - run: uv run --no-sync pre-commit run --files src/paperqa/configs/clinical_trials.json src/paperqa/configs/high_quality.json src/paperqa/configs/search_only_clinical_trials.json tests/test_config_default_inheritance.py
+      - run: uv run --no-sync pre-commit run --files src/paperqa/configs/clinical_trials.json src/paperqa/configs/high_quality.json src/paperqa/configs/search_only_clinical_trials.json src/paperqa/configs/tier4_limits.json src/paperqa/configs/tier5_limits.json tests/test_config_default_inheritance.py
