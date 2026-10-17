@@ -1,7 +1,6 @@
 {
   "answer": {
     "evidence_k": 15,
-    "answer_max_sources": 5,
     "max_concurrent_requests": 10
   },
   "agent": {
