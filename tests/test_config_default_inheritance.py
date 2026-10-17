@@ -38,6 +38,6 @@ def test_no_bundled_config_repeats_default_answer_max_sources() -> None:
             continue
         raw_config = json.loads(config_path.read_text(encoding="utf-8"))
         configured = raw_config.get("answer", {}).get("answer_max_sources")
-        assert configured != default, (
-            f"{config_path.name} repeats default answer_max_sources={default}"
-        )
+        assert (
+            configured != default
+        ), f"{config_path.name} repeats default answer_max_sources={default}"
