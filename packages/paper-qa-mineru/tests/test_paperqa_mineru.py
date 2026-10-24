@@ -167,3 +167,17 @@ def test_missing_media_file_raises(tmp_path: Path) -> None:
 
     with pytest.raises(FileNotFoundError):
         parse_pdf_to_pages(pdf_path)
+
+
+def test_media_suffix_is_jpeg_for_jpg_source(tmp_path: Path) -> None:
+    pdf_path = _write_mineru_dir(
+        tmp_path,
+        [{"type": "image", "img_path": "images/photo.jpg", "page_idx": 0}],
+    )
+    (tmp_path / "paper" / "images" / "photo.jpg").write_bytes(b"\xff\xd8\xff")
+
+    parsed = parse_pdf_to_pages(pdf_path)
+
+    (item,) = parsed.content["1"][1]
+    assert item.info["suffix"] == ".jpg"
+    assert item.to_image_url().startswith("data:image/jpeg;base64,")
