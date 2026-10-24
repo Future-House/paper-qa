@@ -406,8 +406,8 @@ class TestMediaMode:
             == "individual"
         )
         assert (
-            str(MediaMode.INDIVIDUAL)  # noqa: FURB123
-            == str(MediaMode.INDIVIDUAL_CLUSTERING)  # noqa: FURB123
+            str(MediaMode.INDIVIDUAL)
+            == str(MediaMode.INDIVIDUAL_CLUSTERING)
             == "individual"
         )
 

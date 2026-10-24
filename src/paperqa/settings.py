@@ -5,7 +5,7 @@ import os
 import pathlib
 import re
 import warnings
-from collections import defaultdict
+from collections import UserDict, defaultdict
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
 from enum import IntEnum, StrEnum
@@ -373,7 +373,7 @@ class ParsingSettings(BaseModel):
         return mm_enum.should_parse_and_enrich_media
 
 
-class _FormatDict(dict):  # noqa: FURB189
+class _FormatDict(UserDict):
     """Mock a dictionary and store any missing items."""
 
     def __init__(self) -> None:

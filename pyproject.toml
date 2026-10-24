@@ -82,7 +82,6 @@ dev = [
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "pyzotero>=1.11.0",  # Lower pin for typing fix on Zotero.dump in https://github.com/urschrei/pyzotero/issues/298
-    "refurb>=2",  # Pin to keep recent
     "ty",
     "typeguard",
     "vcrpy>=8.3",  # Support aiohttp 3.14 used by LiteLLM
@@ -190,7 +189,6 @@ disable = [
     "global-statement",  # Rely on ruff PLW0603 for this
     "global-variable-not-assigned",  # Rely on ruff PLW0602 for this
     "import-outside-toplevel",  # Rely on ruff PLC0415 for this
-    "import-private-name",  # Rely on ruff PLC2701 for this
     "invalid-name",  # Don't care to enforce this
     "keyword-arg-before-vararg",  # Rely on ruff B026 for this
     "line-too-long",  # Rely on ruff E501 for this
@@ -290,20 +288,6 @@ markers = [
 testpaths = ["packages", "tests"]
 # Timeout in seconds before dumping the stacks. Default is 0 which means no timeout.
 timeout = 300
-
-[tool.refurb]
-enable_all = true
-ignore = [
-    "FURB101",  # Rely on ruff FURB101 for this
-    "FURB103",  # Rely on ruff FURB103 for this
-    "FURB108",  # Rely on ruff PLR1714 for this
-    "FURB141",  # Rely on ruff PTH110 for this
-    "FURB144",  # Rely on ruff PTH107 for this
-    "FURB146",  # Rely on ruff PTH113 for this
-    "FURB147",  # Rely on ruff PTH118 for this
-    "FURB150",  # Rely on ruff PTH102 for this
-    "FURB155",  # Rely on ruff PTH202 for this
-]
 
 [tool.ruff]
 # Line length to use when enforcing long-lines violations (like `E501`).
@@ -439,12 +423,6 @@ extend-select = [
     "TC008",
     "UP042",
     "W391",
-]
-# List of rule codes that are unsupported by Ruff, but should be preserved when
-# (e.g.) validating # noqa directives. Useful for retaining # noqa directives
-# that cover plugins not yet implemented by Ruff.
-external = [
-    "FURB",  # refurb
 ]
 ignore = [
     "A005",  # Overly pedantic

@@ -636,7 +636,7 @@ async def _call_sagemaker_api(
     tool_spec = ToolCall.from_name(tool_name).model_dump(
         exclude={"id": True, "function": {"arguments"}}
     )
-    payload = {  # noqa: FURB173
+    payload = {
         "model": model_name,
         "messages": [Message.create_message(images=[image]).model_dump(mode="json")],
         "tools": [tool_spec],

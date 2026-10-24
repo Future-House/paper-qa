@@ -594,9 +594,9 @@ def _make_progress_bar_update(
         os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     try:
-        is_cli = (
-            is_running_under_cli()  # ty: ignore[unresolved-reference]
-        )  # pylint: disable=used-before-assignment
+        # pylint: disable=used-before-assignment
+        is_cli = is_running_under_cli()  # ty: ignore[unresolved-reference]
+        # pylint: enable=used-before-assignment
     except NameError:  # Work around circular import
         from . import is_running_under_cli
 

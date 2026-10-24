@@ -351,7 +351,7 @@ async def parse_pdf_to_pages(
         # corrections such as sorting by bounding box are hard because of edge cases
         # such as two-column PDFs (where 'vertical then horizontal' ordering
         # is not a valid sorting heuristic)
-        text = "\n\n".join(item.text or "" for item in response)  # noqa: FURB143
+        text = "\n\n".join(item.text or "" for item in response)
         if page_size_limit and len(text) > page_size_limit:
             raise ImpossibleParsingError(
                 f"The text in page {i} of {page_count} was {len(text)} chars"

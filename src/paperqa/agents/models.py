@@ -71,9 +71,14 @@ class AnswerResponse(BaseModel):
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
-        model = (
-            LiteLLMModel(name=llm_model) if isinstance(llm_model, str) else llm_model
-        )
+        if isinstance(llm_model, str):
+            model: LLMModel = LiteLLMModel(name=llm_model)
+            if llm_model == "gpt-6-luna":
+                model.config["model_list"][0]["litellm_params"][
+                    "reasoning_effort"
+                ] = "none"
+        else:
+            model = llm_model
         prompt_template = "{question}\n\n{answer}"
         messages = [
             Message(role="system", content=sys_prompt),
@@ -91,7 +96,7 @@ class AnswerResponse(BaseModel):
 
 
 class TimerData(BaseModel):
-    start_time: float = Field(default_factory=time.time)  # noqa: FURB111
+    start_time: float = Field(default_factory=time.time)
     durations: list[float] = Field(default_factory=list)
 
 

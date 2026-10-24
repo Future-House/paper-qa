@@ -93,7 +93,6 @@ jobs:
         run: rm -r ${{ steps.build-paper-qa.outputs.dist }}
       - run: uv sync
       - run: uv run pylint src packages
-      - run: uv run refurb .
       - uses: suzuki-shunsuke/github-action-renovate-config-validator@v2.1.0
   test-src:
     runs-on: ubuntu-latest
@@ -108,6 +107,8 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync
+      - name: Cache tokenizer data before cassette playback
+        run: uv run python -c "import tiktoken; tiktoken.get_encoding('cl100k_base')"
       - run: uv run pytest -n auto -m 'offline and not live_api' tests
         env:
           PQA_OFFLINE_TESTS: "true"
@@ -125,6 +126,8 @@ jobs:
           enable-cache: true
           python-version: ${{ matrix.python-version }}
       - run: uv sync
+      - name: Cache tokenizer data before cassette playback
+        run: uv run python -c "import tiktoken; tiktoken.get_encoding('cl100k_base')"
       - run: uv run pytest -n auto -m 'offline and not live_api' packages
         env:
           PQA_OFFLINE_TESTS: "true"

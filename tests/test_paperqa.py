@@ -1001,7 +1001,7 @@ async def test_location_awareness(stub_data_dir: Path) -> None:
     def to_pages(value: Context) -> str:
         cxt_val = value.context.lower().split("\n")[0]
         page_range = cxt_val.split("page's")[-1].split("pages")[-1].split("page")[-1]
-        return page_range.strip().removesuffix(".")  # noqa: FURB184
+        return page_range.strip().removesuffix(".")
 
     # NOTE: scores are useless here because we didn't describe them in the prompt
     locations = [to_pages(c) for c in session.contexts]
@@ -1810,7 +1810,7 @@ async def test_chunk_metadata_reader(
     chunk_text, metadata = await read_doc(
         stub_data_dir / "paper.pdf",
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        parsed_text_only=False,  # noqa: FURB120
+        parsed_text_only=False,
         include_metadata=True,
         parse_pdf=pdf_parser,
         chunk_chars=3000,
@@ -1853,7 +1853,7 @@ async def test_chunk_metadata_reader(
     chunk_text, metadata = await read_doc(
         stub_data_dir / "flag_day.html",
         Doc(docname="foo", citation="Foo et al, 2002", dockey="1"),
-        parsed_text_only=False,  # noqa: FURB120
+        parsed_text_only=False,
         include_metadata=True,
         chunk_chars=3000,
         overlap=100,
@@ -2313,7 +2313,7 @@ async def test_image_enrichment_with_oversized_image(caplog) -> None:
     )
 
     settings = Settings(parsing={"enrichment_llm": "claude-sonnet-4-5-20250929"})
-    enricher = settings.make_media_enricher()  # noqa: FURB184
+    enricher = settings.make_media_enricher()
     with (
         caplog.at_level("WARNING", logger="paperqa.settings"),
         # Use patch over VCR since VCR cassette would be huge

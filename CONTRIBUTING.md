@@ -53,12 +53,10 @@ Use the following commands:
   pre-commit run --all-files
   ```
 
-- Run `ty`, `refurb`, or `pylint` directly:
+- Run `ty` or `pylint` directly:
 
   ```bash
   ty check
-  # or
-  refurb paperqa
   # or
   pylint paperqa
   ```
