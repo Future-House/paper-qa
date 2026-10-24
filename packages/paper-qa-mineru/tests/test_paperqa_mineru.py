@@ -40,9 +40,79 @@ def test_pages_are_one_based_and_drop_running_headers(tmp_path: Path) -> None:
 
     assert set(parsed.content) == {"1", "2"}
     page1_text, page1_media = parsed.content["1"]
-    assert page1_text == "Articles\nBody on page one."
+    assert page1_text == "Body on page one."
     assert page1_media == []
     assert parsed.content["2"][0] == "Body on page two."
+
+
+def test_page_range_keeps_only_selected_pages(tmp_path: Path) -> None:
+    pdf_path = _write_mineru_dir(
+        tmp_path,
+        [
+            {"type": "text", "text": "page one", "page_idx": 0},
+            {"type": "text", "text": "page two", "page_idx": 1},
+            {"type": "image", "img_path": "images/fig1.png", "page_idx": 2},
+        ],
+    )
+
+    parsed = parse_pdf_to_pages(pdf_path, page_range=(1, 2))
+
+    assert set(parsed.content) == {"1", "2"}
+    assert parsed.content["1"] == ("page one", [])
+    assert parsed.content["2"] == ("page two", [])
+
+
+def test_parse_media_false_skips_media_but_keeps_table_html(tmp_path: Path) -> None:
+    pdf_path = _write_mineru_dir(
+        tmp_path,
+        [
+            {
+                "type": "table",
+                "table_body": "<table><tr><td>EL1</td></tr></table>",
+                "img_path": "images/absent.png",
+                "page_idx": 0,
+            },
+        ],
+    )
+
+    parsed = parse_pdf_to_pages(pdf_path, parse_media=False)
+
+    table_text, table_media = parsed.content["1"]
+    assert "EL1" in table_text
+    assert table_media == []
+
+
+def test_media_suffix_matches_source_file(tmp_path: Path) -> None:
+    pdf_path = _write_mineru_dir(
+        tmp_path,
+        [{"type": "image", "img_path": "images/fig1.png", "page_idx": 0}],
+    )
+
+    parsed = parse_pdf_to_pages(pdf_path)
+
+    (item,) = parsed.content["1"][1]
+    assert item.info["suffix"] == ".png"
+    assert item.to_image_url().startswith("data:image/png;base64,")
+
+
+def test_captions_enter_page_text(tmp_path: Path) -> None:
+    pdf_path = _write_mineru_dir(
+        tmp_path,
+        [
+            {
+                "type": "image",
+                "img_path": "images/fig1.png",
+                "image_caption": ["Figure 1. Crawler overview."],
+                "image_footnote": [],
+                "page_idx": 0,
+            },
+        ],
+    )
+
+    parsed = parse_pdf_to_pages(pdf_path)
+
+    page_text, _ = parsed.content["1"]
+    assert page_text == "Figure 1. Crawler overview."
 
 
 def test_table_body_and_image_media(tmp_path: Path) -> None:
@@ -68,7 +138,11 @@ def test_table_body_and_image_media(tmp_path: Path) -> None:
     assert table_item.index == 0
     assert table_item.data == PNG_BYTES
     assert table_item.text == "<table><tr><td>EL1</td><td>100-105</td></tr></table>"
-    assert table_item.info == {"mineru_type": "table", "bbox": [1, 2, 3, 4]}
+    assert table_item.info == {
+        "mineru_type": "table",
+        "bbox": [1, 2, 3, 4],
+        "suffix": ".png",
+    }
 
     image_text, image_media = parsed.content["2"]
     assert not image_text
