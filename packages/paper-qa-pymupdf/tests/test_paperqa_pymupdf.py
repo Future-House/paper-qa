@@ -14,11 +14,14 @@ from paperqa.utils import REPLACEMENT_CHAR, ImpossibleParsingError, get_citation
 
 from paperqa_pymupdf import parse_pdf_to_pages
 
+pytestmark = pytest.mark.offline
+
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
 
 
 @pytest.mark.asyncio
+@pytest.mark.live_api
 async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
 

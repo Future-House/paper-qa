@@ -1,7 +1,7 @@
 {
-  "llm": "claude-3-5-sonnet-20240620",
+  "llm": "gpt-6.1-sol",
   "llm_config": null,
-  "summary_llm": "claude-3-5-sonnet-20240620",
+  "summary_llm": "gpt-6-luna",
   "summary_llm_config": null,
   "embedding": "hybrid-text-embedding-3-large",
   "embedding_config": null,
@@ -41,7 +41,7 @@
     "summary_json_system": "Provide a summary of the relevant information that could help determine if a claim is contradicted or supported by this excerpt. The excerpt may be irrelevant. Do not directly answer if it is contradicted - only summarize relevant information. Respond with the following JSON format:\n\n{{\n  \"summary\": \"...\",\n  \"relevance_score\": \"...\"\n}}\n\nwhere `summary` is relevant information from excerpt ({summary_length}) and `relevance_score` is the relevance of `summary` to support or contradict the claim (integer out of 10). If any string entry in the JSON has newlines, be sure to escape them. "
   },
   "agent": {
-    "agent_llm": "gpt-4o-2024-08-06",
+    "agent_llm": "gpt-6-sol",
     "agent_type": "ToolSelector",
     "agent_system_prompt": "You are a helpful AI assistant.",
     "agent_prompt": "Answer question: {question}\n\nSearch for papers, gather evidence, collect papers cited in evidence then re-gather evidence, answer, and complete. Gathering evidence will do nothing if you have not done a new search or collected new papers. If you do not have enough evidence to generate a good answer, you can:\n- Search for more papers (preferred)\n- Collect papers cited by previous evidence (preferred)\n- Gather more evidence using a different phrase\nIf you search for more papers or collect new papers cited by previous evidence, remember to gather evidence again. Once you have five or more pieces of evidence from multiple sources, or you have tried a few times, call the {complete_tool_name} tool to terminate. The current status of evidence/papers/cost is {status}",

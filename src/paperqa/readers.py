@@ -228,7 +228,7 @@ def parse_office_doc(
             # Create a ParsedMedia object
             parsed_media = ParsedMedia(
                 index=media_index,
-                data=image_data,
+                data=image_data,  # ty: ignore[invalid-argument-type]
                 info={"suffix": el.metadata.image_mime_type},
             )
             media_list.append(parsed_media)

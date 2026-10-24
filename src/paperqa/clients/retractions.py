@@ -84,7 +84,10 @@ class RetractionDataPostProcessor(MetadataPostProcessor[DOIQuery]):
 
     def query_creator(self, doc_details: DocDetails, **kwargs) -> DOIQuery | None:
         try:
-            return DOIQuery(doi=doc_details.doi, **kwargs)
+            return DOIQuery(
+                doi=doc_details.doi,  # ty: ignore[invalid-argument-type]
+                **kwargs,
+            )
         except ValidationError:
             logger.debug(
                 f"Must have a valid DOI to query retraction data:{doc_details.doi} "

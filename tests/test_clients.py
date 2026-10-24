@@ -32,6 +32,8 @@ from paperqa.clients.retractions import RetractionDataPostProcessor
 from paperqa.clients.semantic_scholar import s2_title_search
 from paperqa.types import SOURCE_QUALITY_MESSAGES, DocDetails
 
+pytestmark = pytest.mark.offline
+
 # Use to avoid flaky tests every time citation count changes
 CITATION_COUNT_SENTINEL = "CITATION_COUNT_SENTINEL"
 

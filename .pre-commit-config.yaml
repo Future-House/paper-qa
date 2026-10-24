@@ -91,10 +91,11 @@ repos:
     rev: 0.1.3
     hooks:
       - id: markdown-toc-creator
-  - repo: local # Use local so we can inspect paperqa.version
+  - repo: local # Use the project's locked dependencies
     hooks:
-      - id: mypy
-        name: mypy
-        entry: uv run --frozen mypy # Use --frozen to avoid mutating local venv
+      - id: ty
+        name: ty
+        entry: uv run --frozen ty check
         language: system
         types_or: [python, pyi]
+        pass_filenames: false

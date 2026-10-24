@@ -28,7 +28,7 @@ async def litellm_get_search_query(
     question: str,
     count: int,
     template: str | None = None,
-    llm: LLMModel | str = "gpt-4o-mini",
+    llm: LLMModel | str = "gpt-6-luna",
     temperature: float = 1.0,
 ) -> list[str]:
     search_prompt = ""
@@ -59,6 +59,8 @@ async def litellm_get_search_query(
         model.config["model_list"][0]["litellm_params"].update(
             {"temperature": temperature}
         )
+        if llm == "gpt-6-luna":
+            model.config["model_list"][0]["litellm_params"]["reasoning_effort"] = "none"
     else:
         model = llm
     messages = [

@@ -23,6 +23,8 @@ from paperqa.types import Doc, DocDetails
 from paperqa.utils import get_year
 from tests.conftest import TESTS_DIR
 
+pytestmark = pytest.mark.offline
+
 
 def test_prompt_settings_validation() -> None:
     with pytest.raises(ValidationError):
@@ -107,6 +109,22 @@ def test_router_kwargs_present_in_models() -> None:
     settings = Settings()
     assert settings.get_llm().config["router_kwargs"] is not None
     assert settings.get_summary_llm().config["router_kwargs"] is not None
+
+
+def test_default_model_routing() -> None:
+    settings = Settings()
+    assert settings.llm == settings.parsing.enrichment_llm == "gpt-6.1-sol"
+    assert settings.summary_llm == "gpt-6-luna"
+    assert settings.agent.agent_llm == "gpt-6-sol"
+
+    for model in (settings.get_llm(), settings.get_enrichment_llm()):
+        params = model.config["model_list"][0]["litellm_params"]
+        assert "temperature" not in params
+
+    for model in (settings.get_summary_llm(), settings.get_agent_llm()):
+        params = model.config["model_list"][0]["litellm_params"]
+        assert params["reasoning_effort"] == "none"
+        assert params["temperature"] == settings.temperature
 
 
 @pytest.mark.parametrize(

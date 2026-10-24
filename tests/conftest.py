@@ -14,7 +14,6 @@ import httpx_aiohttp
 import litellm.llms.custom_httpx.aiohttp_transport
 import pytest
 import vcr.stubs.aiohttp_stubs
-import vcr.stubs.httpcore_stubs
 from dotenv import load_dotenv
 from lmi.utils import (
     ANTHROPIC_API_KEY_HEADER,
@@ -32,11 +31,28 @@ TESTS_DIR = Path(__file__).parent
 CASSETTES_DIR = TESTS_DIR / "cassettes"
 
 IN_GITHUB_ACTIONS: bool = os.getenv("GITHUB_ACTIONS") == "true"
+OFFLINE_TESTS: bool = os.getenv("PQA_OFFLINE_TESTS") == "true"
+if OFFLINE_TESTS:
+    os.environ["LITELLM_LOCAL_MODEL_COST_MAP"] = "True"
+    os.environ.update(
+        dict.fromkeys(
+            (
+                "OPENAI_API_KEY",
+                "ANTHROPIC_API_KEY",
+                "GEMINI_API_KEY",
+                "SEMANTIC_SCHOLAR_API_KEY",
+                "CROSSREF_API_KEY",
+                "NVIDIA_API_KEY",
+            ),
+            "ci-cassette-placeholder",
+        )
+    )
 
 
 @pytest.fixture(autouse=True, scope="session")
 def _load_env() -> None:
-    load_dotenv()
+    if not OFFLINE_TESTS:
+        load_dotenv()
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -106,7 +122,7 @@ def _patch_litellm_logging_worker_for_race_condition() -> Iterator[None]:
 
 
 @pytest.fixture(scope="session", name="vcr_config")
-def fixture_vcr_config() -> dict[str, Any]:
+def fixture_vcr_config(pytestconfig: pytest.Config) -> dict[str, Any]:
     return {
         "filter_headers": [
             CROSSREF_KEY_HEADER,
@@ -116,7 +132,14 @@ def fixture_vcr_config() -> dict[str, Any]:
             "cookie",
         ],
         "ignore_hosts": ["huggingface.co"],
-        "record_mode": "once" if not IN_GITHUB_ACTIONS else "none",
+        "record_mode": (
+            "none"
+            if OFFLINE_TESTS
+            else (
+                pytestconfig.getoption("--record-mode")
+                or ("once" if not IN_GITHUB_ACTIONS else "none")
+            )
+        ),
         "allow_playback_repeats": True,
         "cassette_library_dir": str(CASSETTES_DIR),
         # "drop_unused_requests": True,  # Restore after https://github.com/kevin1024/vcrpy/issues/961
@@ -216,26 +239,12 @@ class PreReadCompatibleAiohttpResponseStream(
                     yield chunk
 
 
-async def _vcr_handle_async_request(
-    cassette,  # noqa: ARG001
-    real_handle_async_request,
-    self,
-    real_request,
-):
-    """VCR handler that only sends, not possibly recording or playing back responses."""
-    return await real_handle_async_request(self, real_request)
-
-
 # Permanently patch the original response stream,
 # to work around https://github.com/karpetrosyan/httpx-aiohttp/issues/23
 # and https://github.com/BerriAI/litellm/issues/11724
 httpx_aiohttp.transport.AiohttpResponseStream = (  # type: ignore[misc]
     litellm.llms.custom_httpx.aiohttp_transport.AiohttpResponseStream  # type: ignore[misc]
 ) = PreReadCompatibleAiohttpResponseStream  # type: ignore[assignment]
-
-# Permanently patch vcrpy's async VCR recording functionality,
-# to work around https://github.com/kevin1024/vcrpy/issues/944
-vcr.stubs.httpcore_stubs._vcr_handle_async_request = _vcr_handle_async_request
 
 # Permanently patch vcrpy's aiohttp build_response to set raw_headers,
 # to work around https://github.com/kevin1024/vcrpy/issues/970

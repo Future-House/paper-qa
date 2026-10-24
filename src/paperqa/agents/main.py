@@ -133,7 +133,11 @@ async def run_agent(
         )
     elif ldp_agent_or_none := await settings.make_ldp_agent(agent_type):
         session, agent_status = await run_ldp_agent(
-            query, settings, docs, ldp_agent_or_none, **runner_kwargs
+            query,
+            settings,
+            docs,
+            ldp_agent_or_none,  # ty: ignore[invalid-argument-type]
+            **runner_kwargs,
         )
     else:
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
@@ -323,7 +327,7 @@ async def run_aviary_agent(
     return await _run_with_timeout_failure(rollout, settings, env)
 
 
-class LDPRolloutCallback(Callback):
+class LDPRolloutCallback(Callback):  # ty: ignore[unsupported-base]
     """Shim connecting ldp RolloutManager Callbacks with paperqa runner callbacks."""
 
     def __init__(
@@ -353,7 +357,7 @@ class LDPRolloutCallback(Callback):
             await self.on_env_step_callback(*args)
 
 
-class LDPAdjustToolsForAgentCallback(Callback):
+class LDPAdjustToolsForAgentCallback(Callback):  # ty: ignore[unsupported-base]
     def __init__(self, settings: Settings):
         self._settings = settings
 
@@ -393,7 +397,7 @@ async def run_ldp_agent(
                 ),
                 LDPAdjustToolsForAgentCallback(settings),
             ],
-        )
+        )  # ty: ignore[call-non-callable]
         trajs = await rollout_manager.sample_trajectories(
             environments=[env], max_steps=settings.agent.max_timesteps
         )

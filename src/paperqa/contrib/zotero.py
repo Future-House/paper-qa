@@ -254,12 +254,14 @@ class ZoteroDB(zotero.Zotero):
 
                 if no_pdf or is_duplicate:
                     continue
-                pdf = cast("Path", pdf)
+                pdf = cast("Path", pdf)  # ty: ignore[redundant-cast]
                 title = item["data"].get("title", "")
                 if len(items) >= start:
                     parsed_text = self._parse_pdf(pdf)
                     if isinstance(parsed_text, Awaitable):
-                        parsed_text = asyncio.run(parsed_text)
+                        parsed_text = asyncio.run(
+                            parsed_text  # ty: ignore[invalid-argument-type]
+                        )
                     if not isinstance(parsed_text.content, dict):
                         raise ValueError(
                             "The content type coming from the PDF parser"

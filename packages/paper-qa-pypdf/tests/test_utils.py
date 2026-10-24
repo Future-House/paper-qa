@@ -1,6 +1,10 @@
 import operator
 
+import pytest
+
 from paperqa_pypdf.utils import cluster_bboxes
+
+pytestmark = pytest.mark.offline
 
 
 def test_cluster_bboxes_empty() -> None:

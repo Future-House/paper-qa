@@ -14,7 +14,7 @@ from pydantic import BaseModel, Field
 from paperqa import Docs, Settings
 
 try:
-    import openreview
+    import openreview  # ty: ignore[unresolved-import]
 except ImportError:
     openreview = None
 
@@ -60,7 +60,8 @@ class OpenReviewPaperHelper:
         )
         self.venue_id = venue_id
         self.llm_model = LiteLLMModel(
-            name=self.settings.llm, config=self.settings.llm_config
+            name=self.settings.llm,
+            config=self.settings.llm_config,  # ty: ignore[invalid-argument-type]
         )
 
     def get_venues(self) -> list[str]:

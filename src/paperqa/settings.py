@@ -25,12 +25,7 @@ from typing import (
 import anyio
 import litellm
 from aviary.core import Message, Tool, ToolSelector
-from lmi import (
-    CommonLLMNames,
-    EmbeddingModel,
-    LiteLLMModel,
-    embedding_model_factory,
-)
+from lmi import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -50,12 +45,9 @@ from paperqa._ldp_shims import (
     HAS_LDP_INSTALLED,
     Agent,
     HTTPAgentClient,
-    MemoryAgent,
     ReActAgent,
     SimpleAgent,
     SimpleAgentState,
-    UIndexMemoryModel,
-    _Memories,
     set_training_mode,
 )
 from paperqa.prompts import (
@@ -347,11 +339,7 @@ class ParsingSettings(BaseModel):
         description="Parse clinical trial JSONs into human readable text.",
     )
     enrichment_llm: str = Field(
-        # NOTE: from CapArena (https://arxiv.org/abs/2503.12329),
-        # GPT-4o was the best image captioning model as of spring 2025
-        # NOTE: claude-haiku-4-5-20251001 recurringly failed to describe display type
-        # to be display type, so its captioning ability isn't good enough yet
-        default=CommonLLMNames.GPT_4O.value,
+        default="gpt-6.1-sol",
         description="LLM for media enrichment (e.g. generating descriptions).",
     )
     enrichment_llm_config: dict | None = Field(
@@ -617,7 +605,7 @@ class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="gpt-6-sol",
         description="LLM inside the agent making tool selections.",
     )
 
@@ -729,14 +717,21 @@ def make_default_litellm_model_list_settings(
     llm: str, temperature: float = 0.0
 ) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
+    litellm_params = {"model": llm}
+    if llm != "gpt-6.1-sol":
+        # GPT-6.1 Sol cannot disable reasoning and rejects temperature.
+        litellm_params["temperature"] = temperature
+        if llm in {"gpt-6-sol", "gpt-6-luna"}:
+            # Preserve the non-reasoning behavior of our prior defaults. This
+            # also enables tool calling through the Chat Completions API.
+            litellm_params["reasoning_effort"] = "none"
     return {
         "name": llm,
         "model_list": [
             {
                 "model_name": llm,
                 "litellm_params": {
-                    "model": llm,
-                    "temperature": temperature,
+                    **litellm_params,
                     # SEE: https://docs.litellm.ai/docs/tutorials/prompt_caching#litellm-python-sdk-usage
                     "cache_control_injection_points": [
                         {"location": "message", "role": "system"}
@@ -751,7 +746,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="gpt-6.1-sol",
         description=(
             "LLM for general use including metadata inference (see Docs.aadd)"
             " and answer generation (see Docs.aquery and gen_answer tool)."
@@ -775,7 +770,7 @@ class Settings(BaseSettings):
         ),
     )
     summary_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="gpt-6-luna",
         description=(
             "LLM for creating contextual summaries"
             " (see Docs.aget_evidence and gather_evidence tool)."
@@ -982,7 +977,7 @@ class Settings(BaseSettings):
 
     async def make_ldp_agent(
         self, agent_type: str | type
-    ) -> "Agent[SimpleAgentState] | None":
+    ) -> "Agent[SimpleAgentState] | None":  # ty: ignore[invalid-type-form]
         """Attempt to convert the input agent type to an ldp Agent."""
         if not isinstance(agent_type, str):  # Convert to fully qualified name
             agent_type = f"{agent_type.__module__}.{agent_type.__name__}"
@@ -998,53 +993,25 @@ class Settings(BaseSettings):
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
-        if issubclass(agent_cls, ReActAgent | MemoryAgent):
-            if (
-                issubclass(agent_cls, MemoryAgent)
-                and "memory_model" in config
-                and "memories" in config
-            ):
-                if "embedding_model" in config["memory_model"]:
-                    config["memory_model"]["embedding_model"] = (
-                        EmbeddingModel.from_name(
-                            embedding=config["memory_model"].pop("embedding_model")[
-                                "name"
-                            ]
-                        )
-                    )
-                try:
-                    config["memory_model"] = UIndexMemoryModel(**config["memory_model"])
-                except ImportError as exc:
-                    raise ImportError(
-                        "Memory agents require the 'usearch' package,"
-                        " which is part of the 'memory' extra."
-                        " Please: `pip install paper-qa[memory]`."
-                    ) from exc
-                memories = _Memories.validate_python(config.pop("memories"))
-                await asyncio.gather(
-                    *(
-                        config["memory_model"].add_memory(memory)
-                        for memory in (
-                            memories.values()
-                            if isinstance(memories, dict)
-                            else memories
-                        )
-                    )
-                )
+        ldp_llm_config = {"name": agent_llm, "temperature": self.temperature}
+        if agent_llm in {"gpt-6-sol", "gpt-6-luna"}:
+            ldp_llm_config["reasoning_effort"] = "none"
+        if issubclass(agent_cls, ReActAgent):  # ty: ignore[invalid-argument-type]
             return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
+                llm_model=ldp_llm_config,  # ty: ignore[unknown-argument]
                 **config,
             )
-        if issubclass(agent_cls, SimpleAgent):
+        if issubclass(agent_cls, SimpleAgent):  # ty: ignore[invalid-argument-type]
             return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
-                sys_prompt=agent_settings.agent_system_prompt,
+                llm_model=ldp_llm_config,  # ty: ignore[unknown-argument]
+                sys_prompt=agent_settings.agent_system_prompt,  # ty: ignore[unknown-argument]
                 **config,
             )
-        if issubclass(agent_cls, HTTPAgentClient):
-            set_training_mode(False)
-            return HTTPAgentClient[SimpleAgentState](
-                agent_state_type=SimpleAgentState, **config
+        if issubclass(agent_cls, HTTPAgentClient):  # ty: ignore[invalid-argument-type]
+            set_training_mode(False)  # ty: ignore[call-non-callable]
+            return HTTPAgentClient[SimpleAgentState](  # ty: ignore[not-subscriptable]
+                agent_state_type=SimpleAgentState,  # ty: ignore[invalid-argument-type]
+                **config,
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 

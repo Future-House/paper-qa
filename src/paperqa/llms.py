@@ -256,7 +256,7 @@ class NumpyVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
 
         if self._texts_filter is not None:
             original_indices = np.where(self._texts_filter)[0]
-            embedding_matrix = embedding_matrix[self._texts_filter]  # type: ignore[index]
+            embedding_matrix = embedding_matrix[self._texts_filter]  # type: ignore[index]  # ty: ignore[not-subscriptable]
         else:
             original_indices = np.arange(len(self.texts))
 
@@ -512,7 +512,7 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
                     text=payload.get("text", ""),
                     name=payload.get("name", ""),
                     doc=docs.docs[doc_data["dockey"]],
-                    embedding=vector_value,
+                    embedding=vector_value,  # ty: ignore[invalid-argument-type]
                 )
                 docs.texts.append(text)
 

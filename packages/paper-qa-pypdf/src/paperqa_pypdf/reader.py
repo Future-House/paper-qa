@@ -115,7 +115,9 @@ def parse_pdf_to_pages(  # noqa: PLR0912
 
         if media_mode in {MediaMode.FULL_PAGE, MediaMode.INDIVIDUAL_CLUSTERING}:
             try:
-                pdf_doc = pdfium.PdfDocument(str(path))
+                pdf_doc = pdfium.PdfDocument(  # ty: ignore[unresolved-attribute]
+                    str(path)
+                )
             except AttributeError as exc:
                 raise ImportError(
                     "Media parsing requires 'pypdfium2' to be installed for rasterization support."
@@ -126,7 +128,7 @@ def parse_pdf_to_pages(  # noqa: PLR0912
             pdf_context = nullcontext()
 
         if media_mode == MediaMode.INDIVIDUAL_CLUSTERING:
-            plumber_pdf = pdfplumber.open(str(path))
+            plumber_pdf = pdfplumber.open(str(path))  # ty: ignore[unresolved-attribute]
             plumber_context: AbstractContextManager = plumber_pdf
         else:
             plumber_context = nullcontext()
@@ -150,6 +152,8 @@ def parse_pdf_to_pages(  # noqa: PLR0912
                     )
 
                 if media_mode == MediaMode.FULL_PAGE:
+                    if pdfium is None:
+                        raise ImportError("Media parsing requires pypdfium2.")
                     pdfium_page: pdfium.PdfPage = pdf_doc[i]
                     pdfium_rendered_page: pdfium.PdfBitmap = pdfium_page.render(
                         **render_kwargs
@@ -353,12 +357,14 @@ def parse_pdf_to_pages(  # noqa: PLR0912
     # Determine mode string and parsing libraries based on actual mode used
     lib_parts = [f"{pypdf.__name__} ({pypdf.__version__})"]
     if media_mode == MediaMode.FULL_PAGE:
-        lib_parts.append(f"{pdfium.__name__} ({pdfium.PYPDFIUM_INFO})")
+        lib_parts.append(
+            f"{pdfium.__name__} ({pdfium.PYPDFIUM_INFO})"  # ty: ignore[unresolved-attribute]
+        )
     elif media_mode == MediaMode.INDIVIDUAL_CLUSTERING:
         lib_parts.extend(
             [
-                f"{pdfium.__name__} ({pdfium.PYPDFIUM_INFO})",
-                f"pdfplumber ({pdfplumber.__version__})",
+                f"{pdfium.__name__} ({pdfium.PYPDFIUM_INFO})",  # ty: ignore[unresolved-attribute]
+                f"pdfplumber ({pdfplumber.__version__})",  # ty: ignore[unresolved-attribute]
             ]
         )
     multimodal_string = f"|multimodal|dpi={dpi}|mode={media_mode.metadata_value}"

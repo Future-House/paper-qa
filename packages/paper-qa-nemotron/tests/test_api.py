@@ -21,6 +21,8 @@ from paperqa_nemotron.api import (
     _wait_exponential_for_nvidia_api_retry,
 )
 
+pytestmark = pytest.mark.offline
+
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
 
