@@ -1186,8 +1186,8 @@ llm = [
 
 [[package]]
 name = "fhlmi"
-version = "1.0.8.dev2+ga64ba4906"
-source = { git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02#a64ba49062381a50d216fd299df21927f9be1a02" }
+version = "1.0.8.dev1+g1daf71901"
+source = { git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main#1daf71901cb7990f0f2a84f3e312686364e787d2" }
 dependencies = [
     { name = "aiohttp" },
     { name = "coredis" },
@@ -3200,9 +3200,9 @@ dev = [
 requires-dist = [
     { name = "anyio" },
     { name = "fhaviary", extras = ["llm"], specifier = ">=0.34" },
-    { name = "fhlmi", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
-    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
-    { name = "fhlmi", extras = ["image"], marker = "extra == 'image'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
+    { name = "fhlmi", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
+    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
+    { name = "fhlmi", extras = ["image"], marker = "extra == 'image'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
     { name = "html2text" },
     { name = "httpx" },
     { name = "httpx-aiohttp" },
@@ -3290,7 +3290,7 @@ requires-dist = [
     { name = "docling", specifier = ">=2.74" },
     { name = "docling-core", specifier = ">=2" },
     { name = "docling-ibm-models", extras = ["opencv-python-headless"], marker = "extra == 'dev'", specifier = ">=3.10.0" },
-    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
+    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
@@ -3345,8 +3345,8 @@ requires-dist = [
     { name = "aiobotocore", marker = "extra == 'sagemaker'" },
     { name = "docling", marker = "extra == 'dev'", specifier = ">=2.56" },
     { name = "fhaviary", extras = ["image"] },
-    { name = "fhlmi", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
-    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
+    { name = "fhlmi", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
+    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
     { name = "httpx-aiohttp", marker = "extra == 'dev'" },
     { name = "limits", marker = "extra == 'typing'" },
     { name = "litellm", specifier = ">=1.71.0,!=1.107.0" },
@@ -3388,7 +3388,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
+    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "pymupdf", specifier = ">=1.24.12" },
@@ -3432,7 +3432,7 @@ media = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&rev=a64ba49062381a50d216fd299df21927f9be1a02" },
+    { name = "fhlmi", marker = "extra == 'dev'", git = "https://github.com/Future-House/ldp?subdirectory=packages%2Flmi&branch=main" },
     { name = "paper-qa", editable = "." },
     { name = "paper-qa", marker = "extra == 'dev'", editable = "." },
     { name = "paper-qa-pypdf", extras = ["enhanced", "media"], marker = "extra == 'dev'", editable = "packages/paper-qa-pypdf" },
