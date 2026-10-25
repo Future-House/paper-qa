@@ -31,7 +31,7 @@ classifiers = [
 dependencies = [
     "anyio",
     "fhaviary[llm]>=0.34",  # For type(action)=Message
-    "fhlmi>=0.45.0",  # For type(action)=Message
+    "fhlmi>=1.10.0",  # For type(action)=Message and default temperature handling
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "httpx-aiohttp",
@@ -62,7 +62,7 @@ requires-python = ">=3.11,<3.15"
 
 [project.optional-dependencies]
 dev = [
-    "fhlmi>=0.44.0",  # Lower pin for update from Haiku 3.5 to 4.5
+    "fhlmi>=1.10.0",
     "httpx-aiohttp>=0.1.11",  # Pin for raw headers fix
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
@@ -564,11 +564,10 @@ extend-exclude = [
 ]
 
 [tool.uv]
-# Temporary until fhlmi is released with support for LiteLLM 1.106.2.
+# fhlmi 1.10.0 still declares litellm<=1.84.1; remove after its bound is widened.
 override-dependencies = ["litellm==1.106.2"]
 
 [tool.uv.sources]
-fhlmi = {branch = "main", git = "https://github.com/Future-House/ldp", subdirectory = "packages/lmi"}
 paper-qa = {workspace = true}
 paper-qa-docling = {workspace = true}
 paper-qa-nemotron = {workspace = true}
