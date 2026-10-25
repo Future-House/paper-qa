@@ -9,9 +9,10 @@ from typing import Any, ClassVar, Protocol, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
-from lmi import LiteLLMModel, LLMModel
+from lmi import LLMModel
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
+from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.version import __version__
 
@@ -71,14 +72,11 @@ class AnswerResponse(BaseModel):
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
-        if isinstance(llm_model, str):
-            model: LLMModel = LiteLLMModel(name=llm_model)
-            if llm_model == "gpt-6-luna":
-                model.config["model_list"][0]["litellm_params"][
-                    "reasoning_effort"
-                ] = "none"
-        else:
-            model = llm_model
+        model = (
+            Settings(summary_llm=llm_model, temperature=1.0).get_summary_llm()
+            if isinstance(llm_model, str)
+            else llm_model
+        )
         prompt_template = "{question}\n\n{answer}"
         messages = [
             Message(role="system", content=sys_prompt),

@@ -6,10 +6,11 @@ from datetime import datetime
 from typing import cast
 
 from aviary.core import Message
-from lmi import LiteLLMModel, LLMModel
+from lmi import LLMModel
 from rich.table import Table
 
 from paperqa.docs import Docs
+from paperqa.settings import Settings
 from paperqa.types import DocDetails
 
 from .models import AnswerResponse
@@ -54,15 +55,11 @@ async def litellm_get_search_query(
             f" is optional. The current year is {get_year()}."
         )
 
-    if isinstance(llm, str):
-        model: LLMModel = LiteLLMModel(name=llm)
-        model.config["model_list"][0]["litellm_params"].update(
-            {"temperature": temperature}
-        )
-        if llm == "gpt-6-luna":
-            model.config["model_list"][0]["litellm_params"]["reasoning_effort"] = "none"
-    else:
-        model = llm
+    model = (
+        Settings(summary_llm=llm, temperature=temperature).get_summary_llm()
+        if isinstance(llm, str)
+        else llm
+    )
     messages = [
         Message(content=search_prompt.format(question=question, count=count)),
     ]
