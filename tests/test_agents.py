@@ -372,10 +372,7 @@ async def test_agent_types(
     assert response.session.question == question
     agent_llm = agent_test_settings.agent.agent_llm
     # TODO: once LDP can track tokens, we can remove this check
-    if (
-        agent_type not in {FAKE_AGENT_TYPE, SimpleAgent}
-        and agent_llm in response.session.token_counts
-    ):
+    if agent_type not in {FAKE_AGENT_TYPE, SimpleAgent}:
         assert (
             response.session.token_counts[agent_llm][0] > 500
         ), "Expected many prompt tokens"

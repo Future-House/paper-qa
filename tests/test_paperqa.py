@@ -3182,6 +3182,7 @@ async def test_partitioning_fn_docs(use_partition: bool) -> None:
         ), "None of the 'don't like X' statements should be included"
 
 
+@pytest.mark.offline
 class TestLLMParseJson:
     """Tests for extracting JSON strings from LLM Response and ensuring proper formatting."""
 

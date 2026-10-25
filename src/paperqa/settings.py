@@ -346,10 +346,11 @@ class ParsingSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the enrichment_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
     enrichment_page_radius: int = Field(
@@ -377,6 +378,7 @@ class _FormatDict(UserDict):
     """Mock a dictionary and store any missing items."""
 
     def __init__(self) -> None:
+        super().__init__()
         self.key_set: set[str] = set()
 
     def __missing__(self, key: str) -> str:
@@ -613,10 +615,11 @@ class AgentSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the agent_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
 
@@ -742,6 +745,15 @@ def make_default_litellm_model_list_settings(
     }
 
 
+def merge_default_litellm_model_settings(
+    llm: str, config: dict | None, temperature: float
+) -> dict:
+    """Fill in the model list when a caller supplies only router options."""
+    if config is not None and "model_list" in config:
+        return config
+    return make_default_litellm_model_list_settings(llm, temperature) | (config or {})
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
@@ -763,10 +775,11 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
     summary_llm: str = Field(
@@ -780,10 +793,11 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the summary_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
     embedding: str = Field(
@@ -920,25 +934,24 @@ class Settings(BaseSettings):
     def get_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.llm,
-            config=self.llm_config
-            or make_default_litellm_model_list_settings(self.llm, self.temperature),
+            config=merge_default_litellm_model_settings(
+                self.llm, self.llm_config, self.temperature
+            ),
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.summary_llm,
-            config=self.summary_llm_config
-            or make_default_litellm_model_list_settings(
-                self.summary_llm, self.temperature
+            config=merge_default_litellm_model_settings(
+                self.summary_llm, self.summary_llm_config, self.temperature
             ),
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.agent.agent_llm,
-            config=self.agent.agent_llm_config
-            or make_default_litellm_model_list_settings(
-                self.agent.agent_llm, self.temperature
+            config=merge_default_litellm_model_settings(
+                self.agent.agent_llm, self.agent.agent_llm_config, self.temperature
             ),
         )
 
@@ -948,9 +961,10 @@ class Settings(BaseSettings):
     def get_enrichment_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.parsing.enrichment_llm,
-            config=self.parsing.enrichment_llm_config
-            or make_default_litellm_model_list_settings(
-                self.parsing.enrichment_llm, self.temperature
+            config=merge_default_litellm_model_settings(
+                self.parsing.enrichment_llm,
+                self.parsing.enrichment_llm_config,
+                self.temperature,
             ),
         )
 
@@ -993,7 +1007,15 @@ class Settings(BaseSettings):
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
-        ldp_llm_config = {"name": agent_llm, "temperature": self.temperature}
+        ldp_llm_config: dict[str, Any] = {"name": agent_llm}
+        if agent_llm == "gpt-6.1-sol":
+            # LDP constructs its own LiteLLMModel, whose fallback model list
+            # otherwise supplies an unsupported temperature for this model.
+            ldp_llm_config["model_list"] = make_default_litellm_model_list_settings(
+                agent_llm, self.temperature
+            )["model_list"]
+        else:
+            ldp_llm_config["temperature"] = self.temperature
         if agent_llm in {"gpt-6-sol", "gpt-6-luna"}:
             ldp_llm_config["reasoning_effort"] = "none"
         if issubclass(agent_cls, ReActAgent):  # ty: ignore[invalid-argument-type]
