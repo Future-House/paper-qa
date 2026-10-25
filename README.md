@@ -295,10 +295,10 @@ pqa -i 'answers' search 'ranking and contextual summarization'
 
 PaperQA2 is highly configurable, when running from the command line,
 `pqa --help` shows all options and short descriptions.
-For example to run with a higher temperature:
+For example, GPT-4o accepts a custom temperature:
 
 ```bash
-pqa --temperature 0.5 ask 'What is PaperQA2?'
+pqa --llm gpt-4o --summary_llm gpt-4o --temperature 0.5 ask 'What is PaperQA2?'
 ```
 
 You can view all settings with `pqa view`.
@@ -409,7 +409,7 @@ from paperqa import Settings, ask
 
 answer_response = ask(
     "What is PaperQA2?",
-    settings=Settings(temperature=0.5, paper_directory="my_papers"),
+    settings=Settings(agent={"index": {"paper_directory": "my_papers"}}),
 )
 ```
 
@@ -427,9 +427,7 @@ from paperqa import Settings, ask
 
 answer_response = ask(
     "What is PaperQA2?",
-    settings=Settings(
-        temperature=0.5, agent={"index": {"paper_directory": "my_papers"}}
-    ),
+    settings=Settings(agent={"index": {"paper_directory": "my_papers"}}),
 )
 ```
 
@@ -441,9 +439,7 @@ from paperqa import Settings, agent_query
 
 answer_response = await agent_query(
     query="What is PaperQA2?",
-    settings=Settings(
-        temperature=0.5, agent={"index": {"paper_directory": "my_papers"}}
-    ),
+    settings=Settings(agent={"index": {"paper_directory": "my_papers"}}),
 )
 ```
 
@@ -988,7 +984,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                                                     |
 | `embedding`                                  | `"text-embedding-3-small"`             | Embedding model for embedding text chunks when adding papers.                                                                 |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                                       |
-| `temperature`                                | `0.0`                                  | Temperature for LLMs.                                                                                                         |
+| `temperature`                                | `None`                                 | Optional temperature for LLMs; omitted when unset.                                                                            |
 | `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                                                  |
 | `texts_index_mmr_lambda`                     | `1.0`                                  | Lambda for MMR in text index.                                                                                                 |
 | `verbosity`                                  | `0`                                    | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                                               |

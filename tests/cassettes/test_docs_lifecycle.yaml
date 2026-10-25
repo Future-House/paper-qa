@@ -4249,7 +4249,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        \ * \\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -4421,7 +4421,7 @@ interactions:
         to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
         \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
         this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title\\n\\n---\\n\\nQuestion:
-        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -4606,7 +4606,7 @@ interactions:
         \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
         \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
         proposed cuts to the\\n[un\\n\\n---\\n\\nQuestion: What is the national flag
-        of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -4787,7 +4787,7 @@ interactions:
         [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
         July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
         February 15, 2010. Retrieved February 15, 2011.\\n \\n\\n---\\n\\nQuestion:
-        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -4937,7 +4937,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        External links\\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json

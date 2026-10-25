@@ -4,7 +4,6 @@ import logging
 import os
 import pathlib
 import re
-import warnings
 from collections import UserDict, defaultdict
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
@@ -15,7 +14,6 @@ from typing import (
     Any,
     ClassVar,
     Protocol,
-    Self,
     TypeAlias,
     assert_never,
     cast,
@@ -34,7 +32,6 @@ from pydantic import (
     computed_field,
     field_validator,
     model_serializer,
-    model_validator,
 )
 from pydantic.json_schema import SkipJsonSchema
 from pydantic_core.core_schema import SerializationInfo
@@ -717,17 +714,17 @@ class AgentSettings(BaseModel):
 
 
 def make_default_litellm_model_list_settings(
-    llm: str, temperature: float = 0.0
+    llm: str,
+    temperature: float | None = None,
+    *,
+    reasoning_effort: str | None = None,
 ) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
     litellm_params = {"model": llm}
-    if llm != "gpt-6.1-sol":
-        # GPT-6.1 Sol cannot disable reasoning and rejects temperature.
+    if temperature is not None:
         litellm_params["temperature"] = temperature
-        if llm in {"gpt-6-sol", "gpt-6-luna"}:
-            # Preserve the non-reasoning behavior of our prior defaults. This
-            # also enables tool calling through the Chat Completions API.
-            litellm_params["reasoning_effort"] = "none"
+    if reasoning_effort is not None:
+        litellm_params["reasoning_effort"] = reasoning_effort
     return {
         "name": llm,
         "model_list": [
@@ -746,12 +743,18 @@ def make_default_litellm_model_list_settings(
 
 
 def merge_default_litellm_model_settings(
-    llm: str, config: dict | None, temperature: float
+    llm: str,
+    config: dict | None,
+    temperature: float | None,
+    *,
+    reasoning_effort: str | None = None,
 ) -> dict:
     """Fill in the model list when a caller supplies only router options."""
     if config is not None and "model_list" in config:
         return config
-    return make_default_litellm_model_list_settings(llm, temperature) | (config or {})
+    return make_default_litellm_model_list_settings(
+        llm, temperature, reasoning_effort=reasoning_effort
+    ) | (config or {})
 
 
 class Settings(BaseSettings):
@@ -808,7 +811,9 @@ class Settings(BaseSettings):
         default=None,
         description="Optional configuration for the embedding model.",
     )
-    temperature: float = Field(default=0.0, description="Temperature for LLMs.")
+    temperature: float | None = Field(
+        default=None, description="Optional temperature for LLMs; omitted when unset."
+    )
     batch_size: int = Field(default=1, description="Batch size for calling LLMs.")
     texts_index_mmr_lambda: float = Field(
         default=1.0, description="Lambda for MMR in text index."
@@ -828,26 +833,6 @@ class Settings(BaseSettings):
         ),
         exclude=True,
     )
-
-    @model_validator(mode="after")
-    def _update_temperature(self) -> Self:
-        """Ensures temperature is 1 if the LLM requires it.
-
-        o1 reasoning models only support temperature = 1.
-        SEE: https://platform.openai.com/docs/guides/reasoning/quickstart
-        """
-        for model_prefix in ("o1", "gpt-5"):
-            if self.llm.startswith(model_prefix) and self.temperature != 1:
-                warnings.warn(
-                    f"When dealing with OpenAI {model_prefix} models,"
-                    " the temperature must be set to 1,"
-                    f" so the specified temperature {self.temperature}"
-                    " has been overridden to 1.",
-                    category=UserWarning,
-                    stacklevel=2,
-                )
-                self.temperature = 1
-        return self
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -951,7 +936,12 @@ class Settings(BaseSettings):
         return LiteLLMModel(
             name=self.agent.agent_llm,
             config=merge_default_litellm_model_settings(
-                self.agent.agent_llm, self.agent.agent_llm_config, self.temperature
+                self.agent.agent_llm,
+                self.agent.agent_llm_config,
+                self.temperature,
+                reasoning_effort=(
+                    "none" if self.agent.agent_llm == "gpt-6-sol" else None
+                ),
             ),
         )
 
@@ -982,9 +972,15 @@ class Settings(BaseSettings):
                 )
             )
         ):
+            model_config = self.get_agent_llm().config
+            router = litellm.Router(
+                model_list=model_config["model_list"],
+                fallbacks=model_config.get("fallbacks", []),
+                **model_config.get("router_kwargs", {}),
+            )
             return ToolSelector(
                 model_name=self.agent.agent_llm,
-                acompletion=self.get_agent_llm().get_router().acompletion,
+                acompletion=router.acompletion,
                 **(self.agent.agent_config or {}),
             )
         return None
@@ -1008,16 +1004,12 @@ class Settings(BaseSettings):
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
         ldp_llm_config: dict[str, Any] = {"name": agent_llm}
-        if agent_llm == "gpt-6.1-sol":
-            # LDP constructs its own LiteLLMModel, whose fallback model list
-            # otherwise supplies an unsupported temperature for this model.
-            ldp_llm_config["model_list"] = make_default_litellm_model_list_settings(
-                agent_llm, self.temperature
-            )["model_list"]
-        else:
+        if self.temperature is not None:
             ldp_llm_config["temperature"] = self.temperature
-        if agent_llm in {"gpt-6-sol", "gpt-6-luna"}:
-            ldp_llm_config["reasoning_effort"] = "none"
+        if agent_llm == "gpt-6-sol":
+            ldp_llm_config["model_list"] = make_default_litellm_model_list_settings(
+                agent_llm, self.temperature, reasoning_effort="none"
+            )["model_list"]
         if issubclass(agent_cls, ReActAgent):  # ty: ignore[invalid-argument-type]
             return agent_cls(
                 llm_model=ldp_llm_config,  # ty: ignore[unknown-argument]

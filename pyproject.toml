@@ -563,7 +563,12 @@ extend-exclude = [
     "tests/stub_data/**",
 ]
 
+[tool.uv]
+# Temporary for Future-House/ldp#489; use a published fhlmi release before merging to dev.
+override-dependencies = ["litellm==1.106.2"]
+
 [tool.uv.sources]
+fhlmi = {git = "https://github.com/Future-House/ldp", rev = "a64ba49062381a50d216fd299df21927f9be1a02", subdirectory = "packages/lmi"}
 paper-qa = {workspace = true}
 paper-qa-docling = {workspace = true}
 paper-qa-nemotron = {workspace = true}

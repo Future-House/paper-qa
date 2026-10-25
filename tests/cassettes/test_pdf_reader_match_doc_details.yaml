@@ -10775,7 +10775,7 @@ interactions:
         al. 111 have developed a method named Adversarial Training on EXplanations (ATEX)\\n\\nwhich
         improves model robustness via exposure to adversarial examples.  While there
         are\\n\\nconceptual disparities, we note that\\n\\n---\\n\\nQuestion: Are counterfactuals
-        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -10961,7 +10961,7 @@ interactions:
         should seek to explain molecular property prediction models because users are
         more\\n\\nlikely to trust explained predictions, and explanations can help assess
         if the model is learning\\n\\nt\\n\\n---\\n\\nQuestion: Are counterfactuals
-        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -11147,7 +11147,7 @@ interactions:
         approach, contrastive approach employ a dual\\n\\noptimization method, which
         works by generating a similar and a dissimilar (counterfactuals)\\n\\nexample.
         Contrastive explanations can interpret the model by identifying contribution
-        of\\n\\npresence \\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        of\\n\\npresence \\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -11333,7 +11333,7 @@ interactions:
         is\\n\\nimportant for chemical process design, drug design and crystallization.133\u2013136
         In our previous\\n\\nworks,9,10 we implemented and trained an RNN model in Keras
         to predict solubilities (log\\n\\nmolarity) of small molecules.127 The AqS\\n\\n---\\n\\nQuestion:
-        Are counterfactuals actionable? [yes/no]\"}]}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        Are counterfactuals actionable? [yes/no]\"}]}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -11526,7 +11526,7 @@ interactions:
         2021, 2, 03LT02.\\n\\n\\n(104) Lucic,  A.;   ter  Hoeve,  M.;   Tolomei,  G.;
         \  Rijke,  M.;   Silvestri,  F.  CF-\\n\\n     GNNExplainer:  Counterfactual
         Explanations for Graph Neural Networks. arXiv\\n\\n---\\n\\nQuestion: Are counterfactuals
-        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -11713,7 +11713,7 @@ interactions:
         Explaining the\\n\\n     predictions of any classifier. Proceedings of the 22nd
         ACM SIGKDD international\\n\\n\\n                                      27     conference
         on knowledge discovery and data \\n\\n---\\n\\nQuestion: Are counterfactuals
-        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -11897,7 +11897,7 @@ interactions:
         \ We present an example evaluation of the SHAP explanation method based on the
         above\\n\\nattributes.44 Shapley values were proposed as a local explanation
         method based on feature\\n\\nattribution, as they offer a complete explanation
-        - each feature i\\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        - each feature i\\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -12083,7 +12083,7 @@ interactions:
         \ The counterfactual indicates\\nstructural changes to ethyl benzoate that would
         result in the model predicting the molecule\\nto not contain the \u2018fruity\u2019
         scent. The Tanimoto96 similarity between the counterfactual and\\n2,4 decadienal
-        is also\\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}]}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        is also\\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}]}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -12278,7 +12278,7 @@ interactions:
         a passive characteristic of a model, whereas explainability\\n\\nis an active
         characteristic which is used to clarify the internal decision-making process.\\n\\nNamely,
         an explanation is extra information that gives the context and a cause for one
-        or\\n\\nmore \\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        or\\n\\nmore \\n\\n---\\n\\nQuestion: Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
@@ -12463,7 +12463,7 @@ interactions:
         \ 2.\\n\\n                                          \u2206\u02C6f(\u20D7x) \u2248\u2202\u02C6f(\u20D7x)
         \                                   (2)\\n                               \u2206xi
         \     \u2202xi\\n\\n\\n\\n                                       7                                  \\n\\n---\\n\\nQuestion:
-        Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"reasoning_effort\":\"none\",\"temperature\":0.0,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        Are counterfactuals actionable? [yes/no]\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
       headers:
         accept:
           - application/json
