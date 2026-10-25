@@ -1,6 +1,6 @@
 {
-  "llm": "claude-3-haiku-20240307",
-  "summary_llm": "claude-3-haiku-20240307",
+  "llm": "openai/gpt-6.1-sol",
+  "summary_llm": "openai/gpt-6-luna",
   "answer": {
     "evidence_k": 2,
     "evidence_summary_length": "25 to 50 words",

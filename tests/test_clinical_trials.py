@@ -15,6 +15,8 @@ from paperqa.sources.clinical_trials import (
     parse_clinical_trial,
 )
 
+pytestmark = pytest.mark.offline
+
 SAMPLE_TRIAL_DATA = {
     "protocolSection": {
         "identificationModule": {

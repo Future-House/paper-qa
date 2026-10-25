@@ -15,20 +15,15 @@ from typing import cast
 from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
-import ldp.agent
 import pytest
 from aviary.core import (
     Environment,
     Tool,
-    ToolRequestMessage,
     ToolResponseMessage,
     ToolsAdapter,
     ToolSelector,
 )
-from ldp.agent import MemoryAgent, SimpleAgent
-from ldp.graph.memory import Memory, UIndexMemoryModel
-from ldp.graph.ops import OpResult
-from lmi import CommonLLMNames, EmbeddingModel, LiteLLMModel
+from ldp.agent import SimpleAgent
 from pytest_subtests import SubTests
 from tantivy import Index
 from tenacity import Retrying, retry_if_exception_type, stop_after_attempt
@@ -55,13 +50,12 @@ from paperqa.agents.tools import (
     GenerateAnswer,
     PaperSearch,
     Reset,
-    make_status,
 )
 from paperqa.docs import Docs
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, CONTEXT_INNER_PROMPT_NOT_DETAILED
 from paperqa.settings import AgentSettings, IndexSettings, Settings
 from paperqa.types import Context, Doc, DocDetails, PQASession, Text
-from paperqa.utils import compute_unique_doc_id, extract_thought, get_year, md5sum
+from paperqa.utils import compute_unique_doc_id, get_year, md5sum
 
 
 @pytest.mark.asyncio
@@ -345,7 +339,9 @@ async def test_get_directory_index_w_no_citations(
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", [FAKE_AGENT_TYPE, ToolSelector, SimpleAgent])
-@pytest.mark.parametrize("llm_name", ["gpt-4o", "gemini/gemini-2.0-flash-lite"])
+@pytest.mark.parametrize(
+    "llm_name", ["openai/gpt-6-sol", "gemini/gemini-2.0-flash-lite"]
+)
 @pytest.mark.asyncio
 async def test_agent_types(
     agent_test_settings: Settings,
@@ -357,8 +353,8 @@ async def test_agent_types(
     # make sure agent_llm is different from default, so we can correctly track tokens
     # for agent
     agent_test_settings.agent.agent_llm = llm_name
-    agent_test_settings.llm = "gpt-4o-mini"
-    agent_test_settings.summary_llm = "gpt-4o-mini"
+    agent_test_settings.llm = "openai/gpt-6.1-sol"
+    agent_test_settings.summary_llm = "openai/gpt-6-luna"
     agent_test_settings.agent.agent_prompt += (
         "\n\nCall each tool once in appropriate order and"
         " accept the answer for now, as we're in debug mode."
@@ -399,92 +395,12 @@ async def test_agent_types(
         ), "Answer contains citation with missing 'pages' keyword"
 
 
-@pytest.mark.asyncio
-async def test_successful_memory_agent(agent_test_settings: Settings) -> None:
-    tic = time.perf_counter()
-    memory_id = "call_Wtmv95JbNcQ2nRQCZBoOfcJy"  # Stub value
-    memory = Memory(
-        query=(
-            "Use the tools to answer the question: How can you use XAI for chemical"
-            " property prediction?\n\nWhen the answer looks sufficient,"
-            " you can terminate by calling the {complete_tool_name} tool."
-            " If the answer does not look sufficient,"
-            " and you have already tried to answer several times,"
-            " you can terminate by calling the {complete_tool_name} tool."
-            " The current status of evidence/papers/cost is "
-            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Started 0  # noqa: E501
-            "\n\nTool request message '' for tool calls: paper_search(query='XAI for"
-            " chemical property prediction', min_year='2018', max_year='2024')"
-            f" [id={memory_id}]\n\nTool response message '"
-            f"{make_status(total_paper_count=2, relevant_paper_count=0, evidence_count=0, cost=0.0)}"  # Found 2  # noqa: E501
-            f"' for tool call ID {memory_id} of tool 'paper_search'"
-        ),
-        input=(
-            "Use the tools to answer the question: How can you use XAI for chemical"
-            " property prediction?\n\nWhen the answer looks sufficient,"
-            " you can terminate by calling the {complete_tool_name} tool."
-            " If the answer does not look sufficient,"
-            " and you have already tried to answer several times,"
-            " you can terminate by calling the {complete_tool_name} tool."
-            " The current status of evidence/papers/cost is "
-            f"{make_status(total_paper_count=0, relevant_paper_count=0, evidence_count=0, cost=0.0)}"
-        ),
-        output=(
-            "Tool request message '' for tool calls: paper_search(query='XAI for"
-            " chemical property prediction', min_year='2018', max_year='2024')"
-            f" [id={memory_id}]"
-        ),
-        value=5.0,  # Stub value
-        template="Input: {input}\n\nOutput: {output}\n\nDiscounted Reward: {value}",
-    )
-    memory_model = UIndexMemoryModel(
-        embedding_model=EmbeddingModel.from_name("text-embedding-3-small")
-    )
-    await memory_model.add_memory(memory)
-    serialized_memory_model = memory_model.model_dump(exclude_none=True)
-    query = "How can you use XAI for chemical property prediction?"
-    # NOTE: use Claude 3 for its <thinking> feature, testing regex replacement of it
-    agent_test_settings.agent.agent_llm = CommonLLMNames.CLAUDE_37_SONNET.value
-    agent_test_settings.agent.agent_config = {
-        "memories": serialized_memory_model.pop("memories"),
-        "memory_model": serialized_memory_model,
-    }
-
-    thoughts: list[str] = []
-    orig_llm_model_call = LiteLLMModel.call
-
-    async def on_agent_action(  # noqa: RUF029
-        action: OpResult[ToolRequestMessage], *_
-    ) -> None:
-        thoughts.append(extract_thought(content=action.value.content))
-
-    async def llm_model_call(*args, **kwargs):
-        # NOTE: "required" will not lead to thoughts being emitted, it has to be "auto"
-        # https://docs.anthropic.com/en/docs/build-with-claude/tool-use#chain-of-thought
-        args = args[:-1]  # removing last element (tool_choice) from args
-        return await orig_llm_model_call(*args, tool_choice="auto", **kwargs)  # type: ignore[misc]
-
-    with patch.object(LiteLLMModel, "call", side_effect=llm_model_call, autospec=True):
-        response = await agent_query(
-            query,
-            agent_test_settings,
-            Docs(),
-            agent_type=f"{ldp.agent.__name__}.{MemoryAgent.__name__}",
-            on_agent_action_callback=on_agent_action,
-        )
-    assert response.status == AgentStatus.SUCCESS, "Agent did not succeed"
-    assert (
-        time.perf_counter() - tic <= agent_test_settings.agent.timeout
-    ), "Agent should not have timed out"
-    assert all(thought and "<thinking>" not in thought for thought in thoughts)
-
-
 @pytest.mark.parametrize("agent_type", [ToolSelector, SimpleAgent])
 @pytest.mark.asyncio
 async def test_timeout(agent_test_settings: Settings, agent_type: str | type) -> None:
     agent_test_settings.prompts.pre = None
     agent_test_settings.agent.timeout = 0.05  # Give time for Environment.reset()
-    agent_test_settings.llm = "gpt-4o-mini"
+    agent_test_settings.llm = "openai/gpt-6.1-sol"
     agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
     orig_exec_tool_calls = PaperQAEnvironment.exec_tool_calls
     tool_responses: list[list[ToolResponseMessage]] = []
@@ -512,7 +428,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
 @pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_propagate_options(agent_test_settings: Settings) -> None:
-    llm_name = "gpt-4o-mini"
+    llm_name = "openai/gpt-6-sol"
     default_llm_names = {
         cls.model_fields[name].default
         for name, cls in itertools.product(("llm", "summary_llm"), (Settings,))
@@ -816,6 +732,7 @@ async def test_agent_sharing_state(
         assert not session.contexts
 
 
+@pytest.mark.offline
 def test_settings_model_config() -> None:
     settings_name = "tier1_limits"
     settings = Settings.from_name(settings_name)
@@ -845,6 +762,7 @@ def test_settings_model_config() -> None:
     )
 
 
+@pytest.mark.offline
 def test_tool_schema(agent_test_settings: Settings) -> None:
     """Check the tool schema passed to LLM providers."""
     tools = settings_to_tools(agent_test_settings)
@@ -990,6 +908,7 @@ def test_tool_schema(agent_test_settings: Settings) -> None:
     ]
 
 
+@pytest.mark.offline
 def test_answers_are_striped() -> None:
     """Test that answers are striped."""
     session = PQASession(
@@ -1027,8 +946,8 @@ def test_answers_are_striped() -> None:
 
 @pytest.mark.asyncio
 async def test_clinical_tool_usage(agent_test_settings) -> None:
-    agent_test_settings.llm = "gpt-4o"
-    agent_test_settings.summary_llm = "gpt-4o"
+    agent_test_settings.llm = "openai/gpt-6.1-sol"
+    agent_test_settings.summary_llm = "openai/gpt-6-luna"
     agent_test_settings.agent.tool_names = {
         "clinical_trials_search",
         "gather_evidence",
@@ -1153,6 +1072,7 @@ async def test_index_build_concurrency(agent_test_settings: Settings) -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.offline
 async def test_env_from_name(subtests: SubTests) -> None:
     assert "paperqa" in Environment.available()
 

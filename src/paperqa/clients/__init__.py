@@ -112,13 +112,13 @@ class DocMetadataClient:
                     DocMetadataTask(
                         providers=[
                             c if isinstance(c, MetadataProvider) else c()
-                            for c in sub_clients
+                            for c in sub_clients  # ty: ignore[not-iterable]
                             if (isinstance(c, type) and issubclass(c, MetadataProvider))
                             or isinstance(c, MetadataProvider)
                         ],
                         processors=[
                             c if isinstance(c, MetadataPostProcessor) else c()
-                            for c in sub_clients
+                            for c in sub_clients  # ty: ignore[not-iterable]
                             if (
                                 isinstance(c, type)
                                 and issubclass(c, MetadataPostProcessor)

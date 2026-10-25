@@ -710,7 +710,7 @@ def create_multimodal_message(
     ]
     if text is not None:
         content.append({"type": "text", "text": text})
-    return Message(role=role, content=content)
+    return Message(role=role, content=content)  # ty: ignore[invalid-argument-type]
 
 
 class ParsedText(BaseModel):
@@ -949,10 +949,10 @@ class DocDetails(Doc):
         """Merge two bibtex entries into one, preferring entry2 fields."""
         merged_entry = Entry(entry1.type)
 
-        for field, value in entry1.fields.items():
-            merged_entry.fields[field] = value
-        for field, value in entry2.fields.items():
-            merged_entry.fields[field] = value
+        for field, value in entry1.fields.items():  # ty: ignore[unresolved-attribute]
+            merged_entry.fields[field] = value  # ty: ignore[invalid-assignment]
+        for field, value in entry2.fields.items():  # ty: ignore[unresolved-attribute]
+            merged_entry.fields[field] = value  # ty: ignore[invalid-assignment]
 
         return merged_entry
 
@@ -1048,9 +1048,9 @@ class DocDetails(Doc):
         # we try to regenerate the key if unknowns are present, maybe they have been found
         if not data.get("key") or "unknown" in data["key"].lower():
             data["key"] = create_bibtex_key(
-                data.get("authors") or CITATION_FALLBACK_DATA["authors"],  # type: ignore[arg-type]
-                data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]
-                data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]
+                data.get("authors") or CITATION_FALLBACK_DATA["authors"],  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+                data.get("year") or CITATION_FALLBACK_DATA["year"],  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
+                data.get("title") or CITATION_FALLBACK_DATA["title"],  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
             )
             if "docname" in data.get(
                 "fields_to_overwrite_from_metadata",

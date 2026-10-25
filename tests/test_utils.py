@@ -1,4 +1,8 @@
+import pytest
+
 from paperqa.utils import citation_to_docname
+
+pytestmark = pytest.mark.offline
 
 
 def test_citation_to_docname_acronym_title() -> None:

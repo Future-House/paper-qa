@@ -99,7 +99,7 @@ def maybe_is_pdf(file: BinaryIO) -> bool:
 def maybe_is_html(file: BinaryIO) -> bool:
     magic_number = file.read(4)
     file.seek(0)
-    return magic_number in {b"<htm", b"<!DO", b"<xsl", b"<!X"}
+    return magic_number.lower() in {b"<htm", b"<!do", b"<xsl", b"<!x"}
 
 
 def strings_similarity(s1: str, s2: str, case_insensitive: bool = True) -> float:
@@ -423,7 +423,7 @@ def bibtex_field_extract(
     try:
         pattern = rf"{field}\s*=\s*{{(.*?)}},"
         # note: we intentionally have an attribute error if no match
-        return re.search(pattern, bibtex, re.IGNORECASE).group(1).strip()  # type: ignore[union-attr]
+        return re.search(pattern, bibtex, re.IGNORECASE).group(1).strip()  # type: ignore[union-attr]  # ty: ignore[unresolved-attribute]
     except AttributeError:
         return missing_replacements.get(field, "")
 
@@ -482,7 +482,7 @@ async def _get_with_retrying(  # type: ignore[return]  # noqa: RET503
     http_exception_mappings: dict[HTTPStatus | int, Exception] | None = None,
     retry_predicate: Callable[[BaseException], bool] = is_retryable,
     **get_kwargs,
-) -> dict[str, Any]:
+) -> dict[str, Any]:  # ty: ignore[invalid-return-type]
     """Get from a URL with retrying protection.
 
     Args:

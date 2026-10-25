@@ -295,10 +295,10 @@ pqa -i 'answers' search 'ranking and contextual summarization'
 
 PaperQA2 is highly configurable, when running from the command line,
 `pqa --help` shows all options and short descriptions.
-For example to run with a higher temperature:
+For example, GPT-4o accepts a custom temperature:
 
 ```bash
-pqa --temperature 0.5 ask 'What is PaperQA2?'
+pqa --llm gpt-4o --summary_llm gpt-4o --temperature 0.5 ask 'What is PaperQA2?'
 ```
 
 You can view all settings with `pqa view`.
@@ -382,7 +382,7 @@ You can also specify them manually with any rate limit string that matches the s
 the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
-pqa --summary_llm_config '{"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}}' \
+pqa --summary_llm_config '{"rate_limit": {"openai/gpt-6-luna": "30000 per 1 minute"}}' \
     ask 'What is PaperQA2?'
 ```
 
@@ -394,8 +394,8 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What is PaperQA2?",
     settings=Settings(
-        llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
-        summary_llm_config={"rate_limit": {"gpt-4o-2024-11-20": "30000 per 1 minute"}},
+        llm_config={"rate_limit": {"openai/gpt-6.1-sol": "30000 per 1 minute"}},
+        summary_llm_config={"rate_limit": {"openai/gpt-6-luna": "30000 per 1 minute"}},
     ),
 )
 ```
@@ -409,7 +409,7 @@ from paperqa import Settings, ask
 
 answer_response = ask(
     "What is PaperQA2?",
-    settings=Settings(temperature=0.5, paper_directory="my_papers"),
+    settings=Settings(agent={"index": {"paper_directory": "my_papers"}}),
 )
 ```
 
@@ -427,9 +427,7 @@ from paperqa import Settings, ask
 
 answer_response = ask(
     "What is PaperQA2?",
-    settings=Settings(
-        temperature=0.5, agent={"index": {"paper_directory": "my_papers"}}
-    ),
+    settings=Settings(agent={"index": {"paper_directory": "my_papers"}}),
 )
 ```
 
@@ -441,9 +439,7 @@ from paperqa import Settings, agent_query
 
 answer_response = await agent_query(
     query="What is PaperQA2?",
-    settings=Settings(
-        temperature=0.5, agent={"index": {"paper_directory": "my_papers"}}
-    ),
+    settings=Settings(agent={"index": {"paper_directory": "my_papers"}}),
 )
 ```
 
@@ -520,8 +516,8 @@ asyncio.run(main())
 
 ### Choosing Model
 
-By default, PaperQA2 uses OpenAI's `gpt-4o-2024-11-20` model for the
-`summary_llm`, `llm`, and `agent_llm`.
+By default, PaperQA2 uses OpenAI's `gpt-6-luna` for `summary_llm`,
+`gpt-6.1-sol` for `llm` and media enrichment, and `gpt-6-sol` for `agent_llm`.
 Please see the [Settings Cheatsheet](#settings-cheatsheet)
 for more information on these settings.
 PaperQA2 also defaults to using OpenAI's `text-embedding-3-small` model for the `embedding` setting.
@@ -538,7 +534,7 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What is PaperQA2?",
     settings=Settings(
-        llm="gpt-4o-mini", summary_llm="gpt-4o-mini", agent={"index": {"paper_directory": "my_papers"}}
+        llm="openai/gpt-6.1-sol", summary_llm="openai/gpt-6-luna", agent={"index": {"paper_directory": "my_papers"}}
     ),
 )
 ```
@@ -982,13 +978,13 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                                                   |
 | -------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-4o-2024-11-20"`                  | LLM for general use including metadata inference (see Docs.aadd) and answer generation (see Docs.aquery and gen_answer tool). |
+| `llm`                                        | `"openai/gpt-6.1-sol"`                 | LLM for general use including metadata inference (see Docs.aadd) and answer generation (see Docs.aquery and gen_answer tool). |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                                             |
-| `summary_llm`                                | `"gpt-4o-2024-11-20"`                  | LLM for creating contextual summaries (see Docs.aget_evidence and gather_evidence tool).                                      |
+| `summary_llm`                                | `"openai/gpt-6-luna"`                  | LLM for creating contextual summaries (see Docs.aget_evidence and gather_evidence tool).                                      |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                                                     |
 | `embedding`                                  | `"text-embedding-3-small"`             | Embedding model for embedding text chunks when adding papers.                                                                 |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                                       |
-| `temperature`                                | `0.0`                                  | Temperature for LLMs.                                                                                                         |
+| `temperature`                                | `None`                                 | Optional temperature for LLMs; omitted when unset.                                                                            |
 | `batch_size`                                 | `1`                                    | Batch size for calling LLMs.                                                                                                  |
 | `texts_index_mmr_lambda`                     | `1.0`                                  | Lambda for MMR in text index.                                                                                                 |
 | `verbosity`                                  | `0`                                    | Integer verbosity level for logging (0-3). 3 = all LLM/Embeddings calls logged.                                               |
@@ -1016,7 +1012,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.configure_pdf_parser`               | No-op                                  | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging.                       |
 | `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                                       |
 | `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                                                |
-| `parsing.enrichment_llm`                     | `"gpt-4o-2024-11-20"`                  | LLM for media enrichment.                                                                                                     |
+| `parsing.enrichment_llm`                     | `"openai/gpt-6.1-sol"`                 | LLM for media enrichment.                                                                                                     |
 | `parsing.enrichment_llm_config`              | `None`                                 | Optional configuration for `enrichment_llm`.                                                                                  |
 | `parsing.enrichment_page_radius`             | `1`                                    | Page radius for context text in enrichment.                                                                                   |
 | `parsing.enrichment_prompt`                  | `image_enrichment_prompt_template`     | Prompt template for enriching media.                                                                                          |
@@ -1035,7 +1031,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompts.context_outer`                      | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                                                     |
 | `prompts.context_inner`                      | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables.                       |
 | `prompts.answer_iteration_prompt`            | `answer_iteration_prompt_template`     | Prompt to inject existing prior answers to allow iteration. Default injects no prior answers.                                 |
-| `agent.agent_llm`                            | `"gpt-4o-2024-11-20"`                  | LLM inside the agent making tool selections.                                                                                  |
+| `agent.agent_llm`                            | `"openai/gpt-6-sol"`                   | LLM inside the agent making tool selections.                                                                                  |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                                       |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                                         |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                                         |

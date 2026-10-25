@@ -1,10 +1,14 @@
 import operator
 
+import pytest
+
 from paperqa_pypdf.utils import cluster_bboxes
+
+pytestmark = pytest.mark.offline
 
 
 def test_cluster_bboxes_empty() -> None:
-    assert cluster_bboxes([]) == []  # noqa: FURB115
+    assert cluster_bboxes([]) == []
 
 
 def test_cluster_bboxes_single() -> None:
@@ -17,7 +21,7 @@ def test_cluster_bboxes_single() -> None:
 def test_cluster_bboxes_no_overlap_far_apart() -> None:
     bbox1 = (0.0, 0.0, 10.0, 10.0)
     bbox2 = (100.0, 100.0, 110.0, 110.0)
-    results = cluster_bboxes([bbox1, bbox2], tolerance=50)  # noqa: FURB120
+    results = cluster_bboxes([bbox1, bbox2], tolerance=50)
     assert len(results) == 2
     assert set(results) == {bbox1, bbox2}
 
@@ -25,7 +29,7 @@ def test_cluster_bboxes_no_overlap_far_apart() -> None:
 def test_cluster_bboxes_overlapping() -> None:
     bbox1 = (0.0, 0.0, 20.0, 20.0)
     bbox2 = (10.0, 10.0, 30.0, 30.0)
-    results = cluster_bboxes([bbox1, bbox2], tolerance=50)  # noqa: FURB120
+    results = cluster_bboxes([bbox1, bbox2], tolerance=50)
     assert len(results) == 1
     assert results[0] == (0.0, 0.0, 30.0, 30.0), "Merged bbox should be the union"
 

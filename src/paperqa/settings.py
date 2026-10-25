@@ -4,8 +4,7 @@ import logging
 import os
 import pathlib
 import re
-import warnings
-from collections import defaultdict
+from collections import UserDict, defaultdict
 from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import suppress
 from enum import IntEnum, StrEnum
@@ -15,7 +14,6 @@ from typing import (
     Any,
     ClassVar,
     Protocol,
-    Self,
     TypeAlias,
     assert_never,
     cast,
@@ -25,12 +23,7 @@ from typing import (
 import anyio
 import litellm
 from aviary.core import Message, Tool, ToolSelector
-from lmi import (
-    CommonLLMNames,
-    EmbeddingModel,
-    LiteLLMModel,
-    embedding_model_factory,
-)
+from lmi import EmbeddingModel, LiteLLMModel, embedding_model_factory
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -39,7 +32,6 @@ from pydantic import (
     computed_field,
     field_validator,
     model_serializer,
-    model_validator,
 )
 from pydantic.json_schema import SkipJsonSchema
 from pydantic_core.core_schema import SerializationInfo
@@ -50,12 +42,9 @@ from paperqa._ldp_shims import (
     HAS_LDP_INSTALLED,
     Agent,
     HTTPAgentClient,
-    MemoryAgent,
     ReActAgent,
     SimpleAgent,
     SimpleAgentState,
-    UIndexMemoryModel,
-    _Memories,
     set_training_mode,
 )
 from paperqa.prompts import (
@@ -347,21 +336,18 @@ class ParsingSettings(BaseModel):
         description="Parse clinical trial JSONs into human readable text.",
     )
     enrichment_llm: str = Field(
-        # NOTE: from CapArena (https://arxiv.org/abs/2503.12329),
-        # GPT-4o was the best image captioning model as of spring 2025
-        # NOTE: claude-haiku-4-5-20251001 recurringly failed to describe display type
-        # to be display type, so its captioning ability isn't good enough yet
-        default=CommonLLMNames.GPT_4O.value,
+        default="openai/gpt-6.1-sol",
         description="LLM for media enrichment (e.g. generating descriptions).",
     )
     enrichment_llm_config: dict | None = Field(
         default=None,
         description=(
             "Optional configuration for the enrichment_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
     enrichment_page_radius: int = Field(
@@ -385,10 +371,11 @@ class ParsingSettings(BaseModel):
         return mm_enum.should_parse_and_enrich_media
 
 
-class _FormatDict(dict):  # noqa: FURB189
+class _FormatDict(UserDict):
     """Mock a dictionary and store any missing items."""
 
     def __init__(self) -> None:
+        super().__init__()
         self.key_set: set[str] = set()
 
     def __missing__(self, key: str) -> str:
@@ -617,7 +604,7 @@ class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="openai/gpt-6-sol",
         description="LLM inside the agent making tool selections.",
     )
 
@@ -625,10 +612,11 @@ class AgentSettings(BaseModel):
         default=None,
         description=(
             "Optional configuration for the agent_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
 
@@ -726,32 +714,50 @@ class AgentSettings(BaseModel):
 
 
 def make_default_litellm_model_list_settings(
-    llm: str, temperature: float = 0.0
+    llm: str,
+    temperature: float | None = None,
+    *,
+    reasoning_effort: str | None = None,
 ) -> dict:
     """Settings matching "model_list" schema here: https://docs.litellm.ai/docs/routing."""
+    litellm_params = {"model": llm}
+    if temperature is not None:
+        litellm_params["temperature"] = temperature
+    if reasoning_effort is not None:
+        litellm_params["reasoning_effort"] = reasoning_effort
+        # LiteLLM 1.84 predates GPT-6 and otherwise rejects this request parameter.
+        litellm_params["allowed_openai_params"] = ["reasoning_effort"]
     return {
         "name": llm,
         "model_list": [
             {
                 "model_name": llm,
-                "litellm_params": {
-                    "model": llm,
-                    "temperature": temperature,
-                    # SEE: https://docs.litellm.ai/docs/tutorials/prompt_caching#litellm-python-sdk-usage
-                    "cache_control_injection_points": [
-                        {"location": "message", "role": "system"}
-                    ],
-                },
+                "litellm_params": litellm_params,
             }
         ],
     }
+
+
+def merge_default_litellm_model_settings(
+    llm: str,
+    config: dict | None,
+    temperature: float | None,
+    *,
+    reasoning_effort: str | None = None,
+) -> dict:
+    """Fill in the model list when a caller supplies only router options."""
+    if config is not None and "model_list" in config:
+        return config
+    return make_default_litellm_model_list_settings(
+        llm, temperature, reasoning_effort=reasoning_effort
+    ) | (config or {})
 
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="openai/gpt-6.1-sol",
         description=(
             "LLM for general use including metadata inference (see Docs.aadd)"
             " and answer generation (see Docs.aquery and gen_answer tool)."
@@ -768,14 +774,15 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
     summary_llm: str = Field(
-        default=CommonLLMNames.GPT_4O.value,
+        default="openai/gpt-6-luna",
         description=(
             "LLM for creating contextual summaries"
             " (see Docs.aget_evidence and gather_evidence tool)."
@@ -785,10 +792,11 @@ class Settings(BaseSettings):
         default=None,
         description=(
             "Optional configuration for the summary_llm model. More specifically, it's"
-            " a LiteLLM Router configuration to pass to LiteLLMModel, must have"
+            " a LiteLLM Router configuration to pass to LiteLLMModel, may include a"
             " `model_list` key (corresponding to model_list inputs here:"
             " https://docs.litellm.ai/docs/routing), and can optionally include a"
-            " router_kwargs key with router kwargs as values."
+            " router_kwargs key with router kwargs as values. If model_list is"
+            " omitted, the default model configuration is used."
         ),
     )
     embedding: str = Field(
@@ -799,7 +807,9 @@ class Settings(BaseSettings):
         default=None,
         description="Optional configuration for the embedding model.",
     )
-    temperature: float = Field(default=0.0, description="Temperature for LLMs.")
+    temperature: float | None = Field(
+        default=None, description="Optional temperature for LLMs; omitted when unset."
+    )
     batch_size: int = Field(default=1, description="Batch size for calling LLMs.")
     texts_index_mmr_lambda: float = Field(
         default=1.0, description="Lambda for MMR in text index."
@@ -819,26 +829,6 @@ class Settings(BaseSettings):
         ),
         exclude=True,
     )
-
-    @model_validator(mode="after")
-    def _update_temperature(self) -> Self:
-        """Ensures temperature is 1 if the LLM requires it.
-
-        o1 reasoning models only support temperature = 1.
-        SEE: https://platform.openai.com/docs/guides/reasoning/quickstart
-        """
-        for model_prefix in ("o1", "gpt-5"):
-            if self.llm.startswith(model_prefix) and self.temperature != 1:
-                warnings.warn(
-                    f"When dealing with OpenAI {model_prefix} models,"
-                    " the temperature must be set to 1,"
-                    f" so the specified temperature {self.temperature}"
-                    " has been overridden to 1.",
-                    category=UserWarning,
-                    stacklevel=2,
-                )
-                self.temperature = 1
-        return self
 
     @computed_field  # type: ignore[prop-decorator]
     @property
@@ -925,25 +915,29 @@ class Settings(BaseSettings):
     def get_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.llm,
-            config=self.llm_config
-            or make_default_litellm_model_list_settings(self.llm, self.temperature),
+            config=merge_default_litellm_model_settings(
+                self.llm, self.llm_config, self.temperature
+            ),
         )
 
     def get_summary_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.summary_llm,
-            config=self.summary_llm_config
-            or make_default_litellm_model_list_settings(
-                self.summary_llm, self.temperature
+            config=merge_default_litellm_model_settings(
+                self.summary_llm, self.summary_llm_config, self.temperature
             ),
         )
 
     def get_agent_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.agent.agent_llm,
-            config=self.agent.agent_llm_config
-            or make_default_litellm_model_list_settings(
-                self.agent.agent_llm, self.temperature
+            config=merge_default_litellm_model_settings(
+                self.agent.agent_llm,
+                self.agent.agent_llm_config,
+                self.temperature,
+                reasoning_effort=(
+                    "none" if self.agent.agent_llm == "openai/gpt-6-sol" else None
+                ),
             ),
         )
 
@@ -953,9 +947,10 @@ class Settings(BaseSettings):
     def get_enrichment_llm(self) -> LiteLLMModel:
         return LiteLLMModel(
             name=self.parsing.enrichment_llm,
-            config=self.parsing.enrichment_llm_config
-            or make_default_litellm_model_list_settings(
-                self.parsing.enrichment_llm, self.temperature
+            config=merge_default_litellm_model_settings(
+                self.parsing.enrichment_llm,
+                self.parsing.enrichment_llm_config,
+                self.temperature,
             ),
         )
 
@@ -973,16 +968,22 @@ class Settings(BaseSettings):
                 )
             )
         ):
+            model_config = self.get_agent_llm().config
+            router = litellm.Router(
+                model_list=model_config["model_list"],
+                fallbacks=model_config.get("fallbacks", []),
+                **model_config.get("router_kwargs", {}),
+            )
             return ToolSelector(
                 model_name=self.agent.agent_llm,
-                acompletion=self.get_agent_llm().get_router().acompletion,
+                acompletion=router.acompletion,
                 **(self.agent.agent_config or {}),
             )
         return None
 
     async def make_ldp_agent(
         self, agent_type: str | type
-    ) -> "Agent[SimpleAgentState] | None":
+    ) -> "Agent[SimpleAgentState] | None":  # ty: ignore[invalid-type-form]
         """Attempt to convert the input agent type to an ldp Agent."""
         if not isinstance(agent_type, str):  # Convert to fully qualified name
             agent_type = f"{agent_type.__module__}.{agent_type.__name__}"
@@ -998,53 +999,29 @@ class Settings(BaseSettings):
         agent_cls = cast("type[Agent]", locate(agent_type))
         agent_settings = self.agent
         agent_llm, config = agent_settings.agent_llm, agent_settings.agent_config or {}
-        if issubclass(agent_cls, ReActAgent | MemoryAgent):
-            if (
-                issubclass(agent_cls, MemoryAgent)
-                and "memory_model" in config
-                and "memories" in config
-            ):
-                if "embedding_model" in config["memory_model"]:
-                    config["memory_model"]["embedding_model"] = (
-                        EmbeddingModel.from_name(
-                            embedding=config["memory_model"].pop("embedding_model")[
-                                "name"
-                            ]
-                        )
-                    )
-                try:
-                    config["memory_model"] = UIndexMemoryModel(**config["memory_model"])
-                except ImportError as exc:
-                    raise ImportError(
-                        "Memory agents require the 'usearch' package,"
-                        " which is part of the 'memory' extra."
-                        " Please: `pip install paper-qa[memory]`."
-                    ) from exc
-                memories = _Memories.validate_python(config.pop("memories"))
-                await asyncio.gather(
-                    *(
-                        config["memory_model"].add_memory(memory)
-                        for memory in (
-                            memories.values()
-                            if isinstance(memories, dict)
-                            else memories
-                        )
-                    )
-                )
+        ldp_llm_config: dict[str, Any] = {"name": agent_llm}
+        if self.temperature is not None:
+            ldp_llm_config["temperature"] = self.temperature
+        if agent_llm == "openai/gpt-6-sol":
+            ldp_llm_config["model_list"] = make_default_litellm_model_list_settings(
+                agent_llm, self.temperature, reasoning_effort="none"
+            )["model_list"]
+        if issubclass(agent_cls, ReActAgent):  # ty: ignore[invalid-argument-type]
             return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
+                llm_model=ldp_llm_config,  # ty: ignore[unknown-argument]
                 **config,
             )
-        if issubclass(agent_cls, SimpleAgent):
+        if issubclass(agent_cls, SimpleAgent):  # ty: ignore[invalid-argument-type]
             return agent_cls(
-                llm_model={"name": agent_llm, "temperature": self.temperature},
-                sys_prompt=agent_settings.agent_system_prompt,
+                llm_model=ldp_llm_config,  # ty: ignore[unknown-argument]
+                sys_prompt=agent_settings.agent_system_prompt,  # ty: ignore[unknown-argument]
                 **config,
             )
-        if issubclass(agent_cls, HTTPAgentClient):
-            set_training_mode(False)
-            return HTTPAgentClient[SimpleAgentState](
-                agent_state_type=SimpleAgentState, **config
+        if issubclass(agent_cls, HTTPAgentClient):  # ty: ignore[invalid-argument-type]
+            set_training_mode(False)  # ty: ignore[call-non-callable]
+            return HTTPAgentClient[SimpleAgentState](  # ty: ignore[not-subscriptable]
+                agent_state_type=SimpleAgentState,  # ty: ignore[invalid-argument-type]
+                **config,
             )
         raise NotImplementedError(f"Didn't yet handle agent type {agent_type}.")
 

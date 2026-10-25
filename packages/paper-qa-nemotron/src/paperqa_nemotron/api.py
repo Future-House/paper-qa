@@ -317,7 +317,7 @@ class NemotronParseMarkdown(BaseModel):
 class NemotronParseMarkdownBBox(NemotronParseAnnotatedBBox, NemotronParseMarkdown):
     """Payload for 'markdown_bbox' tool, or merges with results from detection_only."""
 
-    text: str | None = Field(  # type: ignore[assignment]
+    text: str | None = Field(  # type: ignore[assignment]  # ty: ignore[invalid-attribute-override]
         description="Markdown text, or None if from detection_only without text."
     )
 
@@ -411,7 +411,7 @@ def _wait_exponential_for_nvidia_api_retry(retry_state: RetryCallState) -> float
     ):
         # Track TimeoutError (Nvidia API rate limit) count separately
         timeout_count: int = getattr(retry_state, "_timeout_error_count", 0) + 1
-        retry_state._timeout_error_count = timeout_count  # type: ignore[attr-defined]
+        retry_state._timeout_error_count = timeout_count  # type: ignore[attr-defined]  # ty: ignore[unresolved-attribute]
         # Temporarily override attempt_number for wait_exponential calculation
         with patch.object(retry_state, "attempt_number", timeout_count):
             return _NVIDIA_API_RETRY_WAIT(retry_state)
@@ -515,7 +515,7 @@ async def _call_nvidia_api(
         api_base=api_base,
         # Explicitly specify OpenAI-compatible provider over Nvidia NIM provider,
         # so this works with both Nvidia API and DGX Cloud Lepton
-        custom_llm_provider=litellm.types.utils.LlmProviders.CUSTOM_OPENAI,
+        custom_llm_provider=litellm.types.utils.LlmProviders.CUSTOM_OPENAI,  # ty: ignore[possibly-missing-submodule]
         **completion_kwargs,
     )
     if (
@@ -636,7 +636,7 @@ async def _call_sagemaker_api(
     tool_spec = ToolCall.from_name(tool_name).model_dump(
         exclude={"id": True, "function": {"arguments"}}
     )
-    payload = {  # noqa: FURB173
+    payload = {
         "model": model_name,
         "messages": [Message.create_message(images=[image]).model_dump(mode="json")],
         "tools": [tool_spec],
@@ -645,7 +645,7 @@ async def _call_sagemaker_api(
     }
 
     try:
-        session = get_session()
+        session = get_session()  # ty: ignore[call-non-callable]
     except TypeError as exc:
         raise ImportError(
             "Calling nemotron-parse on AWS SageMaker requires installing with the"

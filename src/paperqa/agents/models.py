@@ -9,9 +9,10 @@ from typing import Any, ClassVar, Protocol, cast
 from uuid import UUID, uuid4
 
 from aviary.core import Message
-from lmi import LiteLLMModel, LLMModel
+from lmi import LLMModel
 from pydantic import BaseModel, ConfigDict, Field, ValidationInfo, field_validator
 
+from paperqa.settings import Settings
 from paperqa.types import PQASession
 from paperqa.version import __version__
 
@@ -66,13 +67,15 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model: LLMModel | str = "gpt-4o") -> str:
+    async def get_summary(self, llm_model: LLMModel | str = "openai/gpt-6-luna") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
         model = (
-            LiteLLMModel(name=llm_model) if isinstance(llm_model, str) else llm_model
+            Settings(summary_llm=llm_model).get_summary_llm()
+            if isinstance(llm_model, str)
+            else llm_model
         )
         prompt_template = "{question}\n\n{answer}"
         messages = [
@@ -91,7 +94,7 @@ class AnswerResponse(BaseModel):
 
 
 class TimerData(BaseModel):
-    start_time: float = Field(default_factory=time.time)  # noqa: FURB111
+    start_time: float = Field(default_factory=time.time)
     durations: list[float] = Field(default_factory=list)
 
 

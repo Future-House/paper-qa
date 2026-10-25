@@ -23,6 +23,8 @@ from paperqa.types import Doc, DocDetails
 from paperqa.utils import get_year
 from tests.conftest import TESTS_DIR
 
+pytestmark = pytest.mark.offline
+
 
 def test_prompt_settings_validation() -> None:
     with pytest.raises(ValidationError):
@@ -103,31 +105,23 @@ def test_index_naming(subtests: SubTests) -> None:
         assert settings.agent.index.get_named_index_directory().name == "test"
 
 
-def test_router_kwargs_present_in_models() -> None:
+def test_default_model_request_parameters() -> None:
     settings = Settings()
-    assert settings.get_llm().config["router_kwargs"] is not None
-    assert settings.get_summary_llm().config["router_kwargs"] is not None
 
+    for model in (settings.get_llm(), settings.get_enrichment_llm()):
+        params = model.config["model_list"][0]["litellm_params"]
+        assert "temperature" not in params
+        assert "reasoning_effort" not in params
 
-@pytest.mark.parametrize(
-    "model_name",
-    [
-        "o1",
-        "o1-thismodeldoesnotexist",
-        "gpt-5",
-        "gpt-5-2025-08-07",
-        "gpt-5-mini-2025-08-07",
-    ],
-)
-def test_models_requiring_temp_1(model_name: str) -> None:
-    with pytest.warns(UserWarning, match="temperature") as record:  # noqa: PT031
-        s = Settings(llm=model_name, temperature=0)
-        (w,) = record.list
-        assert "temperature must be set to 1" in str(w.message)
-        assert s.temperature == 1
+    summary_params = settings.get_summary_llm().config["model_list"][0][
+        "litellm_params"
+    ]
+    assert "reasoning_effort" not in summary_params
+    assert "temperature" not in summary_params
 
-        Settings(llm=model_name, temperature=1)
-        assert record.list == [w], "Expected no new warnings with correct temperature"
+    agent_params = settings.get_agent_llm().config["model_list"][0]["litellm_params"]
+    assert agent_params["reasoning_effort"] == "none"
+    assert "temperature" not in agent_params
 
 
 @pytest.mark.parametrize(

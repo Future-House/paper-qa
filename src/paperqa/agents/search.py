@@ -89,8 +89,8 @@ class SearchDocumentStorage(StrEnum):
         if self == SearchDocumentStorage.JSON_MODEL_DUMP:
             return json.loads(data)
         if self == SearchDocumentStorage.PICKLE_COMPRESSED:
-            return pickle.loads(zlib.decompress(data))  # type: ignore[arg-type] # noqa: S301
-        return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301
+            return pickle.loads(zlib.decompress(data))  # type: ignore[arg-type] # noqa: S301  # ty: ignore[invalid-argument-type]
+        return pickle.loads(data)  # type: ignore[arg-type] # noqa: S301  # ty: ignore[invalid-argument-type]
 
 
 # Cache keys are a two-tuple of index name and absolute index directory
@@ -225,7 +225,7 @@ class SearchIndex:
             self._searcher = index.searcher()
         return self._searcher
 
-    @contextlib.asynccontextmanager
+    @contextlib.asynccontextmanager  # ty: ignore[deprecated]
     async def writer(self, reset: bool = False) -> AsyncIterator[IndexWriter]:
         if not self._writer:
             index = await self.index
@@ -594,7 +594,9 @@ def _make_progress_bar_update(
         os.environ.get("PQA_INDEX_ENABLE_PROGRESS_BAR", "").lower() in VAR_MATCH_LOOKUP
     )
     try:
-        is_cli = is_running_under_cli()  # pylint: disable=used-before-assignment
+        # pylint: disable=used-before-assignment
+        is_cli = is_running_under_cli()  # ty: ignore[unresolved-reference]
+        # pylint: enable=used-before-assignment
     except NameError:  # Work around circular import
         from . import is_running_under_cli
 

@@ -14,12 +14,15 @@ from paperqa.utils import ImpossibleParsingError, get_citation_ids
 
 from paperqa_docling import parse_pdf_to_pages
 
+pytestmark = pytest.mark.offline
+
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
 
 
 @pytest.mark.timeout(60 * 7)  # Extended from global 5-min timeout
 @pytest.mark.asyncio
+@pytest.mark.live_api
 async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
 
@@ -171,6 +174,7 @@ async def test_parse_pdf_to_pages() -> None:
     ), "All modes should parse the same number of pages"
 
 
+@pytest.mark.live_api
 def test_page_range() -> None:
     filepath = STUB_DATA_DIR / "pasa.pdf"
 
@@ -196,6 +200,7 @@ def test_page_range() -> None:
     assert "page_range=(1,20)" in parsed_text_p1_20.metadata.name
 
 
+@pytest.mark.live_api
 def test_media_deduplication() -> None:
     parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
     assert isinstance(parsed_text.content, dict)
@@ -218,6 +223,7 @@ def test_media_deduplication() -> None:
     ), "Expected tables on all pages beyond 1 to be deduplicated"
 
 
+@pytest.mark.live_api
 def test_page_size_limit_denial() -> None:
     with pytest.raises(ImpossibleParsingError, match="char limit"):
         parse_pdf_to_pages(STUB_DATA_DIR / "paper.pdf", page_size_limit=10)  # chars
@@ -248,6 +254,7 @@ def test_nonexistent_file_failure() -> None:
         parse_pdf_to_pages(filename)
 
 
+@pytest.mark.live_api
 def test_table_parsing() -> None:
     filepath = STUB_DATA_DIR / "influence.pdf"
     parsed_text = parse_pdf_to_pages(filepath)
@@ -270,6 +277,7 @@ def test_table_parsing() -> None:
 IN_GITHUB_ACTIONS: bool = os.getenv("GITHUB_ACTIONS") == "true"
 
 
+@pytest.mark.live_api
 def test_document_timeout_denial() -> None:
     tic = time.perf_counter()
     with pytest.raises(ImpossibleParsingError, match="partial"):
@@ -284,6 +292,7 @@ def test_document_timeout_denial() -> None:
         ), "Expected document timeout to have taken much less time than a normal read"
 
 
+@pytest.mark.live_api
 def test_equation_parsing() -> None:
     parsed_text = parse_pdf_to_pages(STUB_DATA_DIR / "duplicate_media.pdf")
     assert isinstance(parsed_text.content, dict)

@@ -18,12 +18,15 @@ from PIL import Image
 from paperqa_pypdf import parse_pdf_to_pages
 from paperqa_pypdf.reader import MediaMode
 
+pytestmark = pytest.mark.offline
+
 REPO_ROOT = Path(__file__).parents[3]
 STUB_DATA_DIR = REPO_ROOT / "tests" / "stub_data"
 
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
+@pytest.mark.live_api
 async def test_parse_pdf_to_pages() -> None:
     assert isinstance(parse_pdf_to_pages, PDFParserFn)
 
@@ -403,8 +406,8 @@ class TestMediaMode:
             == "individual"
         )
         assert (
-            str(MediaMode.INDIVIDUAL)  # noqa: FURB123
-            == str(MediaMode.INDIVIDUAL_CLUSTERING)  # noqa: FURB123
+            str(MediaMode.INDIVIDUAL)
+            == str(MediaMode.INDIVIDUAL_CLUSTERING)
             == "individual"
         )
 

@@ -28,7 +28,18 @@ Where the `dev` extra includes development dependencies such as `pytest`.
 
 Use the following commands:
 
-- Run tests (requires an OpenAI key in your environment)
+- Run the same credential-free tests as CI:
+
+  ```bash
+  LITELLM_LOCAL_MODEL_COST_MAP=true PQA_OFFLINE_TESTS=true \
+    pytest -m 'offline and not live_api'
+  ```
+
+  This mode uses local fixtures and VCR cassettes, supplies placeholder API keys,
+  and disables cassette recording. Tests marked `live_api` need provider credentials
+  and are excluded from CI.
+
+- Run all tests, including live API tests (requires provider keys):
 
   ```bash
   pytest
@@ -42,12 +53,10 @@ Use the following commands:
   pre-commit run --all-files
   ```
 
-- Run `mypy`, `refurb`, or `pylint` directly:
+- Run `ty` or `pylint` directly:
 
   ```bash
-  mypy paperqa
-  # or
-  refurb paperqa
+  ty check
   # or
   pylint paperqa
   ```
@@ -67,12 +76,13 @@ uv run pytest --record-mode=once tests/desired_test_module.py
 ```
 
 And the new cassette(s) should appear in [`tests/cassettes`](tests/cassettes).
+Use `--record-mode=all` to refresh an existing cassette after model changes.
 
 Our configuration for `pytest-recording` can be found in [`tests/conftest.py`](tests/conftest.py).
 This includes header removals (e.g. OpenAI `authorization` key)
 from responses to ensure sensitive information is excluded from the cassettes.
 
-Please ensure cassettes are less than 1 MB
-to keep tests loading quickly.
+Keep cassettes small where possible. Media requests and tokenizer data can make
+some recorded files larger than 1 MB.
 
 Happy coding!

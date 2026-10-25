@@ -354,7 +354,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1205,7 +1205,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1448,7 +1448,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":null}'
+      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"float"}'
       headers:
         accept:
           - application/json
@@ -2527,6 +2527,2511 @@ interactions:
           - 3ms
         x-request-id:
           - req_7c2c55fc034349a4b8562cf44c36ef7c
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/61UTY/aMBD9K5HPcWKHJIRcWVWqtP1QRS8lHEwygEUSp7azgBD/veOwXSjsblWp
+          OcXjj3nz3sw7EmOF7Q3JidoSnzRgjFgDtYcOMLZTektraezV1hNoI1WLuzxgAbvskPxIVqIEi68d
+          Tz6xyoqaajB97UKTbBzHY59ICw0u50ci2wr2ULl7lbBAO6Hdwfk8YlHkx360WPjnHSsbB8fFKYsp
+          i2Y8zVmSJ8kPzO92sYymIzlP42zCE/wyzhCDhhVoaEugpepbS3Lmk65fYkkb0Pji91YO9diDp1be
+          TGnVWuV9RdAGHy5xBa2llWqEbAecz39zRFZqZUwjkCE8brUs7UDLStQGTpc0Fe20dKnvq+SpzyN/
+          xBcLPP/w5aPjlAUjPsqKcDLOeBxHacSTEVbMJ67QsypLpba03IjOYg0OB+C7r9LIM3/i8/SeR55R
+          NqE8nTGWsyyP01sek9GYJWkSpYw5HrtBXxKzhMajFM8a1evShaaOBaQZY9LQF74rujxccW6lrfH0
+          nPA08D4hZ2Blu/bsBnDV1eA9gljl3gzX015L1RtvKgw4UT4Lx6uovQ+1WLvAVLSiEt6DOBCsq8OU
+          cn9hbujHZjmoy9NJ+iwjqgaavsCYQg1LLQYQ5/fcW7Vst0Nnfv/2iNc31nYmL8IitOfGCCpY6/6A
+          tAelaorwScKuCJ0cN3oV4ds6BvumvuqtZ00t7G0Rbuwfe5dRe1JOaenCFXIruq6WpTg33HCXNrLF
+          YsjJv0e/2+1ukVeq7BtM4f7ke2iLsKtW93D71nRQypXEvvtnvEY2shYahw67GMrtgNu1KHQKR/EN
+          R+DOEV6zBO4sIUJLQD+Ic87vLIFPOEuzhJ9b2ZRK481oHLA4RbtwJvG7m4/YThJH+uB+/y+Ng7Sn
+          k5sS078xrdd28DJJ5mqMbiFh1kDp9XuZyZUT/SWp02BwZ9rhrJxHnvvkZw9nQpBQbeng2gMaA0KX
+          G4psOENv+7o+nU6/AI0M1aVSBgAA
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "762"
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:18 GMT
+        Permissions-Policy:
+          - interest-cohort=()
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Strict-Transport-Security:
+          - max-age=31536000;
+        Vary:
+          - Accept-Encoding
+        x-api-pool:
+          - polite-array
+        x-concurrency-limit:
+          - "3"
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "3"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=National+Flag+of+Canada+Day&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "2825ef76fbc2d0001226a7b98d2f7e6d28d72f7f", "externalIds":
+          {"MAG": "2891797987", "DOI": "10.3138/9781442621534-019", "CorpusId": 166149247},
+          "url": "https://www.semanticscholar.org/paper/2825ef76fbc2d0001226a7b98d2f7e6d28d72f7f",
+          "title": "16. Marketing the Maple Leaf: The Curious Case of National Flag
+          of Canada Day", "venue": "", "year": 2016, "citationCount": 0, "influentialCitationCount":
+          0, "isOpenAccess": false, "openAccessPdf": {"url": "", "status": "CLOSED",
+          "license": null}, "publicationTypes": null, "publicationDate": "2016-12-31",
+          "journal": {"name": "", "pages": "405-436", "volume": ""}, "citationStyles":
+          {"bibtex": "@Inproceedings{Nimijean201616MT,\n author = {Richard Nimijean
+          and L. Rankin},\n pages = {405-436},\n title = {16. Marketing the Maple Leaf:
+          The Curious Case of National Flag of Canada Day},\n year = {2016}\n}\n"},
+          "authors": [{"authorId": "118523421", "name": "Richard Nimijean"}, {"authorId":
+          "144557636", "name": "L. Rankin"}], "matchScore": 109.01583}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1015"
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:18 GMT
+        Via:
+          - 1.1 4273720efc0ae0a4ce7986e15cf86448.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - 2JkqSvX7SiiamI4fRztOPrANZ1rl9StWHCDB3mEcmL56Gvmo1ZDutg==
+        X-Amz-Cf-Pop:
+          - SFO53-P10
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - FxV5ZHnYvHcEW1g=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1015"
+        x-amzn-Remapped-Date:
+          - Sat, 24 Oct 2026 22:52:18 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - ab134ebe-db0e-4455-ba64-f7f5f0e8aabb
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"model\":\"text-embedding-3-small\",\"input\":[\"Jump to content\\n\\nMain
+        menu\\n\\nMain menu\\n\\nmove to sidebar  hide\\n\\nNavigation\\n\\n  * [Main
+        page](/wiki/Main_Page \\\"Visit the main page \\\\[z\\\\]\\\")\\n  * [Contents](/wiki/Wikipedia:Contents
+        \\\"Guides to browsing Wikipedia\\\")\\n  * [Current events](/wiki/Portal:Current_events
+        \\\"Articles related to current events\\\")\\n  * [Random article](/wiki/Special:Random
+        \\\"Visit a randomly selected article \\\\[x\\\\]\\\")\\n  * [About Wikipedia](/wiki/Wikipedia:About
+        \\\"Learn about Wikipedia and how it works\\\")\\n  * [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us
+        \\\"How to contact Wikipedia\\\")\\n  * [Donate](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en
+        \\\"Support us by donating to the Wikimedia Foundation\\\")\\n\\nContribute\\n\\n
+        \ * [Help](/wiki/Help:Contents \\\"Guidance on how to use and edit Wikipedia\\\")\\n
+        \ * [Learn to edit](/wiki/Help:Introduction \\\"Learn how to edit Wikipedia\\\")\\n
+        \ * [Community portal](/wiki/Wikipedia:Community_portal \\\"The hub for editors\\\")\\n
+        \ * [Recent changes](/wiki/Special:RecentChanges \\\"A list of recent changes
+        to Wikipedia \\\\[r\\\\]\\\")\\n  * [Upload file](/wiki/Wikipedia:File_upload_wizard
+        \\\"Add images or other media for use on Wikipedia\\\")\\n\\n[ ![](/static/images/icons/wikipedia.png)\\n![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
+        ![The\\nFree Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)\\n](/wiki/Main_Page)\\n\\n[
+        Search ](/wiki/Special:Search \\\"Search Wikipedia \\\\[f\\\\]\\\")\\n\\nSearch\\n\\nAppearance\\n\\n
+        \ * [Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \\\"You are encouraged to create an account and log in; however, it is not mandatory\\\")\\n
+        \ * [Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \\\"You're encouraged to log in; however, it's not mandatory. \\\\[o\\\\]\\\")\\n\\nPersonal
+        tools\\n\\n  * [ Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \\\"You are encouraged to create an account and log in; however, it is not mandatory\\\")\\n
+        \ * [ Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \\\"You're encouraged to log in; however, it's not mandatory. \\\\[o\\\\]\\\")\\n\\nPages
+        for logged out editors [learn more](/wiki/Help:Introduction)\\n\\n  * [Contributions](/wiki/Special:MyContributions
+        \\\"A list of edits made from this IP address \\\\[y\\\\]\\\")\\n  * [Talk](/wiki/Special:MyTalk
+        \\\"Discussion about edits from this IP address \\\\[n\\\\]\\\")\\n\\n## Contents\\n\\nmove
+        to sidebar  hide\\n\\n  * (Top)\\n  * 1 History Toggle History subsection\\n
+        \   * 1.1 Background\\n    * 1.2 Flag Day\\n  * 2 See also\\n  * 3 Footnotes\\n
+        \ * 4 External links\\n\\nToggle the table of contents\\n\\n#  National Flag
+        of Canada Day\\n\\n7 languages\\n\\n  * [\u0627\u0644\u0639\u0631\u0628\u064A\u0629](https://ar.wikipedia.org/wiki/%D9%8A%D9%88%D9%85_%D8%B9%D9%84%D9%85_%D9%83%D9%86%D8%AF%D8%A7_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A
+        \\\"\u064A\u0648\u0645 \u0639\u0644\u0645 \u0643\u0646\u062F\u0627 \u0627\u0644\u0648\u0637\u0646\u064A
+        \u2013 Arabic\\\")\\n  * [Espa\xF1ol](https://es.wikipedia.org/wiki/D%C3%ADa_de_la_Bandera_Nacional_de_Canad%C3%A1
+        \\\"D\xEDa de la Bandera Nacional de Canad\xE1 \u2013 Spanish\\\")\\n  * [Fran\xE7ais](https://fr.wikipedia.org/wiki/Jour_du_drapeau_national_du_Canada
+        \\\"Jour du drapeau national du Canada \u2013 French\\\")\\n  * [\u0540\u0561\u0575\u0565\u0580\u0565\u0576](https://hy.wikipedia.org/wiki/%D4%BF%D5%A1%D5%B6%D5%A1%D5%A4%D5%A1%D5%B5%D5%AB_%D5%A1%D5%A6%D5%A3%D5%A1%D5%B5%D5%AB%D5%B6_%D5%A4%D6%80%D5%B8%D5%B7%D5%AB_%D6%85%D6%80
+        \\\"\u053F\u0561\u0576\u0561\u0564\u0561\u0575\u056B \u0561\u0566\u0563\u0561\u0575\u056B\u0576
+        \u0564\u0580\u0578\u0577\u056B \u0585\u0580 \u2013 Armenian\\\")\\n  * [\u05E2\u05D1\u05E8\u05D9\u05EA](https://he.wikipedia.org/wiki/%D7%99%D7%95%D7%9D_%D7%94%D7%93%D7%92%D7%9C_%D7%94%D7%9C%D7%90%D7%95%D7%9E%D7%99_%D7%A9%D7%9C_%D7%A7%D7%A0%D7%93%D7%94
+        \\\"\u05D9\u05D5\u05DD \u05D4\u05D3\u05D2\u05DC \u05D4\u05DC\u05D0\u05D5\u05DE\u05D9
+        \u05E9\u05DC \u05E7\u05E0\u05D3\u05D4 \u2013 Hebrew\\\")\\n  * [Bahasa Melayu](https://ms.wikipedia.org/wiki/Hari_Bendera_Kebangsaan_Kanada
+        \\\"Hari Bendera Kebangsaan Kanada \u2013 Malay\\\")\\n  * [Polski](https://pl.wikipedia.org/wiki/Narodowy_dzie%C5%84_flagi_Kanady
+        \\\"Narodowy dzie\u0144 flagi Kanady \u2013 Polish\\\")\\n\\n[Edit\\nlinks](https://www.wikidata.org/wiki/Special:EntityPage/Q6972703#sitelinks-\\nwikipedia
+        \\\"Edit interlanguage links\\\")\\n\\n  * [Article](/wiki/National_Flag_of_Canada_Day
+        \\\"View the content page \\\\[c\\\\]\\\")\\n  * [Talk](/wiki/Talk:National_Flag_of_Canada_Day
+        \\\"Discuss improvements to the content page \\\\[t\\\\]\\\")\\n\\nEnglish\\n\\n
+        \ * [Read](/wiki/National_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
+        \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
+        \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
+        to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title\",\"_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
+        \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
+        to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history)\\n\\nGeneral\\n\\n
+        \ * [What links here](/wiki/Special:WhatLinksHere/National_Flag_of_Canada_Day
+        \\\"List of all English Wikipedia pages containing links to this page \\\\[j\\\\]\\\")\\n
+        \ * [Related changes](/wiki/Special:RecentChangesLinked/National_Flag_of_Canada_Day
+        \\\"Recent changes in pages linked from this page \\\\[k\\\\]\\\")\\n  * [Upload
+        file](/wiki/Wikipedia:File_Upload_Wizard \\\"Upload files \\\\[u\\\\]\\\")\\n
+        \ * [Special pages](/wiki/Special:SpecialPages \\\"A list of all special pages
+        \\\\[q\\\\]\\\")\\n  * [Permanent link](/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994
+        \\\"Permanent link to this revision of this page\\\")\\n  * [Page information](/w/index.php?title=National_Flag_of_Canada_Day&action=info
+        \\\"More information about this page\\\")\\n  * [Cite this page](/w/index.php?title=Special:CiteThisPage&page=National_Flag_of_Canada_Day&id=1231946994&wpFormIdentifier=titleform
+        \\\"Information on how to cite this page\\\")\\n  * [Get shortened URL](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNational_Flag_of_Canada_Day)\\n
+        \ * [Download QR code](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNational_Flag_of_Canada_Day)\\n
+        \ * [Wikidata item](https://www.wikidata.org/wiki/Special:EntityPage/Q6972703
+        \\\"Structured data on this page hosted by Wikidata \\\\[g\\\\]\\\")\\n\\nPrint/export\\n\\n
+        \ * [Download as PDF](/w/index.php?title=Special:DownloadAsPdf&page=National_Flag_of_Canada_Day&action=show-download-screen
+        \\\"Download this page as a PDF file\\\")\\n  * [Printable version](/w/index.php?title=National_Flag_of_Canada_Day&printable=yes
+        \\\"Printable version of this page \\\\[p\\\\]\\\")\\n\\nIn other projects\\n\\n
+        \ * [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:National_Flag_of_Canada_Day)\\n\\nAppearance\\n\\nmove
+        to sidebar  hide\\n\\nFrom Wikipedia, the free encyclopedia\\n\\nCanadian holiday\\n\\nNational
+        Flag of Canada Day  \\n---  \\n[![](//upload.wikimedia.org/wikipedia/commons/thumb/6/68/Canada_flag_halifax_9_-04.JPG/250px-\\nCanada_flag_halifax_9_-04.JPG)](/wiki/File:Canada_flag_halifax_9_-04.JPG)
+        The\\nnational flag of Canada  \\nObserved by  |  [Canada](/wiki/Canada \\\"Canada\\\")
+        \ \\nDate |  [February 15](/wiki/February_15 \\\"February 15\\\")  \\nNext time
+        \ |  February 15, 2025 (2025-02-15)  \\nFrequency | Annual  \\n  \\n**National
+        Flag of Canada Day** ([French](/wiki/French_language \\\"French\\nlanguage\\\"):
+        _Jour du drapeau national du Canada_), commonly shortened to\\n**Flag Day**
+        , is observed annually on February 15 to commemorate the\\ninauguration of the
+        [flag of Canada](/wiki/Flag_of_Canada \\\"Flag of Canada\\\") on\\nthat date
+        in 1965.[1] The day is marked by flying the flag, occasional public\\nceremonies
+        and educational programs in schools. It is not a [public\\nholiday](/wiki/Public_holidays_in_Canada
+        \\\"Public holidays in Canada\\\"),\\nalthough there has been discussion about
+        creating one.\\n\\n## History\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=1\\n\\\"Edit
+        section: History\\\")]\\n\\n### Background\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=2\\n\\\"Edit
+        section: Background\\\")]\\n\\nAmid [much controversy](/wiki/Great_Canadian_flag_debate
+        \\\"Great Canadian flag\\ndebate\\\"), the [Parliament of Canada](/wiki/Parliament_of_Canada
+        \\\"Parliament of\\nCanada\\\") in 1964 voted to adopt a new design for the
+        [Canadian\\nflag](/wiki/Flag_of_Canada \\\"Flag of Canada\\\") and issued a
+        call for\\nsubmissions.[2]\\n\\nThis flag would replace the [Canadian Red Ensign](/wiki/Canadian_Red_Ensign\\n\\\"Canadian
+        Red Ensign\\\"), which had been, with various successive alterations,\\nin conventional
+        use as the national flag of [Canada](/wiki/Canada \\\"Canada\\\")\\nsince 1868.
+        Nearly 4,000 designs were submitted by Canadians.[2] On October\\n22, 1964,
+        the [Maple Leaf flag](/wiki/Maple_Leaf_flag \\\"Maple Leaf\\nflag\\\")\u2014designed
+        by historian [George Stanley](/wiki/George_Stanley \\\"George\\nStanley\\\")\u2014won
+        with a unanimous vote.[3] Under the leadership of [Prime\\nMinister](/wiki/Prime_Minister_of_Canada
+        \\\"Prime Minister of Canada\\\") [Lester\\nPearson](/wiki/Lester_B._Pearson
+        \\\"Lester B. Pearson\\\"), resolutions\\nrecommending the new design were passed
+        by the [House of\\nCommons](/wiki/House_of_Commons_of_Canada \\\"House of Commons
+        of Canada\\\") on\\nDecember 15, 1964, and by the [Senate](/wiki/Senate_of_Canada
+        \\\"Senate of\\nCanada\\\") two days later.[4]\\n\\nThe flag was proclaimed
+        by [Elizabeth II](/wiki/Elizabeth_II \\\"Elizabeth II\\\"),\\n[Queen of Canada](/wiki/Monarchy_of_Canada
+        \\\"Monarchy of Canada\\\"), on January\\n28, 1965,[3][5] and took effect \\\"upon,
+        from and after\\\" February 15 that\\nyear.[6]\\n\\n### Flag Day\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=3\\n\\\"Edit
+        section: Flag Day\\\")]\\n\\nNational Flag of Canada Day was instituted in 1996
+        by an [Order in\\nCouncil](/wiki/Order_in_Council \\\"Order in Council\\\")
+        from [Governor\\nGeneral](/wiki/Governor_General_of_Canada \\\"Governor General
+        of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc \\\"Rom\xE9o LeBlanc\\\"),
+        on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
+        \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
+        proposed cuts to the\\n[un\",\" an [Order in\\nCouncil](/wiki/Order_in_Council
+        \\\"Order in Council\\\") from [Governor\\nGeneral](/wiki/Governor_General_of_Canada
+        \\\"Governor General of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc
+        \\\"Rom\xE9o LeBlanc\\\"), on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
+        \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
+        proposed cuts to the\\n[unemployment insurance](/wiki/Unemployment_insurance
+        \\\"Unemployment\\ninsurance\\\") system, and while walking through the crowd
+        he was [grabbed by the\\nneck and pushed aside](/wiki/Shawinigan_Handshake \\\"Shawinigan
+        Handshake\\\") a\\nprotester who had approached him.\\n\\nIn 2010, on the flag's
+        45th anniversary, federal ceremonies were held to mark\\nFlag Day at [Ottawa](/wiki/Ottawa
+        \\\"Ottawa\\\"), [Winnipeg](/wiki/Winnipeg\\n\\\"Winnipeg\\\"), [St. John's](/wiki/St._John%27s,_Newfoundland_and_Labrador
+        \\\"St.\\nJohn's, Newfoundland and Labrador\\\"), and at\\n[Whistler](/wiki/Whistler,_British_Columbia
+        \\\"Whistler, British Columbia\\\") and\\n[Vancouver](/wiki/Vancouver \\\"Vancouver\\\")
+        in conjunction with the [2010 Winter\\nOlympics](/wiki/2010_Winter_Olympics
+        \\\"2010 Winter Olympics\\\") in Vancouver.[8]\\nIn 2011, Prime Minister [Stephen
+        Harper](/wiki/Stephen_Harper \\\"Stephen\\nHarper\\\") observed Flag Day by
+        presenting two citizens, whose work honoured the\\n[military](/wiki/Canadian_Armed_Forces
+        \\\"Canadian Armed Forces\\\"), with Canadian\\nflags that had flown over the
+        [Peace Tower](/wiki/Peace_Tower \\\"Peace Tower\\\").\\nIt was announced as
+        inaugurating an annual recognition of patriotism.[9]\\n\\n## See also\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=4\\n\\\"Edit
+        section: See also\\\")]\\n\\n  * ![flag](//upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Maple_Leaf_%28from_roundel%29.svg/25px-Maple_Leaf_%28from_roundel%29.svg.png)[Canada
+        portal](/wiki/Portal:Canada \\\"Portal:Canada\\\")\\n\\n  * [Flag Day](/wiki/Flag_Day
+        \\\"Flag Day\\\")\\n  * [List of Canadian flags](/wiki/List_of_Canadian_flags
+        \\\"List of Canadian flags\\\")\\n  * [National flag](/wiki/National_flag \\\"National
+        flag\\\")\\n\\n## Footnotes\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=5\\n\\\"Edit
+        section: Footnotes\\\")]\\n\\n  1. **^** [Department of Canadian Heritage](/wiki/Department_of_Canadian_Heritage
+        \\\"Department of Canadian Heritage\\\"). [\\\"Ceremonial and Canadian Symbols
+        Promotion > The National Flag of Canada\\\"](https://web.archive.org/web/20100423114158/http://www.canadianheritage.gc.ca/progs/cpsc-ccsp/sc-cs/df1_e.cfm).
+        Queen's Printer for Canada. Archived from [the original](http://www.canadianheritage.gc.ca/progs/cpsc-ccsp/sc-cs/df1_e.cfm)
+        on April 23, 2010. Retrieved March 21, 2010.\\n  2. ^ _**a**_ _**b**_ Government
+        of Canada, Public Services and Procurement Canada (July 31, 2015). [\\\"Infographic:
+        National Flag of Canada Day \u2013 February 15 \u2013 Canada's Parliamentary
+        Precinct \u2013 PWGSC\\\"](https://www.tpsgc-pwgsc.gc.ca/citeparlementaire-parliamentaryprecinct/decouvrez-discover/jour-drap-flag-day-eng.html).
+        _www.tpsgc-pwgsc.gc.ca_. Retrieved February 5, 2022.\\n  3. ^ _**a**_ _**b**_
+        [\\\"What is the National Flag Day of Canada?\\\"](http://westernfinancialgroup.ca/What-is-the-National-Flag-of-Canada-Day).
+        _westernfinancialgroup.ca_. Retrieved February 5, 2022.\\n  4. **^** [Department
+        of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department of
+        Canadian Heritage\\\"). [\\\"Ceremonial and Canadian Symbols Promotion > The
+        National Flag of Canada > Birth of the Canadian flag\\\"](http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm).
+        Queen's Printer for Canada. [Archived](https://web.archive.org/web/20100224005050/http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm)
+        from the original on February 24, 2010. Retrieved March 21, 2010.\\n  5. **^**
+        [\\\"Birth of the Canadian flag\\\"](http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm).
+        [Department of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department
+        of Canadian Heritage\\\"). [Archived](https://web.archive.org/web/20081220170253/http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm)
+        from the original on December 20, 2008. Retrieved December 16, 2008.\\n  6.
+        **^** [Conserving the Proclamation of the Canadian Flag](http://www.collectionscanada.gc.ca/publications/archivist-magazine/015002-2021-e.html)
+        [Archived](https://web.archive.org/web/20121021133944/http://www.collectionscanada.gc.ca/publications/archivist-magazine/015002-2021-e.html)
+        October 21, 2012, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback
+        Machine\\\"), Library and Archives of Canada, from John Grace in The Archivist,
+        National Archives, Ottawa, 1990. Retrieved February 15, 2011.\\n  7. **^** [Department
+        of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department of
+        Canadian Heritage\\\"). [\\\"National Flag of Canada Day\\\"](http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm).
+        Queen's Printer for Canada. [Archived](https://web.archive.org/web/20100217042202/http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm)
+        from the original on February 17, 2010. Retrieved March 21, 2010.\\n  8. **^**
+        [Dept. of Canadian Heritage news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        February 15, 2010. Retrieved February 15, 2011.\\n \",\"2010.\\n  8. **^** [Dept.
+        of Canadian Heritage news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        February 15, 2010. Retrieved February 15, 2011.\\n  9. **^** [PM pays tribute
+        to outstanding Canadians on Flag Day](http://www.pm.gc.ca/eng/media.asp?category=1&id=3958&featureId=6&pageId=26)
+        [Archived](https://web.archive.org/web/20110706181811/http://www.pm.gc.ca/eng/media.asp?category=1&id=3958&featureId=6&pageId=26)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        Prime Minister's Office news release. Retrieved February 16, 2011.\\n\\n## External
+        links\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=6\\n\\\"Edit
+        section: External links\\\")]\\n\\n![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/30px-\\nCommons-logo.svg.png)\\n\\nWikimedia
+        Commons has media related to [National Flag of Canada\\nDay](https://commons.wikimedia.org/wiki/Category:National_Flag_of_Canada_Day\\n\\\"commons:Category:National
+        Flag of Canada Day\\\").\\n\\n  * [Flag of Canada Song (1965) Freddie Grant](https://www.youtube.com/watch?v=2IkqmkTK46E)\\n
+        \ * [Flag Day](http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm), Dept. of
+        Canadian Heritage \\n  * [The famous Canadian Flag Collection, at Settlers,
+        Rails & Trails Inc, Argyle, Manitoba](http://argylemuseum.wixsite.com/argylemuseum/canadian-flag-collection)\\n\\n![](https://login.wikimedia.org/wiki/Special:CentralAutoLogin/start?type=1x1)\\n\\nRetrieved
+        from\\n\\\"[https://en.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994](https://en.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994)\\\"\\n\\n[Categories](/wiki/Help:Category
+        \\\"Help:Category\\\"):\\n\\n  * [1996 establishments in Canada](/wiki/Category:1996_establishments_in_Canada
+        \\\"Category:1996 establishments in Canada\\\")\\n  * [Public holidays in Canada](/wiki/Category:Public_holidays_in_Canada
+        \\\"Category:Public holidays in Canada\\\")\\n  * [February observances](/wiki/Category:February_observances
+        \\\"Category:February observances\\\")\\n  * [Flag days](/wiki/Category:Flag_days
+        \\\"Category:Flag days\\\")\\n  * [Winter events in Canada](/wiki/Category:Winter_events_in_Canada
+        \\\"Category:Winter events in Canada\\\")\\n\\nHidden categories:\\n\\n  * [Webarchive
+        template wayback links](/wiki/Category:Webarchive_template_wayback_links \\\"Category:Webarchive
+        template wayback links\\\")\\n  * [Articles with short description](/wiki/Category:Articles_with_short_description
+        \\\"Category:Articles with short description\\\")\\n  * [Short description matches
+        Wikidata](/wiki/Category:Short_description_matches_Wikidata \\\"Category:Short
+        description matches Wikidata\\\")\\n  * [Use mdy dates from February 2018](/wiki/Category:Use_mdy_dates_from_February_2018
+        \\\"Category:Use mdy dates from February 2018\\\")\\n  * [Infobox holiday with
+        missing field](/wiki/Category:Infobox_holiday_with_missing_field \\\"Category:Infobox
+        holiday with missing field\\\")\\n  * [Infobox holiday fixed day](/wiki/Category:Infobox_holiday_fixed_day
+        \\\"Category:Infobox holiday fixed day\\\")\\n  * [Articles containing French-language
+        text](/wiki/Category:Articles_containing_French-language_text \\\"Category:Articles
+        containing French-language text\\\")\\n  * [Commons category link is on Wikidata](/wiki/Category:Commons_category_link_is_on_Wikidata
+        \\\"Category:Commons category link is on Wikidata\\\")\\n\\n  * This page was
+        last edited on 1 July 2024, at 03:41 (UTC). \\n  * Text is available under the
+        [Creative Commons Attribution-ShareAlike License 4.0](//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License)[](//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License);
+        additional terms may apply. By using this site, you agree to the [Terms of Use](//foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use)
+        and [Privacy Policy](//foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy).
+        Wikipedia\xAE is a registered trademark of the [Wikimedia Foundation, Inc.](//wikimediafoundation.org/),
+        a non-profit organization. \\n\\n  * [Privacy policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)\\n
+        \ * [About Wikipedia](/wiki/Wikipedia:About)\\n  * [Disclaimers](/wiki/Wikipedia:General_disclaimer)\\n
+        \ * [Contact Wikipedia](//en.wikipedia.org/wiki/Wikipedia:Contact_us)\\n  *
+        [Code of Conduct](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct)\\n
+        \ * [Developers](https://developer.wikimedia.org)\\n  * [Statistics](https://stats.wikimedia.org/#/en.wikipedia.org)\\n
+        \ * [Cookie statement](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement)\\n
+        \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
+        \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
+        \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
+        \ * \\n\\n\"],\"dimensions\":1536,\"encoding_format\":\"float\"}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "21692"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "120"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/embeddings
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/4196a40OXbcu/TvvgNumcmcVxEMY+RpCLJnNIKnDQgQ5t0dkWRVMeKwbNmGpb7f
+          vVW5kIdnieU/f/nbP//P3/7H77/88Ze//Ovff//l11/+/Kff//TLH//pPz//8Ntf//m3P//5X//t
+          X/Cvn//9j/+U/pBqrjmneuTjLMev+EE+091TKQ3/s17jR+W+Sz967+eV+/hZanc9S+7lzO+flVbT
+          VY50X+f7065SLvx/fX7BD352XuVMVyvPn/EHpaTcW31/FH92hAuruaRWSj1r6Xn8qORa89Wv/L7U
+          cp21nueJC35/VLrbne7zvO7zdfH4X1I57+s66p1en3/28yi1zU86S+lnvc4bVzJ+AX+G+zrb+bkd
+          /LTjn+/exzXx63LGzZx3qf1znSfuGJ+7PJiCOynp4Oe9LqDglvHD5cFkvAw80zv1kl5Xwa8vLZfl
+          nm9+Wl7uD88kXbzLejy/9DyF2vLdL77d5QnW87jTcS0vMV1HuvQq8A241IoveV9+xdu/zuu43rdd
+          Ez4619Q/X4mrXG85vgf8e8VyOUpuvb3+6sQrzXVZalgdDQ/is4Aq3kE/0rF8VWp8WXiZuS5rFO83
+          t3P5bDyBdHwe5/OXWD/1WNZZafjoM7+WwvNntV9XX9bH84dnaQ2Pr73f9PhVrKqER/j+ScEN4uuu
+          ZT1g9V9nT8u7T/ynmo78eqT8KL1r3GLD08WCS+n9O9g4d8Y95/NulW+7z9/FEpk/mc8CbwJ7I+mN
+          Ne7/q2CxvBc5tsTVW54v6XncDStX39HmDrByz/s8al2ebfbvK6lfLX02WS74FizTnI52LvsVH43n
+          nT/rlMsXSwm3cRy4s7uU+fKOUg55Ivibet55XNd45w0Lc1102K/4m7u397PBfr7aca5XgY+98QLw
+          6t4RImNXpPNoZfms68JLOls73jeN7Yglftd8LtdQcct9iWfPD9uBWJHeVzIWFYJl7inL1rovbJ3y
+          WtZ4q7X3vG7ugqfarjXIZgTyIus6dQQ8Dc6t45fsZd93W37ruSa82poPbMy2/DRjvxVbxDgR6o1t
+          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
+          P/7xfwF2I5HCM80BAA==
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d1eda766d29-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:20 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=dzLMHEIch9v5pPHnI9Kk24y5Msctn94NezhbAZEND6c-1792882339.657756-1.0.1.1-aM6DxZ4I_RKk7zwHku0Uflc0rNy66ZcBbQvjreeoy5fEVV4Edjs7VvF9nXfVUj3ZLCDTYebepn3HiHewQb8y3zqvnf5lYHQrH5T.6VSKRurVmwMDmddbCX089zlAEtQ2;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat,
+            24 Oct 2026 23:22:20 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_e90fc62f1fc0447c910a4fea10dba7d6
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "300"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "200000"
+        x-ratelimit-limit-tokens:
+          - "200000000"
+        x-ratelimit-remaining-requests:
+          - "199999"
+        x-ratelimit-remaining-tokens:
+          - "199994750"
+        x-ratelimit-reset-requests:
+          - 0s
+        x-ratelimit-reset-tokens:
+          - 1ms
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Gravity+hill&rows=1
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/3WT227iMBCGXwX5Og52gsnhrtqVditV2qqiK22Bi5AMxSWJs/akFCHefceBbVEP
+          Ui6cGXvm/7+xD8xhgb1jOTNbFrAGnCsegeO+A4rtjN3yWju8SD2Dddq0lJWhCMVbhuUHti5KQKp2
+          OAYMDRY1t+D62oekmiopA6YRGvqdH5huK3iByp+rCgTeFdZvnM8jEUXBJJgsl8Epg7rxcnyciwl9
+          MyFyleVSPFB/nyUbTUdNppNMxHGmRJZOSYOFNVhoS+Cl6VtkuQhY16/I0gYsVbxv9eAH9yOzHt1q
+          RLfq7eNmdEu6HdUuTYvQIq9MU+h2kHpezUlcaY1zTUGQaDtaXeJAZl3UDqj791/XHpMIo1gki/FT
+          WCKq5+16k4RSeuEnyitjtrzcFB2SJl8UyPOnWGQSZEHyEYtMuMi4SGYyyaNJrtL3WJSYpMJDEUKQ
+          sG4YF5OKS0U7nelt6QPfvB9iRjHt+Cu8iq/2FwBRY0275+zH3dXv69mf0c/rmxtGojo6oV/eLA93
+          o1kNpKWM5Jkn4QPLX6vcGkC7H+l2dNUAMSx8qQo6Q2P5AkMaqCD7BEPKhSISM5HmIs7j+AOGSKUq
+          FjI+YXClsXQyisOpiKbT2N+X/ywO5EbTaPd+eX93Qw02iJ3LF+PFeLfbhU8OjQ2NfVyMqfyqhsX4
+          q0kfj56n6z9z0/Z1vVxeXlV3gfp948roU8svWy3PL4x3xPg0Z3p0f3s4OSGpFvnw8oYGDgpbbjjd
+          PP8ovZjj8fgP5jvYUhYEAAA=
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Length:
+          - "587"
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:21 GMT
+        Permissions-Policy:
+          - interest-cohort=()
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Strict-Transport-Security:
+          - max-age=31536000;
+        Vary:
+          - Accept-Encoding
+        x-api-pool:
+          - polite-array
+        x-concurrency-limit:
+          - "3"
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "3"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.crossref.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.crossref.org/works/10.2307%2Fj.ctt5vkfh7.11/transform/application/x-bibtex
+    response:
+      body:
+        string:
+          " @inbook{1, url={http://dx.doi.org/10.2307/j.ctt5vkfh7.11}, DOI={10.2307/j.ctt5vkfh7.11},
+          booktitle={Poetry in America}, publisher={University of Pittsburgh Press},
+          pages={15\u201315} }\n"
+      headers:
+        Access-Control-Allow-Headers:
+          - X-Requested-With, Accept, Accept-Encoding, Accept-Charset, Accept-Language,
+            Accept-Ranges, Cache-Control
+        Access-Control-Allow-Origin:
+          - "*"
+        Access-Control-Expose-Headers:
+          - Link
+        Connection:
+          - keep-alive
+        Date:
+          - Sat, 24 Oct 2026 22:52:21 GMT
+        Permissions-Policy:
+          - interest-cohort=()
+        Server:
+          - Jetty(9.4.40.v20210413)
+        Strict-Transport-Security:
+          - max-age=31536000;
+        Transfer-Encoding:
+          - chunked
+        x-api-pool:
+          - public-single
+        x-concurrency-limit:
+          - "1"
+        x-rate-limit-interval:
+          - 1s
+        x-rate-limit-limit:
+          - "5"
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: null
+      headers:
+        accept:
+          - "*/*"
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        host:
+          - api.semanticscholar.org
+        user-agent:
+          - python-httpx/0.28.1
+      method: GET
+      uri: https://api.semanticscholar.org/graph/v1/paper/search/match?query=Gravity+hill&fields=authors,citationCount,citationStyles,externalIds,influentialCitationCount,isOpenAccess,journal,openAccessPdf,publicationDate,publicationTypes,title,url,venue,year
+    response:
+      body:
+        string:
+          '{"data": [{"paperId": "861b64e8235a5948aec2f2af8a295bae203b3d59", "externalIds":
+          {"DOI": "10.52228/jrub.2025-38-1-6", "CorpusId": 279509683}, "url": "https://www.semanticscholar.org/paper/861b64e8235a5948aec2f2af8a295bae203b3d59",
+          "title": "Explanation of Gravity Hill of Mainpat by using digital Elevation
+          Modeling", "venue": "Journal of Ravishankar University (Part-B)", "year":
+          2025, "citationCount": 1, "influentialCitationCount": 0, "isOpenAccess": false,
+          "openAccessPdf": {"url": "", "status": null, "license": null}, "publicationTypes":
+          ["JournalArticle"], "publicationDate": "2025-06-15", "journal": {"name": "Journal
+          of Ravishankar University (PART-B)"}, "citationStyles": {"bibtex": "@Article{Rajwade2025ExplanationOG,\n
+          author = {Dushyant Kumar Rajwade},\n booktitle = {Journal of Ravishankar University
+          (Part-B)},\n journal = {Journal of Ravishankar University (PART-B)},\n title
+          = {Explanation of Gravity Hill of Mainpat by using digital Elevation Modeling},\n
+          year = {2025}\n}\n"}, "authors": [{"authorId": "2368036338", "name": "Dushyant
+          Kumar Rajwade"}], "matchScore": 61.762283}]}
+
+          '
+      headers:
+        Access-Control-Allow-Origin:
+          - "*"
+        Connection:
+          - keep-alive
+        Content-Length:
+          - "1098"
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:21 GMT
+        Via:
+          - 1.1 7b8786f0e652fedd7412f7b89b9ac2ba.cloudfront.net (CloudFront)
+        X-Amz-Cf-Id:
+          - YniI0GYum2OUx0DsHEjinKo9RR5Htd4Jc__t557P2eTHNb8EHnka2w==
+        X-Amz-Cf-Pop:
+          - SFO53-P10
+        X-Cache:
+          - Miss from cloudfront
+        x-amz-apigw-id:
+          - FxV52H9hPHcEpng=
+        x-amzn-Remapped-Connection:
+          - keep-alive
+        x-amzn-Remapped-Content-Length:
+          - "1098"
+        x-amzn-Remapped-Date:
+          - Sat, 24 Oct 2026 22:52:21 GMT
+        x-amzn-Remapped-Server:
+          - gunicorn
+        x-amzn-RequestId:
+          - 42b16730-4884-47a7-b8b4-f43611299485
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        "{\"model\":\"text-embedding-3-small\",\"input\":[\"# Gravity hill\\n\\n>
+        \\\"Magnetic hill\\\" and \\\"Mystery hill\\\" redirect here. For other uses,\\n>
+        see [Magnetic Hill (disambiguation)](<https://en.wikipedia.org/wiki/Magnetic_Hill_(disambiguation)>)\\n>
+        and [Mystery Hill (disambiguation)](https://en.wikipedia.org/wiki/Mystery_Hill).\\n\\nA
+        **gravity hill**, also known as a\\n**magnetic hill**, **mystery hill**, **mystery
+        spot**, **gravity road**, or **anti-gravity hill**,\\nis a place where the layout
+        of the surrounding land produces an [illusion](https://en.wikipedia.org/wiki/Illusion),\\nmaking
+        a slight downhill slope appear to be an uphill slope.\\nThus, a car left out
+        of gear will appear to be rolling uphill against [gravity](https://en.wikipedia.org/wiki/Gravity).\\n\\nAlthough
+        the slope of gravity hills is an illusion,\\nsites are often accompanied by
+        claims that magnetic or supernatural forces are at work.\\nThe most important
+        factor contributing to the illusion is a completely\\nor mostly obstructed horizon.\\nWithout
+        a horizon,\\nit becomes difficult for a person to judge the slope of a surface,\\nas
+        a reliable reference point is missing,\\nand misleading visual cues can adversely
+        affect the sense of balance.\\nObjects which one would normally assume to be
+        more or less perpendicular to the ground,\\nsuch as trees, may be leaning, offsetting
+        the visual reference.\\n\\nA 2003 study looked into how the absence of a horizon
+        can skew the perspective on gravity hills,\\nby recreating a number of antigravity
+        places in the lab to see how volunteers would react.\\nIn conclusion, researchers
+        from the Universities of Padua and Pavia in Italy\\nfound that without a true
+        horizon in sight,\\nthe human brain could be tricked by common landmarks such
+        as trees and signs.\\n\\nThe illusion is similar to the [Ames room](https://en.wikipedia.org/wiki/Ames_room),\\nin
+        which objects can also appear to roll against gravity.\\n\\nThe opposite phenomenon\u2014an
+        uphill road that appears flat\u2014is known in\\n[bicycle racing](https://en.wikipedia.org/wiki/Cycle_sport)\\nas
+        a [\\\"false flat\\\"](https://en.wikipedia.org/wiki/Glossary_of_cycling#F).\\n\\n##
+        See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
+        [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
+        \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
+        External links\\n\"],\"dimensions\":1536,\"encoding_format\":\"float\"}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "2418"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "120"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/embeddings
+    response:
+      body:
+        string: !!binary |
+          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
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d2b28ff6d29-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:21 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_64eda266c4b74bf89f9c0b6b61efd1a4
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "111"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "200000"
+        x-ratelimit-limit-tokens:
+          - "200000000"
+        x-ratelimit-remaining-requests:
+          - "199999"
+        x-ratelimit-remaining-tokens:
+          - "199999426"
+        x-ratelimit-reset-requests:
+          - 0s
+        x-ratelimit-reset-tokens:
+          - 0s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body:
+        '{"model":"text-embedding-3-small","input":["What is the national flag of
+        Canada?"],"dimensions":1536,"encoding_format":"float"}'
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "101"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "120"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/embeddings
+    response:
+      body:
+        string: !!binary |
+          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
+          Hx8/jW8fP37/8fOv9w/+9a//A+/UgM1jcwAA
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d2d0da96d29-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:22 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_abd157f797dc458e84350d6f833f30d9
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "97"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "200000"
+        x-ratelimit-limit-tokens:
+          - "200000000"
+        x-ratelimit-remaining-requests:
+          - "199999"
+        x-ratelimit-remaining-tokens:
+          - "199999990"
+        x-ratelimit-reset-requests:
+          - 0s
+        x-ratelimit-reset-tokens:
+          - 0s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 4: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\n2010.\\n  8. **^** [Dept. of Canadian Heritage
+        news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        February 15, 2010. Retrieved February 15, 2011.\\n  9. **^** [PM pays tribute
+        to outstanding Canadians on Flag Day](http://www.pm.gc.ca/eng/media.asp?category=1&id=3958&featureId=6&pageId=26)
+        [Archived](https://web.archive.org/web/20110706181811/http://www.pm.gc.ca/eng/media.asp?category=1&id=3958&featureId=6&pageId=26)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        Prime Minister's Office news release. Retrieved February 16, 2011.\\n\\n## External
+        links\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=6\\n\\\"Edit
+        section: External links\\\")]\\n\\n![](//upload.wikimedia.org/wikipedia/en/thumb/4/4a/Commons-logo.svg/30px-\\nCommons-logo.svg.png)\\n\\nWikimedia
+        Commons has media related to [National Flag of Canada\\nDay](https://commons.wikimedia.org/wiki/Category:National_Flag_of_Canada_Day\\n\\\"commons:Category:National
+        Flag of Canada Day\\\").\\n\\n  * [Flag of Canada Song (1965) Freddie Grant](https://www.youtube.com/watch?v=2IkqmkTK46E)\\n
+        \ * [Flag Day](http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm), Dept. of
+        Canadian Heritage \\n  * [The famous Canadian Flag Collection, at Settlers,
+        Rails & Trails Inc, Argyle, Manitoba](http://argylemuseum.wixsite.com/argylemuseum/canadian-flag-collection)\\n\\n![](https://login.wikimedia.org/wiki/Special:CentralAutoLogin/start?type=1x1)\\n\\nRetrieved
+        from\\n\\\"[https://en.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994](https://en.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994)\\\"\\n\\n[Categories](/wiki/Help:Category
+        \\\"Help:Category\\\"):\\n\\n  * [1996 establishments in Canada](/wiki/Category:1996_establishments_in_Canada
+        \\\"Category:1996 establishments in Canada\\\")\\n  * [Public holidays in Canada](/wiki/Category:Public_holidays_in_Canada
+        \\\"Category:Public holidays in Canada\\\")\\n  * [February observances](/wiki/Category:February_observances
+        \\\"Category:February observances\\\")\\n  * [Flag days](/wiki/Category:Flag_days
+        \\\"Category:Flag days\\\")\\n  * [Winter events in Canada](/wiki/Category:Winter_events_in_Canada
+        \\\"Category:Winter events in Canada\\\")\\n\\nHidden categories:\\n\\n  * [Webarchive
+        template wayback links](/wiki/Category:Webarchive_template_wayback_links \\\"Category:Webarchive
+        template wayback links\\\")\\n  * [Articles with short description](/wiki/Category:Articles_with_short_description
+        \\\"Category:Articles with short description\\\")\\n  * [Short description matches
+        Wikidata](/wiki/Category:Short_description_matches_Wikidata \\\"Category:Short
+        description matches Wikidata\\\")\\n  * [Use mdy dates from February 2018](/wiki/Category:Use_mdy_dates_from_February_2018
+        \\\"Category:Use mdy dates from February 2018\\\")\\n  * [Infobox holiday with
+        missing field](/wiki/Category:Infobox_holiday_with_missing_field \\\"Category:Infobox
+        holiday with missing field\\\")\\n  * [Infobox holiday fixed day](/wiki/Category:Infobox_holiday_fixed_day
+        \\\"Category:Infobox holiday fixed day\\\")\\n  * [Articles containing French-language
+        text](/wiki/Category:Articles_containing_French-language_text \\\"Category:Articles
+        containing French-language text\\\")\\n  * [Commons category link is on Wikidata](/wiki/Category:Commons_category_link_is_on_Wikidata
+        \\\"Category:Commons category link is on Wikidata\\\")\\n\\n  * This page was
+        last edited on 1 July 2024, at 03:41 (UTC). \\n  * Text is available under the
+        [Creative Commons Attribution-ShareAlike License 4.0](//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License)[](//en.wikipedia.org/wiki/Wikipedia:Text_of_the_Creative_Commons_Attribution-ShareAlike_4.0_International_License);
+        additional terms may apply. By using this site, you agree to the [Terms of Use](//foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use)
+        and [Privacy Policy](//foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy).
+        Wikipedia\xAE is a registered trademark of the [Wikimedia Foundation, Inc.](//wikimediafoundation.org/),
+        a non-profit organization. \\n\\n  * [Privacy policy](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy)\\n
+        \ * [About Wikipedia](/wiki/Wikipedia:About)\\n  * [Disclaimers](/wiki/Wikipedia:General_disclaimer)\\n
+        \ * [Contact Wikipedia](//en.wikipedia.org/wiki/Wikipedia:Contact_us)\\n  *
+        [Code of Conduct](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Universal_Code_of_Conduct)\\n
+        \ * [Developers](https://developer.wikimedia.org)\\n  * [Statistics](https://stats.wikimedia.org/#/en.wikipedia.org)\\n
+        \ * [Cookie statement](https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Cookie_statement)\\n
+        \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
+        \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
+        \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
+        \ * \\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6349"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/3VTy27bMBC8+ysWPMtBYjeOk2ObPoEGKVD0UgfCmlzJbChSIKk0hmGgv9Hf65d0
+          STuWnKYXgdrZGc4+uBkBCK3EFQi5wiib1ozfSornj+fz97f+E31W+G02vZlM2i/15cXta1Ekhlv+
+          IBmfWCfSMY+idnYHS08YKameXVxO5vPJ9NU0A41TZBKtbuN4NjadxT1j5bSkwNB3/gXY5G/yZhU9
+          cvi0eIo0FALWxLGnJA56Z1JEYAg6RLRRFD0onY1ks93NQoSuadCvF+JqIb6uCOhRkm8jcBYfbIAb
+          TJWggXcGa3AVvEGLCuEa14BWQevdg1YUwJNJZYLR9j4UsOwi6AjKMWQdHyhIr5cEkW/JGhotVElU
+          x0CmOoGPzFBsTVeaSSnPLQP5B2QrgAHwGU/tLeQbIbpMuaYWfWxY5mA2ET6Q15Eb9efX77ArJRXQ
+          ciRLPJeWzhieKVd+shDFQnBxlH2UQTpP3K7JdthUT1UXMA3TdsYMALRcfG5hHufdHtkeBlhpq8Oq
+          5B0JvDA8lBBdKzK65e9dXojuaMaCe960sYzunrLs2ex0vhMU/fL18Gy6ByNbMUPaxVnxgmKpKKI2
+          YbBUQqJckeq5/QZmpPzJ7aUjR+eHDOyUdgPqaNCBfw2/dPuuO9rWLxl4Lt8DUlLLK1m2npSWx03p
+          0zyl5/u/tMMksmGR9pHfZhk1+TQtRRV2ZvfARFiHSE3JI635EXmdX1laiNF29BdCncd/XAQAAA==
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d3309f44f1c-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:24 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=Yf2bs_KJUNDYVOM.JtcyiEs5H4oZpJLrNiSypWJMsdQ-1792882342.8896806-1.0.1.1-dutvGeA2S2CDNok38XHiQBSYnKZuvuLUmy.izPA0UOwnCOwxs7DX4gtXFBAvWOOqzWnEkpYCIOLFzLat8.i5KvCX_9S59i10G0zI1sR9yU8l20rjL5TUNpBpgntevcEQ;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat,
+            24 Oct 2026 23:22:24 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_63a7b3d235744500853b9c81b0a62998
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1261"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "30000"
+        x-ratelimit-limit-tokens:
+          - "180000000"
+        x-ratelimit-remaining-requests:
+          - "29999"
+        x-ratelimit-remaining-tokens:
+          - "179998506"
+        x-ratelimit-reset-requests:
+          - 2ms
+        x-ratelimit-reset-tokens:
+          - 0s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 1: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\nJump to content\\n\\nMain menu\\n\\nMain menu\\n\\nmove
+        to sidebar  hide\\n\\nNavigation\\n\\n  * [Main page](/wiki/Main_Page \\\"Visit
+        the main page \\\\[z\\\\]\\\")\\n  * [Contents](/wiki/Wikipedia:Contents \\\"Guides
+        to browsing Wikipedia\\\")\\n  * [Current events](/wiki/Portal:Current_events
+        \\\"Articles related to current events\\\")\\n  * [Random article](/wiki/Special:Random
+        \\\"Visit a randomly selected article \\\\[x\\\\]\\\")\\n  * [About Wikipedia](/wiki/Wikipedia:About
+        \\\"Learn about Wikipedia and how it works\\\")\\n  * [Contact us](//en.wikipedia.org/wiki/Wikipedia:Contact_us
+        \\\"How to contact Wikipedia\\\")\\n  * [Donate](https://donate.wikimedia.org/wiki/Special:FundraiserRedirector?utm_source=donate&utm_medium=sidebar&utm_campaign=C13_en.wikipedia.org&uselang=en
+        \\\"Support us by donating to the Wikimedia Foundation\\\")\\n\\nContribute\\n\\n
+        \ * [Help](/wiki/Help:Contents \\\"Guidance on how to use and edit Wikipedia\\\")\\n
+        \ * [Learn to edit](/wiki/Help:Introduction \\\"Learn how to edit Wikipedia\\\")\\n
+        \ * [Community portal](/wiki/Wikipedia:Community_portal \\\"The hub for editors\\\")\\n
+        \ * [Recent changes](/wiki/Special:RecentChanges \\\"A list of recent changes
+        to Wikipedia \\\\[r\\\\]\\\")\\n  * [Upload file](/wiki/Wikipedia:File_upload_wizard
+        \\\"Add images or other media for use on Wikipedia\\\")\\n\\n[ ![](/static/images/icons/wikipedia.png)\\n![Wikipedia](/static/images/mobile/copyright/wikipedia-wordmark-en.svg)
+        ![The\\nFree Encyclopedia](/static/images/mobile/copyright/wikipedia-tagline-en.svg)\\n](/wiki/Main_Page)\\n\\n[
+        Search ](/wiki/Special:Search \\\"Search Wikipedia \\\\[f\\\\]\\\")\\n\\nSearch\\n\\nAppearance\\n\\n
+        \ * [Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \\\"You are encouraged to create an account and log in; however, it is not mandatory\\\")\\n
+        \ * [Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \\\"You're encouraged to log in; however, it's not mandatory. \\\\[o\\\\]\\\")\\n\\nPersonal
+        tools\\n\\n  * [ Create account](/w/index.php?title=Special:CreateAccount&returnto=National+Flag+of+Canada+Day
+        \\\"You are encouraged to create an account and log in; however, it is not mandatory\\\")\\n
+        \ * [ Log in](/w/index.php?title=Special:UserLogin&returnto=National+Flag+of+Canada+Day
+        \\\"You're encouraged to log in; however, it's not mandatory. \\\\[o\\\\]\\\")\\n\\nPages
+        for logged out editors [learn more](/wiki/Help:Introduction)\\n\\n  * [Contributions](/wiki/Special:MyContributions
+        \\\"A list of edits made from this IP address \\\\[y\\\\]\\\")\\n  * [Talk](/wiki/Special:MyTalk
+        \\\"Discussion about edits from this IP address \\\\[n\\\\]\\\")\\n\\n## Contents\\n\\nmove
+        to sidebar  hide\\n\\n  * (Top)\\n  * 1 History Toggle History subsection\\n
+        \   * 1.1 Background\\n    * 1.2 Flag Day\\n  * 2 See also\\n  * 3 Footnotes\\n
+        \ * 4 External links\\n\\nToggle the table of contents\\n\\n#  National Flag
+        of Canada Day\\n\\n7 languages\\n\\n  * [\u0627\u0644\u0639\u0631\u0628\u064A\u0629](https://ar.wikipedia.org/wiki/%D9%8A%D9%88%D9%85_%D8%B9%D9%84%D9%85_%D9%83%D9%86%D8%AF%D8%A7_%D8%A7%D9%84%D9%88%D8%B7%D9%86%D9%8A
+        \\\"\u064A\u0648\u0645 \u0639\u0644\u0645 \u0643\u0646\u062F\u0627 \u0627\u0644\u0648\u0637\u0646\u064A
+        \u2013 Arabic\\\")\\n  * [Espa\xF1ol](https://es.wikipedia.org/wiki/D%C3%ADa_de_la_Bandera_Nacional_de_Canad%C3%A1
+        \\\"D\xEDa de la Bandera Nacional de Canad\xE1 \u2013 Spanish\\\")\\n  * [Fran\xE7ais](https://fr.wikipedia.org/wiki/Jour_du_drapeau_national_du_Canada
+        \\\"Jour du drapeau national du Canada \u2013 French\\\")\\n  * [\u0540\u0561\u0575\u0565\u0580\u0565\u0576](https://hy.wikipedia.org/wiki/%D4%BF%D5%A1%D5%B6%D5%A1%D5%A4%D5%A1%D5%B5%D5%AB_%D5%A1%D5%A6%D5%A3%D5%A1%D5%B5%D5%AB%D5%B6_%D5%A4%D6%80%D5%B8%D5%B7%D5%AB_%D6%85%D6%80
+        \\\"\u053F\u0561\u0576\u0561\u0564\u0561\u0575\u056B \u0561\u0566\u0563\u0561\u0575\u056B\u0576
+        \u0564\u0580\u0578\u0577\u056B \u0585\u0580 \u2013 Armenian\\\")\\n  * [\u05E2\u05D1\u05E8\u05D9\u05EA](https://he.wikipedia.org/wiki/%D7%99%D7%95%D7%9D_%D7%94%D7%93%D7%92%D7%9C_%D7%94%D7%9C%D7%90%D7%95%D7%9E%D7%99_%D7%A9%D7%9C_%D7%A7%D7%A0%D7%93%D7%94
+        \\\"\u05D9\u05D5\u05DD \u05D4\u05D3\u05D2\u05DC \u05D4\u05DC\u05D0\u05D5\u05DE\u05D9
+        \u05E9\u05DC \u05E7\u05E0\u05D3\u05D4 \u2013 Hebrew\\\")\\n  * [Bahasa Melayu](https://ms.wikipedia.org/wiki/Hari_Bendera_Kebangsaan_Kanada
+        \\\"Hari Bendera Kebangsaan Kanada \u2013 Malay\\\")\\n  * [Polski](https://pl.wikipedia.org/wiki/Narodowy_dzie%C5%84_flagi_Kanady
+        \\\"Narodowy dzie\u0144 flagi Kanady \u2013 Polish\\\")\\n\\n[Edit\\nlinks](https://www.wikidata.org/wiki/Special:EntityPage/Q6972703#sitelinks-\\nwikipedia
+        \\\"Edit interlanguage links\\\")\\n\\n  * [Article](/wiki/National_Flag_of_Canada_Day
+        \\\"View the content page \\\\[c\\\\]\\\")\\n  * [Talk](/wiki/Talk:National_Flag_of_Canada_Day
+        \\\"Discuss improvements to the content page \\\\[t\\\\]\\\")\\n\\nEnglish\\n\\n
+        \ * [Read](/wiki/National_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
+        \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
+        \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
+        to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title\\n\\n---\\n\\nQuestion:
+        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "5902"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/3VTy27bMBC8+ysWPNuGEyfO45qmTYs2vQQoijoQ1uRKYkORAkm5dgMD+ZD25/Il
+          XdF2pLTuRZB2OLOjHe7jAEBoJS5ByBKjrGozupYUTz+XP/Xsrvw4dTer22L17vrr8ubDVfgkhi3D
+          Lb6TjHvWWDrmUdTObmHpCSO1qkdnF8fn58fTk2kCKqfItLSijqPZyDQWd4zSaUmBoW/8CfCYnq03
+          q2jF5clwX6koBCyIa/tDXPTOtBWBIegQ0UYx7EDpbCSb7D7ORWiqCv16Li7n4q4koJUkX0fQARC+
+          6Addk9IINfeAqKMhBc9Pv26x/T008NZgAS6HK7SoEN7gevj89BsWTYTIarV3S62YUzvfMqBtjtoG
+          cNasweJSF0kK0CqIuDA0cvloZzFAxYPzGs0Y3kdQjgJYxy8UpNcLAueB1W3U+Tq1Sy40Whbe+cvZ
+          33guhnPhydASraQsSOeJf3iy6Y/FU94EbOOwjTE9AC33THopkPsdsnmJINdWhzLjlANHzmMN0dUi
+          oRt+3qdIm1cpCR5MVccsugdKskez0+OtoOiuTwefHu3AyFZMj3Y2mQ4PKGaKeMwm9K6FkChLUh23
+          u0MJyX54Hanv6OTi5QQ2SrseddCbwL+GD3XfTkfb4pCBv+U7QEqqeXey2vM1lK+H0h3z1C7g/469
+          JJEMi0B+yduVRU2+TUtRjo3ZrogI6xCpyjjSgtfA67Qn7YUYbAZ/AIqc0TIeBAAA
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d3308caeb22-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:24 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=6vVfxaR5W7ZlcdULdSx5bgjtMbVoIHZaqtCGYUZAn1g-1792882342.891108-1.0.1.1-Ws3D7W9M9qWFfktYnRp1BqqcdtwkpTR0WXG1kIXvt98216czR4U2Xd79NLI7dHR8dnn2wGMLFKwnH51DxiqYQ7b_SVW8RA1_xvyrItYd3HvpGlfuH1YMhC2Zmlx.afAP;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat,
+            24 Oct 2026 23:22:24 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_89d245dc58234698adbc3e94a1ecba13
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1295"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "30000"
+        x-ratelimit-limit-tokens:
+          - "180000000"
+        x-ratelimit-remaining-requests:
+          - "29999"
+        x-ratelimit-remaining-tokens:
+          - "179998638"
+        x-ratelimit-reset-requests:
+          - 2ms
+        x-ratelimit-reset-tokens:
+          - 0s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 2: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\n_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
+        \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
+        \\\"Past revisions of this page \\\\[h\\\\]\\\")\\n\\nTools\\n\\nTools\\n\\nmove
+        to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
+        \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
+        this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history)\\n\\nGeneral\\n\\n
+        \ * [What links here](/wiki/Special:WhatLinksHere/National_Flag_of_Canada_Day
+        \\\"List of all English Wikipedia pages containing links to this page \\\\[j\\\\]\\\")\\n
+        \ * [Related changes](/wiki/Special:RecentChangesLinked/National_Flag_of_Canada_Day
+        \\\"Recent changes in pages linked from this page \\\\[k\\\\]\\\")\\n  * [Upload
+        file](/wiki/Wikipedia:File_Upload_Wizard \\\"Upload files \\\\[u\\\\]\\\")\\n
+        \ * [Special pages](/wiki/Special:SpecialPages \\\"A list of all special pages
+        \\\\[q\\\\]\\\")\\n  * [Permanent link](/w/index.php?title=National_Flag_of_Canada_Day&oldid=1231946994
+        \\\"Permanent link to this revision of this page\\\")\\n  * [Page information](/w/index.php?title=National_Flag_of_Canada_Day&action=info
+        \\\"More information about this page\\\")\\n  * [Cite this page](/w/index.php?title=Special:CiteThisPage&page=National_Flag_of_Canada_Day&id=1231946994&wpFormIdentifier=titleform
+        \\\"Information on how to cite this page\\\")\\n  * [Get shortened URL](/w/index.php?title=Special:UrlShortener&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNational_Flag_of_Canada_Day)\\n
+        \ * [Download QR code](/w/index.php?title=Special:QrCode&url=https%3A%2F%2Fen.wikipedia.org%2Fwiki%2FNational_Flag_of_Canada_Day)\\n
+        \ * [Wikidata item](https://www.wikidata.org/wiki/Special:EntityPage/Q6972703
+        \\\"Structured data on this page hosted by Wikidata \\\\[g\\\\]\\\")\\n\\nPrint/export\\n\\n
+        \ * [Download as PDF](/w/index.php?title=Special:DownloadAsPdf&page=National_Flag_of_Canada_Day&action=show-download-screen
+        \\\"Download this page as a PDF file\\\")\\n  * [Printable version](/w/index.php?title=National_Flag_of_Canada_Day&printable=yes
+        \\\"Printable version of this page \\\\[p\\\\]\\\")\\n\\nIn other projects\\n\\n
+        \ * [Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:National_Flag_of_Canada_Day)\\n\\nAppearance\\n\\nmove
+        to sidebar  hide\\n\\nFrom Wikipedia, the free encyclopedia\\n\\nCanadian holiday\\n\\nNational
+        Flag of Canada Day  \\n---  \\n[![](//upload.wikimedia.org/wikipedia/commons/thumb/6/68/Canada_flag_halifax_9_-04.JPG/250px-\\nCanada_flag_halifax_9_-04.JPG)](/wiki/File:Canada_flag_halifax_9_-04.JPG)
+        The\\nnational flag of Canada  \\nObserved by  |  [Canada](/wiki/Canada \\\"Canada\\\")
+        \ \\nDate |  [February 15](/wiki/February_15 \\\"February 15\\\")  \\nNext time
+        \ |  February 15, 2025 (2025-02-15)  \\nFrequency | Annual  \\n  \\n**National
+        Flag of Canada Day** ([French](/wiki/French_language \\\"French\\nlanguage\\\"):
+        _Jour du drapeau national du Canada_), commonly shortened to\\n**Flag Day**
+        , is observed annually on February 15 to commemorate the\\ninauguration of the
+        [flag of Canada](/wiki/Flag_of_Canada \\\"Flag of Canada\\\") on\\nthat date
+        in 1965.[1] The day is marked by flying the flag, occasional public\\nceremonies
+        and educational programs in schools. It is not a [public\\nholiday](/wiki/Public_holidays_in_Canada
+        \\\"Public holidays in Canada\\\"),\\nalthough there has been discussion about
+        creating one.\\n\\n## History\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=1\\n\\\"Edit
+        section: History\\\")]\\n\\n### Background\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=2\\n\\\"Edit
+        section: Background\\\")]\\n\\nAmid [much controversy](/wiki/Great_Canadian_flag_debate
+        \\\"Great Canadian flag\\ndebate\\\"), the [Parliament of Canada](/wiki/Parliament_of_Canada
+        \\\"Parliament of\\nCanada\\\") in 1964 voted to adopt a new design for the
+        [Canadian\\nflag](/wiki/Flag_of_Canada \\\"Flag of Canada\\\") and issued a
+        call for\\nsubmissions.[2]\\n\\nThis flag would replace the [Canadian Red Ensign](/wiki/Canadian_Red_Ensign\\n\\\"Canadian
+        Red Ensign\\\"), which had been, with various successive alterations,\\nin conventional
+        use as the national flag of [Canada](/wiki/Canada \\\"Canada\\\")\\nsince 1868.
+        Nearly 4,000 designs were submitted by Canadians.[2] On October\\n22, 1964,
+        the [Maple Leaf flag](/wiki/Maple_Leaf_flag \\\"Maple Leaf\\nflag\\\")\u2014designed
+        by historian [George Stanley](/wiki/George_Stanley \\\"George\\nStanley\\\")\u2014won
+        with a unanimous vote.[3] Under the leadership of [Prime\\nMinister](/wiki/Prime_Minister_of_Canada
+        \\\"Prime Minister of Canada\\\") [Lester\\nPearson](/wiki/Lester_B._Pearson
+        \\\"Lester B. Pearson\\\"), resolutions\\nrecommending the new design were passed
+        by the [House of\\nCommons](/wiki/House_of_Commons_of_Canada \\\"House of Commons
+        of Canada\\\") on\\nDecember 15, 1964, and by the [Senate](/wiki/Senate_of_Canada
+        \\\"Senate of\\nCanada\\\") two days later.[4]\\n\\nThe flag was proclaimed
+        by [Elizabeth II](/wiki/Elizabeth_II \\\"Elizabeth II\\\"),\\n[Queen of Canada](/wiki/Monarchy_of_Canada
+        \\\"Monarchy of Canada\\\"), on January\\n28, 1965,[3][5] and took effect \\\"upon,
+        from and after\\\" February 15 that\\nyear.[6]\\n\\n### Flag Day\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=3\\n\\\"Edit
+        section: Flag Day\\\")]\\n\\nNational Flag of Canada Day was instituted in 1996
+        by an [Order in\\nCouncil](/wiki/Order_in_Council \\\"Order in Council\\\")
+        from [Governor\\nGeneral](/wiki/Governor_General_of_Canada \\\"Governor General
+        of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc \\\"Rom\xE9o LeBlanc\\\"),
+        on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
+        \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
+        proposed cuts to the\\n[un\\n\\n---\\n\\nQuestion: What is the national flag
+        of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6830"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/3VTwW7bMAy95ysIndNgbtM26W3Y2mHAOhTFgBVYCoOVaUerLBmSnDYoAuw3+nv7
+          klFyEjtbdzFkPvLpkXx6GQEIVYgLEHKJQdaNPrqUFE7L8LS6zm4JP52/t99Pspurm8e76m4uxrHC
+          PvwkGXZVE2m5joKypoOlIwwUWbPz+fFsdnwyPUlAbQvSsaxqwtHZkW4NbiuWVknyDP3gX4CX9I3a
+          TEHPHH433kVq8h4r4tguiYPO6hgR6L3yAU0Q4x6U1gQySe7LQvi2rtGtF+JiIb4tCehZkmsCqIJz
+          VKnIQ+CwwdgPaig1VmBL+IAGCwTs4GvkjuELYZkSxoCFbbhnUAay+dkU0MQztlXr4izAGriiB9fy
+          1ZCdjmPS6QQ+B3DUaJScEWnTJQoN3HLg0nhVmY6puzVp4WnXVNuOFo1pUet15P+6k3x1KPkjricw
+          bLWw3KSxfCAvnXqgPfnvX68eVsozZwTj9dxQQQGVnizEeCEcaVqhkZR7aR3xGGeb4bAdla3HuGTT
+          aj0AWKkNSWFa8/0W2ewXWyqj/DJn73g2Ei/LB9uIhG74e5+M0h7sXjSOrRfyYB8p0Waz6bQjFL0p
+          e/j8bAsGlqIHZfPjrcEOGfOucz8wm5Aol1T0tb0zE5I/ORXoQFG2z8C2UHZQOhpM4F/Bb93eTUeZ
+          6i0Bf9P3gJQU3Zk3jgolD4fSpzmKz/p/aftNJMHCk1vxm82DIhe3VVCJre4envBrH6jOeaUVO86p
+          9PqiIUab0R96Y1shdAQAAA==
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d332a7aa6c4-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:24 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=WnNc3WG9Ea2lnCB96yF4275oI8MeG3x4IrYUD_gJwMw-1792882342.9052978-1.0.1.1-V7hpSCd_ihgbW9BlrwEqzQTwbR6hJDqdhDyy0glG4izCejxgswIZ5L7BImVaOqJVne034tRJwfvYdNXYJKBvPNYfXeDzt8FTOKTcqYD4uHWjimcvX78h1aVWO_C6mQXU;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat,
+            24 Oct 2026 23:22:24 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_3ea1e2ddc067408c8c4e6db4aa997809
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1245"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "30000"
+        x-ratelimit-limit-tokens:
+          - "180000000"
+        x-ratelimit-remaining-requests:
+          - "29999"
+        x-ratelimit-remaining-tokens:
+          - "179998413"
+        x-ratelimit-reset-requests:
+          - 2ms
+        x-ratelimit-reset-tokens:
+          - 0s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
+        from National2023 chunk 3: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
+        2023, Accessed now\\n\\n---\\n\\n an [Order in\\nCouncil](/wiki/Order_in_Council
+        \\\"Order in Council\\\") from [Governor\\nGeneral](/wiki/Governor_General_of_Canada
+        \\\"Governor General of Canada\\\") [Rom\xE9o\\nLeBlanc](/wiki/Rom%C3%A9o_LeBlanc
+        \\\"Rom\xE9o LeBlanc\\\"), on the initiative of Prime\\nMinister [Jean Chr\xE9tien](/wiki/Jean_Chr%C3%A9tien
+        \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
+        \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
+        proposed cuts to the\\n[unemployment insurance](/wiki/Unemployment_insurance
+        \\\"Unemployment\\ninsurance\\\") system, and while walking through the crowd
+        he was [grabbed by the\\nneck and pushed aside](/wiki/Shawinigan_Handshake \\\"Shawinigan
+        Handshake\\\") a\\nprotester who had approached him.\\n\\nIn 2010, on the flag's
+        45th anniversary, federal ceremonies were held to mark\\nFlag Day at [Ottawa](/wiki/Ottawa
+        \\\"Ottawa\\\"), [Winnipeg](/wiki/Winnipeg\\n\\\"Winnipeg\\\"), [St. John's](/wiki/St._John%27s,_Newfoundland_and_Labrador
+        \\\"St.\\nJohn's, Newfoundland and Labrador\\\"), and at\\n[Whistler](/wiki/Whistler,_British_Columbia
+        \\\"Whistler, British Columbia\\\") and\\n[Vancouver](/wiki/Vancouver \\\"Vancouver\\\")
+        in conjunction with the [2010 Winter\\nOlympics](/wiki/2010_Winter_Olympics
+        \\\"2010 Winter Olympics\\\") in Vancouver.[8]\\nIn 2011, Prime Minister [Stephen
+        Harper](/wiki/Stephen_Harper \\\"Stephen\\nHarper\\\") observed Flag Day by
+        presenting two citizens, whose work honoured the\\n[military](/wiki/Canadian_Armed_Forces
+        \\\"Canadian Armed Forces\\\"), with Canadian\\nflags that had flown over the
+        [Peace Tower](/wiki/Peace_Tower \\\"Peace Tower\\\").\\nIt was announced as
+        inaugurating an annual recognition of patriotism.[9]\\n\\n## See also\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=4\\n\\\"Edit
+        section: See also\\\")]\\n\\n  * ![flag](//upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Maple_Leaf_%28from_roundel%29.svg/25px-Maple_Leaf_%28from_roundel%29.svg.png)[Canada
+        portal](/wiki/Portal:Canada \\\"Portal:Canada\\\")\\n\\n  * [Flag Day](/wiki/Flag_Day
+        \\\"Flag Day\\\")\\n  * [List of Canadian flags](/wiki/List_of_Canadian_flags
+        \\\"List of Canadian flags\\\")\\n  * [National flag](/wiki/National_flag \\\"National
+        flag\\\")\\n\\n## Footnotes\\n\\n[[edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit&section=5\\n\\\"Edit
+        section: Footnotes\\\")]\\n\\n  1. **^** [Department of Canadian Heritage](/wiki/Department_of_Canadian_Heritage
+        \\\"Department of Canadian Heritage\\\"). [\\\"Ceremonial and Canadian Symbols
+        Promotion > The National Flag of Canada\\\"](https://web.archive.org/web/20100423114158/http://www.canadianheritage.gc.ca/progs/cpsc-ccsp/sc-cs/df1_e.cfm).
+        Queen's Printer for Canada. Archived from [the original](http://www.canadianheritage.gc.ca/progs/cpsc-ccsp/sc-cs/df1_e.cfm)
+        on April 23, 2010. Retrieved March 21, 2010.\\n  2. ^ _**a**_ _**b**_ Government
+        of Canada, Public Services and Procurement Canada (July 31, 2015). [\\\"Infographic:
+        National Flag of Canada Day \u2013 February 15 \u2013 Canada's Parliamentary
+        Precinct \u2013 PWGSC\\\"](https://www.tpsgc-pwgsc.gc.ca/citeparlementaire-parliamentaryprecinct/decouvrez-discover/jour-drap-flag-day-eng.html).
+        _www.tpsgc-pwgsc.gc.ca_. Retrieved February 5, 2022.\\n  3. ^ _**a**_ _**b**_
+        [\\\"What is the National Flag Day of Canada?\\\"](http://westernfinancialgroup.ca/What-is-the-National-Flag-of-Canada-Day).
+        _westernfinancialgroup.ca_. Retrieved February 5, 2022.\\n  4. **^** [Department
+        of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department of
+        Canadian Heritage\\\"). [\\\"Ceremonial and Canadian Symbols Promotion > The
+        National Flag of Canada > Birth of the Canadian flag\\\"](http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm).
+        Queen's Printer for Canada. [Archived](https://web.archive.org/web/20100224005050/http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm)
+        from the original on February 24, 2010. Retrieved March 21, 2010.\\n  5. **^**
+        [\\\"Birth of the Canadian flag\\\"](http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm).
+        [Department of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department
+        of Canadian Heritage\\\"). [Archived](https://web.archive.org/web/20081220170253/http://www.pch.gc.ca/pgm/ceem-cced/symbl/df3-eng.cfm)
+        from the original on December 20, 2008. Retrieved December 16, 2008.\\n  6.
+        **^** [Conserving the Proclamation of the Canadian Flag](http://www.collectionscanada.gc.ca/publications/archivist-magazine/015002-2021-e.html)
+        [Archived](https://web.archive.org/web/20121021133944/http://www.collectionscanada.gc.ca/publications/archivist-magazine/015002-2021-e.html)
+        October 21, 2012, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback
+        Machine\\\"), Library and Archives of Canada, from John Grace in The Archivist,
+        National Archives, Ottawa, 1990. Retrieved February 15, 2011.\\n  7. **^** [Department
+        of Canadian Heritage](/wiki/Department_of_Canadian_Heritage \\\"Department of
+        Canadian Heritage\\\"). [\\\"National Flag of Canada Day\\\"](http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm).
+        Queen's Printer for Canada. [Archived](https://web.archive.org/web/20100217042202/http://www.pch.gc.ca/special/jdn-nfd/index-eng.cfm)
+        from the original on February 17, 2010. Retrieved March 21, 2010.\\n  8. **^**
+        [Dept. of Canadian Heritage news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
+        July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
+        February 15, 2010. Retrieved February 15, 2011.\\n \\n\\n---\\n\\nQuestion:
+        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "6597"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/3VTy25aMRDd8xUjr0kEJIEk2z6kZJFWanYluhrsAZwY+8qeCyERUn+jv9cv6diE
+          XGjoxrLnzBmfeb12AJQ16hqUniPrRe1OvmjiC2vuRrffXn5MbiKt02O6vzCD5Qveqm5mhMkjad6x
+          TnUQHrENfgvrSMiUo/ZHV4PLy8HZ+VkBFsGQy7RZzSfDE9d4fGPMg9WUBPopT4DXcmZt3tCzmHvd
+          nWVBKeGMxLZzEmMMLlsUpmQTo2fVbUEdPJMvcl/HKjWLBcb1WF2P1f2cgJ41xZpBvOTiE9xhzgQd
+          fHU4gzCFT+jRIHzGNaA3EGlKMQEHYKEX0KIHv6NNhdaFScNgGUygBD7IhZKOdkKFlF3+/PqdAOua
+          MKL8DCFmHzvzp3DDmSJEluoeEs4veC4qvF2KBkkDVphA8nkiA9bDoNfvFZEHzOI0dWHlIQiv2L8T
+          yqf3YUXxdKy6YxXJ0TIrqZIOkaQ+g81+FSXtJmHunm+c2wNETeCSfOnfwxuyee/Y1Hqb5pUMRZIJ
+          kS4kDrUq6EbOhzIBzUFTVR1lprji8EQlbP+yd7UNqNppa+Hh6A1kkeL2aaNh90jEyhCjdWlvipRG
+          PSfTctuRK0i1ipbpQNHw3QMbY8MetbNXgY+Cj/2+rY71s2MC/g3fAlpTLatW1ZGM1YdFad0i5X39
+          n9t7J4pglSguZRkrthRztwxNsXHbjVJpnZgWlbR0JlsTbVmrPBCdTecv1cMjYk0EAAA=
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d330ed51613-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:24 GMT
+        Server:
+          - cloudflare
+        Set-Cookie:
+          - __cf_bm=4AVLMEYdew_9iZMkWXejY8jiFCPe6e70GDhW3J0Bfy4-1792882342.8917003-1.0.1.1-LLpddvhe9vlVaSJ2_GFIxerNXecMo2QO71KjBeCbBCp8RF2crwAtfEepaqjKuCNL7XgT3h1uzO33JjNgiiUIhyJgIx_waeJ6J2VLtSILtc0_fOgXq7GiwFshi4o9eQM6;
+            HttpOnly; SameSite=None; Secure; Path=/; Domain=api.openai.com; Expires=Sat,
+            24 Oct 2026 23:22:24 GMT
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_60f4509afdae4514987702525c8d5ade
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "1436"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "30000"
+        x-ratelimit-limit-tokens:
+          - "180000000"
+        x-ratelimit-remaining-requests:
+          - "29999"
+        x-ratelimit-remaining-tokens:
+          - "179998449"
+        x-ratelimit-reset-requests:
+          - 2ms
+        x-ratelimit-reset-tokens:
+          - 0s
+      status:
+        code: 200
+        message: OK
+  - request:
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
+        a summary of the relevant information that could help answer the question based
+        on the excerpt. Your summary, combined with many others, will be given to the
+        model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
+        \ \\\"summary\\\": \\\"...\\\",\\n  \\\"relevance_score\\\": 0-10\\n}\\n\\nwhere
+        `summary` is relevant information from the text - about 100 words. `relevance_score`
+        is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
+        excerpt may or may not contain relevant information. If not, leave `summary`
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
+        from unknownauthorsUnknownyeargravityhill lines 0-44: Unknown author(s). Gravity
+        hill. Poetry in America, pages 15-15, Unknown year. URL: https://doi.org/10.2307/j.ctt5vkfh7.11,
+        doi:10.2307/j.ctt5vkfh7.11. This article has 0 citations.\\n\\n---\\n\\n# Gravity
+        hill\\n\\n> \\\"Magnetic hill\\\" and \\\"Mystery hill\\\" redirect here. For
+        other uses,\\n> see [Magnetic Hill (disambiguation)](<https://en.wikipedia.org/wiki/Magnetic_Hill_(disambiguation)>)\\n>
+        and [Mystery Hill (disambiguation)](https://en.wikipedia.org/wiki/Mystery_Hill).\\n\\nA
+        **gravity hill**, also known as a\\n**magnetic hill**, **mystery hill**, **mystery
+        spot**, **gravity road**, or **anti-gravity hill**,\\nis a place where the layout
+        of the surrounding land produces an [illusion](https://en.wikipedia.org/wiki/Illusion),\\nmaking
+        a slight downhill slope appear to be an uphill slope.\\nThus, a car left out
+        of gear will appear to be rolling uphill against [gravity](https://en.wikipedia.org/wiki/Gravity).\\n\\nAlthough
+        the slope of gravity hills is an illusion,\\nsites are often accompanied by
+        claims that magnetic or supernatural forces are at work.\\nThe most important
+        factor contributing to the illusion is a completely\\nor mostly obstructed horizon.\\nWithout
+        a horizon,\\nit becomes difficult for a person to judge the slope of a surface,\\nas
+        a reliable reference point is missing,\\nand misleading visual cues can adversely
+        affect the sense of balance.\\nObjects which one would normally assume to be
+        more or less perpendicular to the ground,\\nsuch as trees, may be leaning, offsetting
+        the visual reference.\\n\\nA 2003 study looked into how the absence of a horizon
+        can skew the perspective on gravity hills,\\nby recreating a number of antigravity
+        places in the lab to see how volunteers would react.\\nIn conclusion, researchers
+        from the Universities of Padua and Pavia in Italy\\nfound that without a true
+        horizon in sight,\\nthe human brain could be tricked by common landmarks such
+        as trees and signs.\\n\\nThe illusion is similar to the [Ames room](https://en.wikipedia.org/wiki/Ames_room),\\nin
+        which objects can also appear to roll against gravity.\\n\\nThe opposite phenomenon\u2014an
+        uphill road that appears flat\u2014is known in\\n[bicycle racing](https://en.wikipedia.org/wiki/Cycle_sport)\\nas
+        a [\\\"false flat\\\"](https://en.wikipedia.org/wiki/Glossary_of_cycling#F).\\n\\n##
+        See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
+        [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
+        \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
+        External links\\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
+      headers:
+        accept:
+          - application/json
+        accept-encoding:
+          - gzip, deflate
+        connection:
+          - keep-alive
+        content-length:
+          - "3502"
+        content-type:
+          - application/json
+        host:
+          - api.openai.com
+        user-agent:
+          - AsyncOpenAI/Python 2.29.0
+        x-stainless-arch:
+          - arm64
+        x-stainless-async:
+          - async:asyncio
+        x-stainless-lang:
+          - python
+        x-stainless-os:
+          - MacOS
+        x-stainless-package-version:
+          - 2.29.0
+        x-stainless-raw-response:
+          - "true"
+        x-stainless-read-timeout:
+          - "60.0"
+        x-stainless-retry-count:
+          - "0"
+        x-stainless-runtime:
+          - CPython
+        x-stainless-runtime-version:
+          - 3.13.2
+      method: POST
+      uri: https://api.openai.com/v1/chat/completions
+    response:
+      body:
+        string: !!binary |
+          H4sIAAAAAAAA/42SzW7CMBCE7zxFtOdQAaWFckWVqvbQM21QZJwlMXVsy97QIsS71zY/SVUq9RIp
+          +3nWs+Pd95IERAGzBHjFiNdG9h850uT1ZT7BamfMfHD7vHrbjOVosVo81ZAGhV5tkNNZdcO11yEJ
+          rY6YW2SEoetw8jCaTke347sIal2gDLLSUP++LxvFTopKC47Oo3f/myT7+A3eVIFfvjxIz5UanWMl
+          +tr5kC9aLUMFmHPCEVMEaQu5VoQq2t1n4Jq6ZnaXwSyDDNIMLErcMsUxd1xb9GBw6MotrhvHgm3V
+          SNkBTClNLIwdjS9P5HCxuhZKuCr3aTgfjb/ekTYQ6cF/l3H05sc0YKwPk3LSHxjbTu5Gx37QptzS
+          4RmSdyI7qvtxeqVfXiAxIV0nPOCMV1i00jbpSPJPKwivYdYUQndArzP8b7PXrj4GI1T5n/Yt4ByN
+          X6/cWCwE/xlIe8xi2NG/jl0eIRoGh3brFzAngTY8VIFr1sjjFoHbOcI6969ZojVWxFUKu9A79L4B
+          E8yMCUEDAAA=
+      headers:
+        Access-Control-Expose-Headers:
+          - X-Request-ID
+          - CF-Ray
+          - CF-Ray
+        Alt-Svc:
+          - h3=":443"; ma=86400
+        CF-Cache-Status:
+          - DYNAMIC
+        CF-Ray:
+          - a4fc8d3ccae54f1c-SJC
+        Connection:
+          - keep-alive
+        Content-Encoding:
+          - gzip
+        Content-Type:
+          - application/json
+        Date:
+          - Sat, 24 Oct 2026 22:52:25 GMT
+        Server:
+          - cloudflare
+        Strict-Transport-Security:
+          - max-age=31536000; includeSubDomains; preload
+        Transfer-Encoding:
+          - chunked
+        X-Content-Type-Options:
+          - nosniff
+        X-Request-ID:
+          - req_c4bd592685574a2790808e91e893a400
+        openai-organization:
+          - future-house-xr4tdh
+        openai-processing-ms:
+          - "999"
+        openai-project:
+          - proj_RNqI6HcOEEHFt903C3PXpgXs
+        openai-version:
+          - "2020-10-01"
+        x-openai-proxy-wasm:
+          - v0.1
+        x-ratelimit-limit-requests:
+          - "30000"
+        x-ratelimit-limit-tokens:
+          - "180000000"
+        x-ratelimit-remaining-requests:
+          - "29999"
+        x-ratelimit-remaining-tokens:
+          - "179999202"
+        x-ratelimit-reset-requests:
+          - 2ms
+        x-ratelimit-reset-tokens:
+          - 0s
       status:
         code: 200
         message: OK

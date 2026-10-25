@@ -70,7 +70,7 @@ def pad_image_with_border(
     # Create canvas with border on all sides, while not manipulating the original image
     orig_w, orig_h = image.size
     canvas = Image.new(
-        image.mode, (orig_w + 2 * border_x, orig_h + 2 * border_y), pad_color  # type: ignore[arg-type]
+        image.mode, (orig_w + 2 * border_x, orig_h + 2 * border_y), pad_color  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
     )
     # Paste original image onto canvas with border offset
     canvas.paste(image, (border_x, border_y))
@@ -284,7 +284,7 @@ async def parse_pdf_to_pages(
                         min(rendered_page_pil.height, padded_bbox[3] - offset_y),
                     )
                     # Crop original image at bbox (without border)
-                    region_pil = rendered_page_pil.crop(original_bbox)  # type: ignore[arg-type]
+                    region_pil = rendered_page_pil.crop(original_bbox)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
                     # Use markdown_no_bbox to get text for this region
                     # abandoning the text if we're still hitting a length error
                     try:
@@ -351,7 +351,7 @@ async def parse_pdf_to_pages(
         # corrections such as sorting by bounding box are hard because of edge cases
         # such as two-column PDFs (where 'vertical then horizontal' ordering
         # is not a valid sorting heuristic)
-        text = "\n\n".join(item.text or "" for item in response)  # noqa: FURB143
+        text = "\n\n".join(item.text or "" for item in response)
         if page_size_limit and len(text) > page_size_limit:
             raise ImpossibleParsingError(
                 f"The text in page {i} of {page_count} was {len(text)} chars"
@@ -396,7 +396,7 @@ async def parse_pdf_to_pages(
                     min(rendered_page_pil.width, padded_bbox[2] - offset_x),
                     min(rendered_page_pil.height, padded_bbox[3] - offset_y),
                 )
-                region_pix = rendered_page_pil.crop(original_bbox)  # type: ignore[arg-type]
+                region_pix = rendered_page_pil.crop(original_bbox)  # type: ignore[arg-type]  # ty: ignore[invalid-argument-type]
                 img_bytes = io.BytesIO()
                 region_pix.save(img_bytes, format="PNG")
                 media_metadata = render_kwargs | {

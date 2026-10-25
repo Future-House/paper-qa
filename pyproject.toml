@@ -24,16 +24,18 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Programming Language :: Python",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
     "anyio",
     "fhaviary[llm]>=0.34",  # For type(action)=Message
-    "fhlmi>=0.45.0",  # For type(action)=Message
+    "fhlmi>=1.10.0",  # For type(action)=Message and default temperature handling
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "httpx-aiohttp",
+    "litellm>=1.83.9,!=1.107.0",  # Exclude the compromised release
     "numpy",
     "paper-qa-pypdf",  # TODO: after https://peps.python.org/pep-0771/, make this opt-out if 'pymupdf' extra is specified`
     "pybtex",
@@ -56,17 +58,15 @@ maintainers = [
 ]
 name = "paper-qa"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.15"
 
 [project.optional-dependencies]
 dev = [
-    "fhlmi>=0.44.0",  # Lower pin for update from Haiku 3.5 to 4.5
+    "fhlmi>=1.10.0",
     "httpx-aiohttp>=0.1.11",  # Pin for raw headers fix
     "ipykernel>=6.29",  # For running Jupter notebooks, and pin to keep recent
     "ipython>=8",  # Pin to keep recent
-    "litellm>=1.81.14",  # Lower pin for Anthropic empty system messages fix in https://github.com/BerriAI/litellm/pull/21630
-    "mypy>=1.19",  # Pin for zip default detection
-    "paper-qa[docling,image,ldp,memory,nemotron,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
+    "paper-qa[docling,image,ldp,nemotron,pypdf-media,pymupdf,typing,zotero,local,qdrant,office]",
     "prek<0.2.15",  # Downpin for https://github.com/j178/prek/issues/1104
     "pydantic~=2.11",  # Pin for start of model_fields deprecation
     "pylint-per-file-ignores",
@@ -82,9 +82,9 @@ dev = [
     "pytest>=8",  # Pin to keep recent
     "python-dotenv",
     "pyzotero>=1.11.0",  # Lower pin for typing fix on Zotero.dump in https://github.com/urschrei/pyzotero/issues/298
-    "refurb>=2",  # Pin to keep recent
+    "ty",
     "typeguard",
-    "vcrpy>=8",  # Pin for dropping unused requests support
+    "vcrpy>=8.3",  # Support aiohttp 3.14 used by LiteLLM
 ]
 docling = ["paper-qa-docling"]
 image = ["fhlmi[image]"]
@@ -93,10 +93,6 @@ ldp = [
 ]
 local = [
     "sentence-transformers",
-]
-memory = [
-    "paper-qa[ldp]",
-    "usearch>=2.16.4",  # Pin for Python 3.13 support
 ]
 nemotron = ["paper-qa-nemotron"]
 office = [
@@ -148,77 +144,6 @@ skip = [
 horizontal-rule-style = "prettier"
 proactive = false
 
-[tool.mypy]
-# Type-checks the interior of functions without type annotations.
-check_untyped_defs = true
-# Allows enabling one or multiple error codes globally. Note: This option will
-# override disabled error codes from the disable_error_code option.
-enable_error_code = [
-    "ignore-without-code",
-    "mutable-override",
-    "redundant-cast",
-    "redundant-expr",
-    "redundant-self",
-    "truthy-bool",
-    "truthy-iterable",
-    "unimported-reveal",
-    "unreachable",
-    "unused-awaitable",
-    "unused-ignore",
-]
-# Shows a short summary line after error messages.
-error_summary = false
-# A regular expression that matches file names, directory names and paths which mypy
-# should ignore while recursively discovering files to check. Use forward slashes (/) as
-# directory separators on all platforms.
-exclude = [
-    "^\\.?venv",  # SEE: https://regex101.com/r/0rp5Br/1
-]
-# Specifies the paths to use, after trying the paths from MYPYPATH environment variable.
-# Useful if you'd like to keep stubs in your repo, along with the config file.
-# Multiple paths are always separated with a : or , regardless of the platform.
-# User home directory and environment variables will be expanded.
-mypy_path = "$MYPY_CONFIG_FILE_DIR/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pypdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-pymupdf/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-docling/src,$MYPY_CONFIG_FILE_DIR/packages/paper-qa-nemotron/src"
-# Specifies the OS platform for the target program, for example darwin or win32
-# (meaning OS X or Windows, respectively). The default is the current platform
-# as revealed by Python’s sys.platform variable.
-platform = "linux"
-# Comma-separated list of mypy plugins.
-plugins = ["pydantic.mypy"]
-# Use visually nicer output in error messages: use soft word wrap, show source
-# code snippets, and show error location markers.
-pretty = true
-# Shows column numbers in error messages.
-show_column_numbers = true
-# Shows error codes in error messages.
-# SEE: https://mypy.readthedocs.io/en/stable/error_codes.html#error-codes
-show_error_codes = true
-# Prefixes each error with the relevant context.
-show_error_context = true
-# Warns about casting an expression to its inferred type.
-warn_redundant_casts = true
-# Shows a warning when encountering any code inferred to be unreachable or
-# redundant after performing type analysis.
-warn_unreachable = true
-# Warns about per-module sections in the config file that do not match any
-# files processed when invoking mypy.
-warn_unused_configs = true
-# Warns about unneeded `# type: ignore` comments.
-warn_unused_ignores = true
-
-[[tool.mypy.overrides]]
-# Suppresses error messages about imports that cannot be resolved.
-ignore_missing_imports = true
-# Per-module configuration options
-module = [
-    "openreview",  # SEE: https://github.com/openreview/openreview-py/issues/2551
-    "pybtex.*",  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/141/type-annotations
-    "pymupdf",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/2883
-    "pypdfium2",  # SEE: https://github.com/pypdfium2-team/pypdfium2/issues/367
-    "pyzotero",  # SEE: https://github.com/urschrei/pyzotero/issues/110
-    "vcr.*",  # SEE: https://github.com/kevin1024/vcrpy/issues/780
-]
-
 [tool.pylint]
 
 [tool.pylint.design]
@@ -258,13 +183,12 @@ disable = [
     "cyclic-import",  # Let Python blow up
     "dangerous-default-value",  # Rely on ruff W0102 for this
     "empty-docstring",  # Let pep257 take care of docstrings
-    "expression-not-assigned",  # Rely on mypy func-returns-value for this
+    "expression-not-assigned",  # Covered by static type checking
     "fixme",  # codetags are useful
-    "function-redefined",  # Rely on mypy no-redef for this
+    "function-redefined",  # Covered by static type checking
     "global-statement",  # Rely on ruff PLW0603 for this
     "global-variable-not-assigned",  # Rely on ruff PLW0602 for this
     "import-outside-toplevel",  # Rely on ruff PLC0415 for this
-    "import-private-name",  # Rely on ruff PLC2701 for this
     "invalid-name",  # Don't care to enforce this
     "keyword-arg-before-vararg",  # Rely on ruff B026 for this
     "line-too-long",  # Rely on ruff E501 for this
@@ -274,7 +198,7 @@ disable = [
     "missing-final-newline",  # Rely on ruff W292 for this
     "no-else-return",  # Rely on ruff RET506 for this
     "no-member",  # Buggy, SEE: https://github.com/pylint-dev/pylint/issues/8138
-    "no-value-for-parameter",  # Rely on mypy call-arg for this
+    "no-value-for-parameter",  # Covered by static type checking
     "not-callable",  # Don't care to enforce this
     "protected-access",  # Don't care to enforce this
     "raise-missing-from",  # Rely on ruff B904 for this
@@ -296,7 +220,7 @@ disable = [
     "ungrouped-imports",  # Rely on ruff I001 for this
     "unidiomatic-typecheck",  # Rely on ruff E721 for this
     "unnecessary-dict-index-lookup",  # Rely on ruff PLR1733 for this
-    "unreachable",  # Rely on mypy unreachable for this
+    "unreachable",  # Covered by static type checking
     "unspecified-encoding",  # Rely on ruff PLW1514 for this
     "unspecified-encoding",  # Don't care to enforce this
     "unsubscriptable-object",  # Buggy, SEE: https://github.com/pylint-dev/pylint/issues/3637
@@ -353,6 +277,10 @@ filterwarnings = [
     "ignore:builtin type (SwigPyPacked|SwigPyObject|swigvarlink) has no __module__:DeprecationWarning:importlib._bootstrap",  # SEE: https://github.com/pymupdf/PyMuPDF/issues/3931 --> https://github.com/swig/swig/issues/2881#issuecomment-2332652634
     'ignore:pkg_resources is deprecated as an API.:DeprecationWarning:pybtex',  # SEE: https://bitbucket.org/pybtex-devs/pybtex/issues/169/replace-pkg_resources-with
 ]
+markers = [
+    "live_api: Requires credentials for a live provider API",
+    "offline: Runs without external API credentials using local data, mocks, or VCR cassettes",
+]
 # List of directories that should be searched for tests when no specific directories,
 # files or test ids are given in the command line when executing pytest from the rootdir
 # directory. File system paths may use shell-style wildcards, including the recursive **
@@ -360,20 +288,6 @@ filterwarnings = [
 testpaths = ["packages", "tests"]
 # Timeout in seconds before dumping the stacks. Default is 0 which means no timeout.
 timeout = 300
-
-[tool.refurb]
-enable_all = true
-ignore = [
-    "FURB101",  # Rely on ruff FURB101 for this
-    "FURB103",  # Rely on ruff FURB103 for this
-    "FURB108",  # Rely on ruff PLR1714 for this
-    "FURB141",  # Rely on ruff PTH110 for this
-    "FURB144",  # Rely on ruff PTH107 for this
-    "FURB146",  # Rely on ruff PTH113 for this
-    "FURB147",  # Rely on ruff PTH118 for this
-    "FURB150",  # Rely on ruff PTH102 for this
-    "FURB155",  # Rely on ruff PTH202 for this
-]
 
 [tool.ruff]
 # Line length to use when enforcing long-lines violations (like `E501`).
@@ -510,12 +424,6 @@ extend-select = [
     "UP042",
     "W391",
 ]
-# List of rule codes that are unsupported by Ruff, but should be preserved when
-# (e.g.) validating # noqa directives. Useful for retaining # noqa directives
-# that cover plugins not yet implemented by Ruff.
-external = [
-    "FURB",  # refurb
-]
 ignore = [
     "A005",  # Overly pedantic
     "ANN",  # Don't care to enforce typing
@@ -635,6 +543,9 @@ in_place = true
 spaces_before_inline_comment = 2  # Match Python PEP 8
 spaces_indent_inline_array = 4  # Match Python PEP 8
 trailing_comma_inline_array = true
+
+[tool.ty.src]
+include = ["packages/*/src", "src"]
 
 [tool.typos.default]
 extend-ignore-re = ["(?Rm)^.*(#|//)\\s*spellchecker:( )?disable-line$"]

@@ -73,15 +73,18 @@ class JournalQualityPostProcessor(MetadataPostProcessor[JournalQuery]):
             doc_id=doc_details.doc_id,  # ensure doc_id is preserved
             dockey=doc_details.dockey,  # ensure dockey is preserved
             source_quality=max(
-                self.data.get(journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
-                self.data.get("the " + journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
-                self.data.get(journal_query.replace("&", "and"), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]
+                self.data.get(journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]  # ty: ignore[unresolved-attribute]
+                self.data.get("the " + journal_query, DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]  # ty: ignore[unresolved-attribute]
+                self.data.get(journal_query.replace("&", "and"), DocDetails.UNDEFINED_JOURNAL_QUALITY),  # type: ignore[union-attr]  # ty: ignore[unresolved-attribute]
             ),
         )
 
     def query_creator(self, doc_details: DocDetails, **kwargs) -> JournalQuery | None:
         try:
-            return JournalQuery(journal=doc_details.journal, **kwargs)
+            return JournalQuery(
+                journal=doc_details.journal,  # ty: ignore[invalid-argument-type]
+                **kwargs,
+            )
         except ValidationError:
             logger.debug(
                 "Must have a valid journal name to query journal quality data."

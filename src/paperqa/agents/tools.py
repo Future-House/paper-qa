@@ -69,7 +69,7 @@ class EnvironmentState(BaseModel):
     @property
     def status(self) -> str:
         if self.status_fn is not None:
-            return self.status_fn(cast("Self", self))
+            return self.status_fn(cast("Self", self))  # ty: ignore[redundant-cast]
         return default_status(self)
 
     def get_relevant_contexts(self, score_threshold: int | None = 0) -> list[Context]:
