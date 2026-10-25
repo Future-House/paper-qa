@@ -29,8 +29,8 @@ async def litellm_get_search_query(
     question: str,
     count: int,
     template: str | None = None,
-    llm: LLMModel | str = "gpt-6-luna",
-    temperature: float = 1.0,
+    llm: LLMModel | str = "openai/gpt-6-luna",
+    temperature: float | None = None,
 ) -> list[str]:
     search_prompt = ""
     if isinstance(template, str) and all(

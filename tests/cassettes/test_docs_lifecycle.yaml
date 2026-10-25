@@ -354,7 +354,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        \ * \\n\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1205,7 +1205,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":null}"
+        External links\\n\"],\"model\":\"text-embedding-3-small\",\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -1448,7 +1448,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":null}'
+      body: '{"input":["What is the national flag of Canada?"],"model":"text-embedding-3-small","dimensions":1536,"encoding_format":"float"}'
       headers:
         accept:
           - application/json
@@ -2889,7 +2889,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n\"],\"dimensions\":1536}"
+        \ * \\n\\n\"],\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -3705,7 +3705,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\"],\"dimensions\":1536}"
+        External links\\n\"],\"dimensions\":1536,\"encoding_format\":\"float\"}"
       headers:
         accept:
           - application/json
@@ -3948,7 +3948,7 @@ interactions:
   - request:
       body:
         '{"model":"text-embedding-3-small","input":["What is the national flag of
-        Canada?"],"dimensions":1536}'
+        Canada?"],"dimensions":1536,"encoding_format":"float"}'
       headers:
         accept:
           - application/json
@@ -4189,8 +4189,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
         a summary of the relevant information that could help answer the question based
         on the excerpt. Your summary, combined with many others, will be given to the
         model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
@@ -4198,7 +4197,7 @@ interactions:
         `summary` is relevant information from the text - about 100 words. `relevance_score`
         is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
         excerpt may or may not contain relevant information. If not, leave `summary`
-        empty, and make `relevance_score` be 0.\",\"prompt_cache_breakpoint\":{\"mode\":\"explicit\"}}]},{\"role\":\"user\",\"content\":\"Excerpt
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
         from National2023 chunk 4: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
         2023, Accessed now\\n\\n---\\n\\n2010.\\n  8. **^** [Dept. of Canadian Heritage
         news release](http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
@@ -4249,7 +4248,7 @@ interactions:
         \ * [Mobile view](//en.m.wikipedia.org/w/index.php?title=National_Flag_of_Canada_Day&mobileaction=toggle_view_mobile)\\n\\n
         \ * [![Wikimedia Foundation](/static/images/footer/wikimedia-button.svg)](https://wikimediafoundation.org/)\\n
         \ * [![Powered by MediaWiki](/w/resources/assets/poweredby_mediawiki.svg)](https://www.mediawiki.org/)\\n\\n
-        \ * \\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        \ * \\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
       headers:
         accept:
           - application/json
@@ -4359,8 +4358,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
         a summary of the relevant information that could help answer the question based
         on the excerpt. Your summary, combined with many others, will be given to the
         model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
@@ -4368,7 +4366,7 @@ interactions:
         `summary` is relevant information from the text - about 100 words. `relevance_score`
         is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
         excerpt may or may not contain relevant information. If not, leave `summary`
-        empty, and make `relevance_score` be 0.\",\"prompt_cache_breakpoint\":{\"mode\":\"explicit\"}}]},{\"role\":\"user\",\"content\":\"Excerpt
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
         from National2023 chunk 1: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
         2023, Accessed now\\n\\n---\\n\\nJump to content\\n\\nMain menu\\n\\nMain menu\\n\\nmove
         to sidebar  hide\\n\\nNavigation\\n\\n  * [Main page](/wiki/Main_Page \\\"Visit
@@ -4421,7 +4419,7 @@ interactions:
         to sidebar  hide\\n\\nActions\\n\\n  * [Read](/wiki/National_Flag_of_Canada_Day)\\n
         \ * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit \\\"Edit
         this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title\\n\\n---\\n\\nQuestion:
-        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
       headers:
         accept:
           - application/json
@@ -4531,8 +4529,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
         a summary of the relevant information that could help answer the question based
         on the excerpt. Your summary, combined with many others, will be given to the
         model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
@@ -4540,7 +4537,7 @@ interactions:
         `summary` is relevant information from the text - about 100 words. `relevance_score`
         is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
         excerpt may or may not contain relevant information. If not, leave `summary`
-        empty, and make `relevance_score` be 0.\",\"prompt_cache_breakpoint\":{\"mode\":\"explicit\"}}]},{\"role\":\"user\",\"content\":\"Excerpt
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
         from National2023 chunk 2: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
         2023, Accessed now\\n\\n---\\n\\n_Flag_of_Canada_Day)\\n  * [Edit](/w/index.php?title=National_Flag_of_Canada_Day&action=edit
         \\\"Edit this page \\\\[e\\\\]\\\")\\n  * [View history](/w/index.php?title=National_Flag_of_Canada_Day&action=history
@@ -4606,7 +4603,7 @@ interactions:
         \\\"Jean Chr\xE9tien\\\").[7] At the\\nfirst Flag Day ceremony in [Hull, Quebec](/wiki/Hull,_Quebec
         \\\"Hull, Quebec\\\"),\\nChr\xE9tien was confronted by demonstrators against
         proposed cuts to the\\n[un\\n\\n---\\n\\nQuestion: What is the national flag
-        of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
       headers:
         accept:
           - application/json
@@ -4717,8 +4714,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
         a summary of the relevant information that could help answer the question based
         on the excerpt. Your summary, combined with many others, will be given to the
         model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
@@ -4726,7 +4722,7 @@ interactions:
         `summary` is relevant information from the text - about 100 words. `relevance_score`
         is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
         excerpt may or may not contain relevant information. If not, leave `summary`
-        empty, and make `relevance_score` be 0.\",\"prompt_cache_breakpoint\":{\"mode\":\"explicit\"}}]},{\"role\":\"user\",\"content\":\"Excerpt
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
         from National2023 chunk 3: \\\"National Flag of Canada Day.\\\" WikiMedia Foundation,
         2023, Accessed now\\n\\n---\\n\\n an [Order in\\nCouncil](/wiki/Order_in_Council
         \\\"Order in Council\\\") from [Governor\\nGeneral](/wiki/Governor_General_of_Canada
@@ -4787,7 +4783,7 @@ interactions:
         [Archived](https://web.archive.org/web/20110706182436/http://www.pch.gc.ca/pc-ch/infoCntr/cdm-mc/index-eng.cfm?action=doc&DocIDCd=CJM092444)
         July 6, 2011, at the [Wayback Machine](/wiki/Wayback_Machine \\\"Wayback Machine\\\"),
         February 15, 2010. Retrieved February 15, 2011.\\n \\n\\n---\\n\\nQuestion:
-        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
       headers:
         accept:
           - application/json
@@ -4897,8 +4893,7 @@ interactions:
         code: 200
         message: OK
   - request:
-      body:
-        "{\"messages\":[{\"role\":\"system\",\"content\":[{\"type\":\"text\",\"text\":\"Provide
+      body: "{\"messages\":[{\"role\":\"system\",\"content\":\"Provide
         a summary of the relevant information that could help answer the question based
         on the excerpt. Your summary, combined with many others, will be given to the
         model to generate an answer. Respond with the following JSON format:\\n\\n{\\n
@@ -4906,7 +4901,7 @@ interactions:
         `summary` is relevant information from the text - about 100 words. `relevance_score`
         is an integer 0-10 for the relevance of `summary` to the question.\\n\\nThe
         excerpt may or may not contain relevant information. If not, leave `summary`
-        empty, and make `relevance_score` be 0.\",\"prompt_cache_breakpoint\":{\"mode\":\"explicit\"}}]},{\"role\":\"user\",\"content\":\"Excerpt
+        empty, and make `relevance_score` be 0.\"},{\"role\":\"user\",\"content\":\"Excerpt
         from unknownauthorsUnknownyeargravityhill lines 0-44: Unknown author(s). Gravity
         hill. Poetry in America, pages 15-15, Unknown year. URL: https://doi.org/10.2307/j.ctt5vkfh7.11,
         doi:10.2307/j.ctt5vkfh7.11. This article has 0 citations.\\n\\n---\\n\\n# Gravity
@@ -4937,7 +4932,7 @@ interactions:
         See also\\n\\n- [List of gravity hills](https://en.wikipedia.org/wiki/List_of_gravity_hills)\\n-
         [The Crooked House](https://en.wikipedia.org/wiki/The_Crooked_House) \u2013\\n
         \ a pub (now demolished) with an internal gravity hill illusion.\\n\\n## References\\n\\n##
-        External links\\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1,\"prompt_cache_options\":{\"mode\":\"implicit\"}}"
+        External links\\n\\n---\\n\\nQuestion: What is the national flag of Canada?\"}],\"model\":\"gpt-6-luna\",\"n\":1}"
       headers:
         accept:
           - application/json

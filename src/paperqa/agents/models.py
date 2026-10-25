@@ -67,13 +67,13 @@ class AnswerResponse(BaseModel):
         v.filter_content_for_user()
         return v
 
-    async def get_summary(self, llm_model: LLMModel | str = "gpt-6-luna") -> str:
+    async def get_summary(self, llm_model: LLMModel | str = "openai/gpt-6-luna") -> str:
         sys_prompt = (
             "Revise the answer to a question to be a concise SMS message. "
             "Use abbreviations or emojis if necessary."
         )
         model = (
-            Settings(summary_llm=llm_model, temperature=1.0).get_summary_llm()
+            Settings(summary_llm=llm_model).get_summary_llm()
             if isinstance(llm_model, str)
             else llm_model
         )

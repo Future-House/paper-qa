@@ -23,7 +23,6 @@ dependencies = [
     "fhaviary[image]",
     "fhlmi>=0.27.0",  # Pin for request_limited
     "litellm>=1.71.0,!=1.107.0",  # Exclude the compromised release
-    "mcp",  # LiteLLM 1.106.2 imports MCP during Nemotron completions
     "numpy",
     "paper-qa",
     "pypdfium2>=4.22.0",  # Pin for PYPDFIUM_INFO addition

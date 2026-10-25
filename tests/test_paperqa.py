@@ -446,7 +446,7 @@ def test_extract_score() -> None:
 async def test_chain_completion(caplog) -> None:
     caplog.set_level(level="WARNING", logger="lmi.types")
 
-    s = Settings(llm="gpt-6-luna", temperature=0.2)
+    s = Settings(llm="openai/gpt-6-luna")
     outputs = []
 
     def accum(x) -> None:
@@ -509,8 +509,8 @@ async def test_chain_completion(caplog) -> None:
             id="gemini",
         ),
         pytest.param(
-            "gpt-6.1-sol",
-            "gpt-6-luna",
+            "openai/gpt-6.1-sol",
+            "openai/gpt-6-luna",
             "text-embedding-3-small",
             id="openai",
         ),
@@ -1599,7 +1599,9 @@ async def test_pdf_reader_w_no_chunks(stub_data_dir: Path) -> None:
     settings.parsing.reader_config["chunk_chars"] = 0  # Have one chunk = entire text
     # don't want to shove whole document into llm to get citation or embedding
     settings.parsing.use_doc_details = False
-    settings.summary_llm = "gpt-6-luna"  # context window needs to fit our one chunk
+    settings.summary_llm = (
+        "openai/gpt-6-luna"  # context window needs to fit our one chunk
+    )
 
     docs = Docs()
     await docs.aadd(
@@ -2607,7 +2609,7 @@ async def test_too_much_evidence(
     stub_data_dir: Path, stub_data_dir_w_near_dupes: Path
 ) -> None:
     doc_path = stub_data_dir / "obama.txt"
-    mini_settings = Settings(llm="gpt-6-luna", summary_llm="gpt-6-luna")
+    mini_settings = Settings(llm="openai/gpt-6-luna", summary_llm="openai/gpt-6-luna")
     docs = Docs()
     await docs.aadd(
         doc_path, "WikiMedia Foundation, 2023, Accessed now", settings=mini_settings

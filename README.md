@@ -382,7 +382,7 @@ You can also specify them manually with any rate limit string that matches the s
 the [limits](https://limits.readthedocs.io/en/stable/quickstart.html#rate-limit-string-notation) module:
 
 ```bash
-pqa --summary_llm_config '{"rate_limit": {"gpt-6-luna": "30000 per 1 minute"}}' \
+pqa --summary_llm_config '{"rate_limit": {"openai/gpt-6-luna": "30000 per 1 minute"}}' \
     ask 'What is PaperQA2?'
 ```
 
@@ -394,8 +394,8 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What is PaperQA2?",
     settings=Settings(
-        llm_config={"rate_limit": {"gpt-6.1-sol": "30000 per 1 minute"}},
-        summary_llm_config={"rate_limit": {"gpt-6-luna": "30000 per 1 minute"}},
+        llm_config={"rate_limit": {"openai/gpt-6.1-sol": "30000 per 1 minute"}},
+        summary_llm_config={"rate_limit": {"openai/gpt-6-luna": "30000 per 1 minute"}},
     ),
 )
 ```
@@ -534,7 +534,7 @@ from paperqa import Settings, ask
 answer_response = ask(
     "What is PaperQA2?",
     settings=Settings(
-        llm="gpt-6.1-sol", summary_llm="gpt-6-luna", agent={"index": {"paper_directory": "my_papers"}}
+        llm="openai/gpt-6.1-sol", summary_llm="openai/gpt-6-luna", agent={"index": {"paper_directory": "my_papers"}}
     ),
 )
 ```
@@ -978,9 +978,9 @@ will return much faster than the first query and we'll be certain the authors ma
 
 | Setting                                      | Default                                | Description                                                                                                                   |
 | -------------------------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| `llm`                                        | `"gpt-6.1-sol"`                        | LLM for general use including metadata inference (see Docs.aadd) and answer generation (see Docs.aquery and gen_answer tool). |
+| `llm`                                        | `"openai/gpt-6.1-sol"`                 | LLM for general use including metadata inference (see Docs.aadd) and answer generation (see Docs.aquery and gen_answer tool). |
 | `llm_config`                                 | `None`                                 | Optional configuration for `llm`.                                                                                             |
-| `summary_llm`                                | `"gpt-6-luna"`                         | LLM for creating contextual summaries (see Docs.aget_evidence and gather_evidence tool).                                      |
+| `summary_llm`                                | `"openai/gpt-6-luna"`                  | LLM for creating contextual summaries (see Docs.aget_evidence and gather_evidence tool).                                      |
 | `summary_llm_config`                         | `None`                                 | Optional configuration for `summary_llm`.                                                                                     |
 | `embedding`                                  | `"text-embedding-3-small"`             | Embedding model for embedding text chunks when adding papers.                                                                 |
 | `embedding_config`                           | `None`                                 | Optional configuration for `embedding`.                                                                                       |
@@ -1012,7 +1012,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `parsing.configure_pdf_parser`               | No-op                                  | Callable to configure the PDF parser within `parse_pdf`, useful for behaviors such as enabling logging.                       |
 | `parsing.doc_filters`                        | `None`                                 | Optional filters for allowed documents.                                                                                       |
 | `parsing.use_human_readable_clinical_trials` | `False`                                | Parse clinical trial JSONs into readable text.                                                                                |
-| `parsing.enrichment_llm`                     | `"gpt-6.1-sol"`                        | LLM for media enrichment.                                                                                                     |
+| `parsing.enrichment_llm`                     | `"openai/gpt-6.1-sol"`                 | LLM for media enrichment.                                                                                                     |
 | `parsing.enrichment_llm_config`              | `None`                                 | Optional configuration for `enrichment_llm`.                                                                                  |
 | `parsing.enrichment_page_radius`             | `1`                                    | Page radius for context text in enrichment.                                                                                   |
 | `parsing.enrichment_prompt`                  | `image_enrichment_prompt_template`     | Prompt template for enriching media.                                                                                          |
@@ -1031,7 +1031,7 @@ will return much faster than the first query and we'll be certain the authors ma
 | `prompts.context_outer`                      | `CONTEXT_OUTER_PROMPT`                 | Prompt for how to format all contexts in generate answer.                                                                     |
 | `prompts.context_inner`                      | `CONTEXT_INNER_PROMPT`                 | Prompt for how to format a single context in generate answer. Must contain 'name' and 'text' variables.                       |
 | `prompts.answer_iteration_prompt`            | `answer_iteration_prompt_template`     | Prompt to inject existing prior answers to allow iteration. Default injects no prior answers.                                 |
-| `agent.agent_llm`                            | `"gpt-6-sol"`                          | LLM inside the agent making tool selections.                                                                                  |
+| `agent.agent_llm`                            | `"openai/gpt-6-sol"`                   | LLM inside the agent making tool selections.                                                                                  |
 | `agent.agent_llm_config`                     | `None`                                 | Optional configuration for `agent_llm`.                                                                                       |
 | `agent.agent_type`                           | `"ToolSelector"`                       | Type of agent to use.                                                                                                         |
 | `agent.agent_config`                         | `None`                                 | Optional kwarg for AGENT constructor.                                                                                         |

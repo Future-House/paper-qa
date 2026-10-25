@@ -339,7 +339,9 @@ async def test_get_directory_index_w_no_citations(
 
 @pytest.mark.flaky(reruns=2, only_rerun=["AssertionError", "httpx.RemoteProtocolError"])
 @pytest.mark.parametrize("agent_type", [FAKE_AGENT_TYPE, ToolSelector, SimpleAgent])
-@pytest.mark.parametrize("llm_name", ["gpt-6-sol", "gemini/gemini-2.0-flash-lite"])
+@pytest.mark.parametrize(
+    "llm_name", ["openai/gpt-6-sol", "gemini/gemini-2.0-flash-lite"]
+)
 @pytest.mark.asyncio
 async def test_agent_types(
     agent_test_settings: Settings,
@@ -351,8 +353,8 @@ async def test_agent_types(
     # make sure agent_llm is different from default, so we can correctly track tokens
     # for agent
     agent_test_settings.agent.agent_llm = llm_name
-    agent_test_settings.llm = "gpt-6.1-sol"
-    agent_test_settings.summary_llm = "gpt-6-luna"
+    agent_test_settings.llm = "openai/gpt-6.1-sol"
+    agent_test_settings.summary_llm = "openai/gpt-6-luna"
     agent_test_settings.agent.agent_prompt += (
         "\n\nCall each tool once in appropriate order and"
         " accept the answer for now, as we're in debug mode."
@@ -398,7 +400,7 @@ async def test_agent_types(
 async def test_timeout(agent_test_settings: Settings, agent_type: str | type) -> None:
     agent_test_settings.prompts.pre = None
     agent_test_settings.agent.timeout = 0.05  # Give time for Environment.reset()
-    agent_test_settings.llm = "gpt-6.1-sol"
+    agent_test_settings.llm = "openai/gpt-6.1-sol"
     agent_test_settings.agent.tool_names = {"gen_answer", "complete"}
     orig_exec_tool_calls = PaperQAEnvironment.exec_tool_calls
     tool_responses: list[list[ToolResponseMessage]] = []
@@ -426,7 +428,7 @@ async def test_timeout(agent_test_settings: Settings, agent_type: str | type) ->
 @pytest.mark.flaky(reruns=5, only_rerun=["AssertionError"])
 @pytest.mark.asyncio
 async def test_propagate_options(agent_test_settings: Settings) -> None:
-    llm_name = "gpt-6-sol"
+    llm_name = "openai/gpt-6-sol"
     default_llm_names = {
         cls.model_fields[name].default
         for name, cls in itertools.product(("llm", "summary_llm"), (Settings,))
@@ -944,8 +946,8 @@ def test_answers_are_striped() -> None:
 
 @pytest.mark.asyncio
 async def test_clinical_tool_usage(agent_test_settings) -> None:
-    agent_test_settings.llm = "gpt-6.1-sol"
-    agent_test_settings.summary_llm = "gpt-6-luna"
+    agent_test_settings.llm = "openai/gpt-6.1-sol"
+    agent_test_settings.summary_llm = "openai/gpt-6-luna"
     agent_test_settings.agent.tool_names = {
         "clinical_trials_search",
         "gather_evidence",

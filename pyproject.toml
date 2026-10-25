@@ -35,7 +35,7 @@ dependencies = [
     "html2text",  # TODO: evaluate moving to an opt-in dependency
     "httpx",
     "httpx-aiohttp",
-    "litellm==1.106.2",  # Last known safe release after the 1.107.0 compromise
+    "litellm>=1.83.9,!=1.107.0",  # Exclude the compromised release
     "numpy",
     "paper-qa-pypdf",  # TODO: after https://peps.python.org/pep-0771/, make this opt-out if 'pymupdf' extra is specified`
     "pybtex",
@@ -562,10 +562,6 @@ extend-exclude = [
     "tests/cassettes/**",
     "tests/stub_data/**",
 ]
-
-[tool.uv]
-# fhlmi 1.10.0 still declares litellm<=1.84.1; remove after its bound is widened.
-override-dependencies = ["litellm==1.106.2"]
 
 [tool.uv.sources]
 paper-qa = {workspace = true}

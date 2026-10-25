@@ -336,7 +336,7 @@ class ParsingSettings(BaseModel):
         description="Parse clinical trial JSONs into human readable text.",
     )
     enrichment_llm: str = Field(
-        default="gpt-6.1-sol",
+        default="openai/gpt-6.1-sol",
         description="LLM for media enrichment (e.g. generating descriptions).",
     )
     enrichment_llm_config: dict | None = Field(
@@ -604,7 +604,7 @@ class AgentSettings(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     agent_llm: str = Field(
-        default="gpt-6-sol",
+        default="openai/gpt-6-sol",
         description="LLM inside the agent making tool selections.",
     )
 
@@ -725,18 +725,14 @@ def make_default_litellm_model_list_settings(
         litellm_params["temperature"] = temperature
     if reasoning_effort is not None:
         litellm_params["reasoning_effort"] = reasoning_effort
+        # LiteLLM 1.84 predates GPT-6 and otherwise rejects this request parameter.
+        litellm_params["allowed_openai_params"] = ["reasoning_effort"]
     return {
         "name": llm,
         "model_list": [
             {
                 "model_name": llm,
-                "litellm_params": {
-                    **litellm_params,
-                    # SEE: https://docs.litellm.ai/docs/tutorials/prompt_caching#litellm-python-sdk-usage
-                    "cache_control_injection_points": [
-                        {"location": "message", "role": "system"}
-                    ],
-                },
+                "litellm_params": litellm_params,
             }
         ],
     }
@@ -761,7 +757,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(extra="ignore")
 
     llm: str = Field(
-        default="gpt-6.1-sol",
+        default="openai/gpt-6.1-sol",
         description=(
             "LLM for general use including metadata inference (see Docs.aadd)"
             " and answer generation (see Docs.aquery and gen_answer tool)."
@@ -786,7 +782,7 @@ class Settings(BaseSettings):
         ),
     )
     summary_llm: str = Field(
-        default="gpt-6-luna",
+        default="openai/gpt-6-luna",
         description=(
             "LLM for creating contextual summaries"
             " (see Docs.aget_evidence and gather_evidence tool)."
@@ -940,7 +936,7 @@ class Settings(BaseSettings):
                 self.agent.agent_llm_config,
                 self.temperature,
                 reasoning_effort=(
-                    "none" if self.agent.agent_llm == "gpt-6-sol" else None
+                    "none" if self.agent.agent_llm == "openai/gpt-6-sol" else None
                 ),
             ),
         )
@@ -1006,7 +1002,7 @@ class Settings(BaseSettings):
         ldp_llm_config: dict[str, Any] = {"name": agent_llm}
         if self.temperature is not None:
             ldp_llm_config["temperature"] = self.temperature
-        if agent_llm == "gpt-6-sol":
+        if agent_llm == "openai/gpt-6-sol":
             ldp_llm_config["model_list"] = make_default_litellm_model_list_settings(
                 agent_llm, self.temperature, reasoning_effort="none"
             )["model_list"]
