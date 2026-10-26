@@ -17,12 +17,6 @@ jobs:
       contents: read
     env:
       UV_VENV_CLEAR: 1 # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
-    outputs:
-      pymupdf_artifact: ${{ steps.build-paper-qa-pymupdf.outputs.artifact-name }}
-      pypdf_artifact: ${{ steps.build-paper-qa-pypdf.outputs.artifact-name }}
-      docling_artifact: ${{ steps.build-paper-qa-docling.outputs.artifact-name }}
-      nemotron_artifact: ${{ steps.build-paper-qa-nemotron.outputs.artifact-name }}
-      paper_qa_artifact: ${{ steps.build-paper-qa.outputs.artifact-name }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -66,29 +60,10 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - name: Download built paper-qa-pymupdf artifact to dist/
+      - name: Download built packages to dist/
         uses: actions/download-artifact@v8
         with:
-          name: ${{ needs.build.outputs.pymupdf_artifact }}
+          pattern: Packages-paper-qa*
           path: dist
-      - name: Download built paper-qa-pypdf artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ needs.build.outputs.pypdf_artifact }}
-          path: dist
-      - name: Download built paper-qa-docling artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ needs.build.outputs.docling_artifact }}
-          path: dist
-      - name: Download built paper-qa-nemotron artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ needs.build.outputs.nemotron_artifact }}
-          path: dist
-      - name: Download built paper-qa artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ needs.build.outputs.paper_qa_artifact }}
-          path: dist
+          merge-multiple: true
       - uses: pypa/gh-action-pypi-publish@release/v1
