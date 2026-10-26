@@ -2,8 +2,13 @@ name: Publish
 
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to publish (for example, v2026.10.25)
+        required: true
+        type: string
 
 jobs:
   build:
@@ -20,6 +25,9 @@ jobs:
       paper_qa_artifact: ${{ steps.build-paper-qa.outputs.artifact-name }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+          fetch-depth: 0 # setuptools-scm reads the version from the tag
       - id: build-paper-qa-pymupdf
         uses: hynek/build-and-inspect-python-package@v2
         with:
