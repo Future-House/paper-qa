@@ -9,6 +9,10 @@ on:
         description: Existing version tag to publish (for example, v2026.10.25)
         required: true
         type: string
+      publish:
+        description: Upload to PyPI (leave unchecked to test the build)
+        type: boolean
+        default: false
 
 jobs:
   build:
@@ -66,4 +70,10 @@ jobs:
           pattern: Packages-paper-qa*
           path: dist
           merge-multiple: true
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Verify all five packages were collected
+        run: |
+          test "$(find dist -maxdepth 1 -name '*.whl' | wc -l)" -eq 5
+          test "$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l)" -eq 5
+      - name: Upload packages to PyPI
+        if: github.event_name == 'release' || inputs.publish
+        uses: pypa/gh-action-pypi-publish@release/v1
