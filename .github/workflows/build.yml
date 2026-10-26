@@ -2,26 +2,35 @@ name: Publish
 
 on:
   release:
-    types: [created]
+    types: [published]
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing version tag to publish (for example, v2026.10.25)
+        required: true
+        type: string
+      publish:
+        description: Upload to PyPI (leave unchecked to test the build)
+        type: boolean
+        default: false
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       UV_VENV_CLEAR: 1 # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/tags/{0}', inputs.tag) || github.ref }}
+          fetch-depth: 0 # setuptools-scm reads the version from the tag
       - id: build-paper-qa-pymupdf
         uses: hynek/build-and-inspect-python-package@v2
         with:
           path: packages/paper-qa-pymupdf
           upload-name-suffix: -paper-qa-pymupdf
-      - name: Download built paper-qa-pymupdf artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ steps.build-paper-qa-pymupdf.outputs.artifact-name }}
-          path: dist
       - name: Clean up paper-qa-pymupdf build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         run: rm -r ${{ steps.build-paper-qa-pymupdf.outputs.dist }}
       - id: build-paper-qa-pypdf
@@ -29,11 +38,6 @@ jobs:
         with:
           path: packages/paper-qa-pypdf
           upload-name-suffix: -paper-qa-pypdf
-      - name: Download built paper-qa-pypdf artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ steps.build-paper-qa-pypdf.outputs.artifact-name }}
-          path: dist
       - name: Clean up paper-qa-pypdf build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         run: rm -r ${{ steps.build-paper-qa-pypdf.outputs.dist }}
       - id: build-paper-qa-docling
@@ -41,11 +45,6 @@ jobs:
         with:
           path: packages/paper-qa-docling
           upload-name-suffix: -paper-qa-docling
-      - name: Download built paper-qa-docling artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ steps.build-paper-qa-docling.outputs.artifact-name }}
-          path: dist
       - name: Clean up paper-qa-docling build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         run: rm -r ${{ steps.build-paper-qa-docling.outputs.dist }}
       - id: build-paper-qa-nemotron
@@ -53,24 +52,28 @@ jobs:
         with:
           path: packages/paper-qa-nemotron
           upload-name-suffix: -paper-qa-nemotron
-      - name: Download built paper-qa-nemotron artifact to dist/
-        uses: actions/download-artifact@v8
-        with:
-          name: ${{ steps.build-paper-qa-nemotron.outputs.artifact-name }}
-          path: dist
       - name: Clean up paper-qa-nemotron build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
         run: rm -r ${{ steps.build-paper-qa-nemotron.outputs.dist }}
       - id: build-paper-qa
         uses: hynek/build-and-inspect-python-package@v2
         with:
           upload-name-suffix: -paper-qa
-      - name: Download built paper-qa artifact to dist/
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Download built packages to dist/
         uses: actions/download-artifact@v8
         with:
-          name: ${{ steps.build-paper-qa.outputs.artifact-name }}
+          pattern: Packages-paper-qa*
           path: dist
-      - name: Clean up paper-qa build # Work around https://github.com/hynek/build-and-inspect-python-package/issues/174
-        run: rm -r ${{ steps.build-paper-qa.outputs.dist }}
-      - uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
+          merge-multiple: true
+      - name: Verify all five packages were collected
+        run: |
+          test "$(find dist -maxdepth 1 -name '*.whl' | wc -l)" -eq 5
+          test "$(find dist -maxdepth 1 -name '*.tar.gz' | wc -l)" -eq 5
+      - name: Upload packages to PyPI
+        if: github.event_name == 'release' || inputs.publish
+        uses: pypa/gh-action-pypi-publish@release/v1
