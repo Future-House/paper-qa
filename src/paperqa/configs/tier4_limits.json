@@ -1,7 +1,6 @@
 {
   "answer": {
     "evidence_k": 10,
-    "answer_max_sources": 5,
     "max_concurrent_requests": 8
   },
   "parsing": {
