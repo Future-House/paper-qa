@@ -263,9 +263,15 @@ class SearchIndex:
     async def filecheck(self, filename: str, body_filehash: str | None = None) -> bool:
         """Check if this index contains the filename and if the body's filehash matches."""
         index_files = await self.index_files
+        stored_filehash = index_files.get(filename)
+        if stored_filehash == FAILED_DOCUMENT_ADD_ID and body_filehash is None:
+            logger.warning(
+                f"Skipping previously failed document {filename}. Rebuild the index to"
+                " retry it."
+            )
         return bool(
-            index_files.get(filename)
-            and (body_filehash is None or index_files[filename] == body_filehash)
+            stored_filehash
+            and (body_filehash is None or stored_filehash == body_filehash)
         )
 
     async def mark_failed_document(self, path: str | os.PathLike) -> None:
