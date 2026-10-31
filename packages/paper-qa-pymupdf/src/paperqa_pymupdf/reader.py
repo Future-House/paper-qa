@@ -9,6 +9,8 @@ from paperqa.types import ParsedMedia, ParsedMetadata, ParsedText
 from paperqa.utils import ImpossibleParsingError, clean_invalid_unicode
 from pydantic import JsonValue
 
+from paperqa_pymupdf.borderless_tables import detect_borderless_tables
+
 
 def setup_pymupdf_python_logging() -> None:
     """
@@ -252,6 +254,25 @@ def parse_pdf_to_pages(
                                 info=media_metadata,
                             )
                         )
+
+                    # Also detect borderless (three-line / booktabs-style) tables
+                    # that find_tables() misses because it requires cell-border
+                    # intersections to infer column structure.
+                    already_bboxes: list[tuple[float, float, float, float]] = [
+                        tuple(m.info["bbox"])  # type: ignore[arg-type]
+                        for m in media
+                        if m.info.get("type") == "table"
+                    ]
+                    media.extend(
+                        detect_borderless_tables(
+                            page,
+                            page_num=i,
+                            page_width=float(page.rect.width),
+                            dpi=dpi,
+                            pymupdf_pixmap_attrs=PYMUPDF_PIXMAP_ATTRS,
+                            already_detected_bboxes=already_bboxes,
+                        )
+                    )
                     content[str(i + 1)] = text, media
                 else:
                     content[str(i + 1)] = text
