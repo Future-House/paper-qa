@@ -43,25 +43,24 @@ def reformat_name(name: str) -> str:
 
 
 @cache
-def get_openalex_mailto() -> str | None:
-    """Get the OpenAlex mailto address, if available."""
-    mailto_address = os.getenv("OPENALEX_MAILTO")
-    if mailto_address is None:
-        logger.warning(
-            "OPENALEX_MAILTO environment variable not set."
-            " your request may be deprioritized by OpenAlex."
-        )
-    return mailto_address
-
-
-@cache
 def get_openalex_api_key() -> str | None:
     """
-    Get the OpenAlex API key from 'OPENALEX_API_KEY' if available, for premium features.
+    Get the OpenAlex API key from 'OPENALEX_API_KEY', if available.
 
-    SEE: https://github.com/ourresearch/openalex-api-tutorials/blob/main/notebooks/getting-started/premium.ipynb
+    Without a key, OpenAlex requests share a small free daily budget per IP address,
+    so batch metadata lookups can be rate limited (HTTP 429). A free key gives its
+    own budget; the `mailto` parameter doesn't raise the keyless budget.
+
+    SEE: https://help.openalex.org/api/authentication/
     """
-    return os.getenv("OPENALEX_API_KEY")
+    api_key = os.getenv("OPENALEX_API_KEY")
+    if not api_key:
+        logger.warning(
+            "OPENALEX_API_KEY environment variable not set, so OpenAlex requests share"
+            " a small keyless daily budget. Get a free key at"
+            " https://openalex.org/settings/api."
+        )
+    return api_key
 
 
 async def get_doc_details_from_openalex(  # noqa: PLR0912
@@ -87,10 +86,11 @@ async def get_doc_details_from_openalex(  # noqa: PLR0912
         ValueError: If neither DOI nor title is provided.
         DOINotFoundError: If the paper cannot be found.
     """
-    mailto = get_openalex_mailto()
-    params = {"mailto": mailto} if mailto else {}
+    params: dict[str, str] = {}
     api_key = get_openalex_api_key()
-    headers = {"api_key": api_key} if api_key else {}
+    # Bearer auth is the documented form, and the "authorization" header is
+    # already filtered from VCR cassettes
+    headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
 
     if doi is title is None:
         raise ValueError("Either a DOI or title must be provided.")
