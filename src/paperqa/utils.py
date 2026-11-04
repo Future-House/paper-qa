@@ -522,7 +522,7 @@ def union_collections_to_ordered_list(collections: Iterable) -> list:
 
 def pqa_directory(name: str) -> Path:
     if pqa_home := os.environ.get("PQA_HOME"):
-        directory = Path(pqa_home) / ".pqa" / name
+        directory = Path(pqa_home).expanduser() / ".pqa" / name
     else:
         directory = Path.home() / ".pqa" / name
 
