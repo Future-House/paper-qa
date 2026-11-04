@@ -54,11 +54,11 @@ print(answer_response.session.contexts)
     drugs have been found effective for treating Ulcerative Colitis.', text=Text(text='', name=...
 
 Using `Settings.from_name('search_only_clinical_trials')` is a shortcut, but note that you can easily
-add `clinical_trial_search` into any custom `Settings` by just explicitly naming it as a tool:
+add `clinical_trials_search` into any custom `Settings` by just explicitly naming it as a tool:
 
 ```python
 from pathlib import Path
-from paperqa import Settings, agent_query, AgentSetting
+from paperqa import Settings, agent_query
 from paperqa.agents.tools import DEFAULT_TOOL_NAMES
 
 # you can start with the default list of PaperQA tools
