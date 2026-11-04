@@ -121,8 +121,9 @@ class DOIOrTitleBasedProvider(MetadataProvider[DOIQuery | TitleAuthorQuery]):
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
                 f" {self.__class__.__name__}."
             )
-        # we're suppressing this error to not fail on 403 or 500 errors from providers
-        except httpx.RequestError:
+        # we're suppressing this error to not fail on 403 or 500 errors from providers;
+        # HTTPError covers both a failed request and an error status, like a 429
+        except httpx.HTTPError:
             logger.warning(
                 "Client error for"
                 f" {client_query.doi if isinstance(client_query, DOIQuery) else client_query.title} in"
