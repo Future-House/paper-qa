@@ -86,6 +86,10 @@ class VectorStore(BaseModel, ABC):
     def clear(self) -> None:
         self.texts_hashes = set()
 
+    def remove_texts_and_embeddings(self, _texts: Iterable[Embeddable]) -> None:
+        """Remove texts, falling back to invalidating the full store."""
+        self.clear()
+
     async def partitioned_similarity_search(
         self,
         query: str,
@@ -199,6 +203,21 @@ class NumpyVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
         self._embeddings_matrix = None
         self._texts_filter = None
 
+    @override
+    def remove_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        remaining_texts = self.texts.copy()
+        for text in texts:
+            try:
+                remaining_texts.remove(text)
+            except ValueError:
+                continue
+        self.texts = remaining_texts
+        self.texts_hashes = {hash(text) for text in self.texts}
+        self._embeddings_matrix = (
+            np.array([text.embedding for text in self.texts]) if self.texts else None
+        )
+        self._texts_filter = None
+
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
         await super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
@@ -284,6 +303,7 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
     )
     collection_name: str = Field(default_factory=lambda: f"paper-qa-{uuid.uuid4().hex}")
     vector_name: str | None = Field(default=None)
+    pending_delete_dockeys: set[Any] = Field(default_factory=set, repr=False)
     _point_ids: set[str] | None = None
 
     def __del__(self):
@@ -311,6 +331,7 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
             and self.collection_name == other.collection_name
             and self.vector_name == other.vector_name
             and self.client.init_options == other.client.init_options
+            and self.pending_delete_dockeys == other.pending_delete_dockeys
             and self._point_ids == other._point_ids
         )
 
@@ -358,13 +379,68 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
 
     async def aclear(self) -> None:
         """Asynchronous clear implementation."""
-        if not await self._collection_exists():
-            return
+        if await self._collection_exists():
+            await self.client.delete_collection(collection_name=self.collection_name)
+        self._point_ids = None
+        self.pending_delete_dockeys.clear()
 
-        await self.client.delete_collection(collection_name=self.collection_name)
+    @override
+    def remove_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        texts_list = list(texts)
+        self.texts_hashes.difference_update(hash(text) for text in texts_list)
+        dockeys: set[str | int | bool] = set()
+        for text in texts_list:
+            dockey = cast("Text", text).doc.model_dump(mode="json")["dockey"]
+            if not isinstance(dockey, (str, int, bool)):
+                # Non-scalar payload keys cannot be filtered reliably in Qdrant.
+                self.clear()
+                return
+            dockeys.add(dockey)
+        self.pending_delete_dockeys.update(dockeys)
         self._point_ids = None
 
+    async def _flush_pending_deletes(self) -> None:
+        if not self.pending_delete_dockeys:
+            return
+        dockeys = self.pending_delete_dockeys.copy()
+        if await self._collection_exists():
+            string_dockeys = [key for key in dockeys if isinstance(key, str)]
+            integer_dockeys = [
+                key
+                for key in dockeys
+                if isinstance(key, int) and not isinstance(key, bool)
+            ]
+            boolean_dockeys = [key for key in dockeys if isinstance(key, bool)]
+            conditions: list[models.FieldCondition] = []
+            if string_dockeys:
+                conditions.append(
+                    models.FieldCondition(
+                        key="doc.dockey", match=models.MatchAny(any=string_dockeys)
+                    )
+                )
+            if integer_dockeys:
+                conditions.append(
+                    models.FieldCondition(
+                        key="doc.dockey", match=models.MatchAny(any=integer_dockeys)
+                    )
+                )
+            conditions.extend(
+                models.FieldCondition(
+                    key="doc.dockey", match=models.MatchValue(value=key)
+                )
+                for key in boolean_dockeys
+            )
+            await self.client.delete(
+                collection_name=self.collection_name,
+                points_selector=models.FilterSelector(
+                    filter=models.Filter(should=conditions)
+                ),
+                wait=True,
+            )
+        self.pending_delete_dockeys.difference_update(dockeys)
+
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        await self._flush_pending_deletes()
         await super().add_texts_and_embeddings(texts)
 
         texts_list = list(texts)
@@ -405,11 +481,14 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
                 )
             ],
         )
-        self._point_ids = set(ids)
+        if self._point_ids is None:
+            self._point_ids = set()
+        self._point_ids.update(ids)
 
     async def similarity_search(
         self, query: str, k: int, embedding_model: EmbeddingModel
     ) -> tuple[Sequence[Embeddable], list[float]]:
+        await self._flush_pending_deletes()
         if not await self._collection_exists():
             return ([], [])
 
