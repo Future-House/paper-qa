@@ -942,7 +942,11 @@ class DocDetails(Doc):
         """Validate bibtex entries have certain fields."""
         if fields is None:
             fields = ["doi", "title"]
-        return all(field + "=" in bibtex for field in fields)
+        # pybtex writes `doi = "..."` and Crossref writes `DOI={...}`
+        return all(
+            re.search(rf"(?:^|[\s,{{]){re.escape(field)}\s*=", bibtex, re.IGNORECASE)
+            for field in fields
+        )
 
     @staticmethod
     def merge_bibtex_entries(entry1: Entry, entry2: Entry) -> Entry:

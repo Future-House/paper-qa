@@ -2787,6 +2787,40 @@ def test_none_values() -> None:
 
 
 @pytest.mark.offline
+@pytest.mark.parametrize(
+    ("bibtex", "complete"),
+    [
+        pytest.param(
+            '@article{k,\n    title = "T",\n    doi = "10.1/x"\n}', True, id="pybtex"
+        ),
+        pytest.param("@article{k, title={T}, DOI={10.1/x}}", True, id="crossref"),
+        pytest.param("@article{k, title={T}, doi={10.1/x}}", True, id="compact"),
+        pytest.param("@article{k, booktitle={T}, doi={10.1/x}}", False, id="booktitle"),
+        pytest.param(
+            "@article{k, title={T}, url={https://x.org/?doi=10.1/x}}",
+            False,
+            id="doi-in-url",
+        ),
+    ],
+)
+def test_is_bibtex_complete(bibtex: str, complete: bool) -> None:
+    assert DocDetails.is_bibtex_complete(bibtex) == complete
+
+
+@pytest.mark.offline
+def test_complete_bibtex_is_kept_on_validation() -> None:
+    bibtex = '@article{smith2020,\n    title = "A paper",\n    doi = "10.1/x"\n}\n'
+    doc = DocDetails(
+        bibtex=bibtex,
+        title="A paper",
+        doi="10.1/x",
+        other={"bibtex_source": ["crossref"]},
+    )
+    assert doc.bibtex == bibtex
+    assert doc.other["bibtex_source"] == ["crossref"]
+
+
+@pytest.mark.offline
 def test_docdetails_merge_with_non_list_fields() -> None:
     """Check republication where the source metadata has different shapes."""
     initial_date = datetime(2023, 1, 1)
