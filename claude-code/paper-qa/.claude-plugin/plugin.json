@@ -1,0 +1,14 @@
+{
+  "name": "paper-qa",
+  "version": "0.1.0",
+  "description": "Claude Code skill for evidence-grounded question answering with PaperQA.",
+  "repository": "https://github.com/Future-House/paper-qa",
+  "license": "MIT",
+  "keywords": [
+    "paper-qa",
+    "research",
+    "papers",
+    "citations",
+    "literature-review"
+  ]
+}
