@@ -670,10 +670,16 @@ async def get_directory_index(
             f" {search_index.index_name}, may take a few minutes."
         )
 
+    file_location_base = (
+        await paper_directory.absolute()
+        if index_settings.use_absolute_paper_directory
+        else anyio.Path(".")
+    )
+    valid_file_locations = {
+        str(file_location_base / f) for f in valid_papers_rel_file_paths
+    }
     index_unique_file_paths: set[str] = set((await search_index.index_files).keys())
-    if extra_index_files := (
-        index_unique_file_paths - {str(f) for f in valid_papers_rel_file_paths}
-    ):
+    if extra_index_files := index_unique_file_paths - valid_file_locations:
         if index_settings.sync_with_paper_directory:
             for extra_file in extra_index_files:
                 logger.warning(
