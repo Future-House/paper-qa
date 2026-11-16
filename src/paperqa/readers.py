@@ -183,7 +183,7 @@ def parse_text(
     else:
         total_length = sum(len(t) for t in text)
         for i, t in enumerate(text):
-            if page_size_limit and len(text) > page_size_limit:
+            if page_size_limit and len(t) > page_size_limit:
                 raise ImpossibleParsingError(
                     f"The {parse_summary} on page {i} of {len(text)} was {len(t)} chars"
                     f" long, which exceeds the {page_size_limit} char limit at path"
