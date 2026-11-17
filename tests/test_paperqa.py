@@ -1358,6 +1358,44 @@ async def test_sparse_embedding(
     assert np.shape(docs.texts[0].embedding) == np.shape(docs.texts[1].embedding)
 
 
+@pytest.mark.offline
+@pytest.mark.asyncio
+async def test_numpy_vector_store_reuses_embeddings_matrix() -> None:
+    class XEmbeds(EmbeddingModel):
+        name: str = "x_embed"
+
+        async def embed_documents(self, texts):
+            return [[1.0, 0.0] for _ in texts]
+
+    doc = Doc(docname="stub", citation="stub", dockey="stub")
+    texts = [
+        Text(text=f"text {i}", name=f"text {i}", doc=doc, embedding=embedding)
+        for i, embedding in enumerate([[0.0, 2.0], [3.0, 4.0], [5.0, 0.0]])
+    ]
+    store = NumpyVectorStore()
+    await store.add_texts_and_embeddings(texts[:2])
+    assert await store.similarity_search("x", 3, XEmbeds()) == (texts[1::-1], [0.6, 0])
+    matrix = store._embeddings_matrix
+    await store.add_texts_and_embeddings([])
+    assert store._embeddings_matrix is matrix, "No new texts shouldn't rebuild"
+
+    await store.add_texts_and_embeddings(texts[2:])
+    assert await store.similarity_search("x", 3, XEmbeds()) == (
+        texts[::-1],
+        [1, 0.6, 0],
+    )
+
+    # A store rebuilt from its fields lacks the matrix, so it should still get built
+    rebuilt = NumpyVectorStore(texts=store.texts, texts_hashes=store.texts_hashes)
+    await rebuilt.add_texts_and_embeddings([])
+    assert rebuilt == store
+
+    # Stores pickled before norm caching lack the private attribute
+    del store._embeddings_norms
+    legacy_store = pickle.loads(pickle.dumps(store))
+    assert (await legacy_store.similarity_search("x", 1, XEmbeds()))[1] == [1]
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("vector_store", [NumpyVectorStore, QdrantVectorStore])
 async def test_hybrid_embedding(
