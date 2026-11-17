@@ -173,6 +173,7 @@ class VectorStore(BaseModel, ABC):
 class NumpyVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
     texts: list[Embeddable] = Field(default_factory=list)
     _embeddings_matrix: np.ndarray | None = None
+    _embeddings_norms: np.ndarray | None = None
     _texts_filter: np.ndarray | None = None
 
     def __eq__(self, other) -> bool:
@@ -197,12 +198,17 @@ class NumpyVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
         super().clear()
         self.texts = []
         self._embeddings_matrix = None
+        self._embeddings_norms = None
         self._texts_filter = None
 
     async def add_texts_and_embeddings(self, texts: Iterable[Embeddable]) -> None:
+        texts = list(texts)
+        if not texts and self._embeddings_matrix is not None:
+            return  # Nothing new, so reuse the embeddings matrix
         await super().add_texts_and_embeddings(texts)
         self.texts.extend(texts)
         self._embeddings_matrix = np.array([t.embedding for t in self.texts])
+        self._embeddings_norms = None
 
     async def partitioned_similarity_search(
         self,
@@ -252,16 +258,26 @@ class NumpyVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
 
         embedding_model.set_mode(EmbeddingModes.DOCUMENT)
 
-        embedding_matrix = self._embeddings_matrix
+        embedding_matrix = cast("np.ndarray", self._embeddings_matrix)
+        # Absent from stores pickled before the norms were cached
+        embedding_norms = getattr(self, "_embeddings_norms", None)
+        if embedding_norms is None:
+            embedding_norms = np.linalg.norm(embedding_matrix, axis=1)
+            self._embeddings_norms = embedding_norms
 
         if self._texts_filter is not None:
             original_indices = np.where(self._texts_filter)[0]
-            embedding_matrix = embedding_matrix[self._texts_filter]  # type: ignore[index]  # ty: ignore[not-subscriptable]
+            embedding_matrix = embedding_matrix[self._texts_filter]
+            embedding_norms = embedding_norms[self._texts_filter]
         else:
             original_indices = np.arange(len(self.texts))
 
-        similarity_scores = cosine_similarity(
-            np_query.reshape(1, -1), embedding_matrix
+        # Same as cosine_similarity, but reusing the texts' norms
+        query_matrix = np_query.reshape(1, -1)
+        similarity_scores = (
+            query_matrix
+            @ embedding_matrix.T
+            / (np.linalg.norm(query_matrix, axis=1) * embedding_norms)
         )[0]
         similarity_scores = np.nan_to_num(similarity_scores, nan=-np.inf)
         # minus so descending
