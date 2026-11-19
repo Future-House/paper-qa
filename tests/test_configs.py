@@ -221,6 +221,37 @@ def test_validity_of_bundled_configs(subtests: SubTests) -> None:
             assert isinstance(settings, Settings)
 
 
+def test_rapid_mlx_settings() -> None:
+    settings = get_settings("rapid_mlx")
+    settings = Settings.model_validate_json(settings.model_dump_json())
+    chat_model = "openai/mlx-community/Qwen3.5-4B-MLX-4bit"
+    api_base = "http://127.0.0.1:8000/v1"
+
+    for model in (
+        settings.get_llm(),
+        settings.get_summary_llm(),
+        settings.get_agent_llm(),
+        settings.get_enrichment_llm(),
+    ):
+        assert model.name == chat_model
+        deployment = model.config["model_list"][0]
+        assert deployment["model_name"] == chat_model
+        assert deployment["litellm_params"]["model"] == chat_model
+        assert deployment["litellm_params"]["api_base"] == api_base
+        assert deployment["litellm_params"]["api_key"] == "rapid-mlx"
+
+    assert settings.embedding == "openai/embeddinggemma-2-4bit"
+    assert settings.embedding_config == {
+        "kwargs": {"api_base": api_base, "api_key": "rapid-mlx"}
+    }
+    embedding = settings.get_embedding_model()
+    assert embedding.name == settings.embedding
+    assert embedding.config["kwargs"] == settings.embedding_config["kwargs"]
+    assert settings.agent.agent_type == "ToolSelector"
+    assert not settings.parsing.use_doc_details
+    assert not settings.parsing.multimodal
+
+
 def test_readme_settings_cheatsheet_accuracy(subtests: SubTests) -> None:
     readme_path = TESTS_DIR.parent / "README.md"
 

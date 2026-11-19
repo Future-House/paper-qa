@@ -364,6 +364,7 @@ Inside [`src/paperqa/configs`](src/paperqa/configs) we bundle known useful setti
 | wikicrow     | Setting to emulate the Wikipedia article writing used in our WikiCrow publication.                                           |
 | contracrow   | Setting to find contradictions in papers, your query should be a claim that needs to be flagged as a contradiction (or not). |
 | debug        | Setting useful solely for debugging, but not in any actual application beyond debugging.                                     |
+| rapid_mlx    | Local chat, summaries, agent tool selection, and embeddings on Apple Silicon via Rapid-MLX.                                  |
 | tier1_limits | Settings that match OpenAI rate limits for each tier, you can use `tier<1-5>_limits` to specify the tier.                    |
 
 ### Rate Limits
@@ -646,6 +647,52 @@ answer_response = ask(
     ),
 )
 ```
+
+[Rapid-MLX](https://github.com/raullenchai/Rapid-MLX) can run the LLMs and embeddings
+locally on Apple Silicon (macOS, M-series).
+Install it and start an OpenAI-compatible server in a separate terminal:
+
+```bash
+pip install rapid-mlx
+rapid-mlx serve qwen3.5-4b-4bit --embedding-model embeddinggemma-2-4bit
+```
+
+After the initial dependency, model, and tokenizer downloads, inference can run offline.
+Use LiteLLM's bundled model-cost map to avoid its remote update check:
+
+```bash
+export LITELLM_LOCAL_MODEL_COST_MAP=true
+```
+
+Put your PDFs or text files in `my_papers`, then use the bundled
+[`rapid_mlx` settings](src/paperqa/configs/rapid_mlx.json):
+
+```python
+from paperqa import ask
+from paperqa.settings import get_settings
+
+settings = get_settings("rapid_mlx")
+settings.agent.index.paper_directory = "my_papers"
+answer_response = ask(
+    "What do these documents say about energy storage?", settings=settings
+)
+print(answer_response.session.formatted_answer)
+```
+
+Or use the CLI:
+
+```bash
+pqa -s rapid_mlx --agent.index.paper_directory my_papers ask 'What is energy storage?'
+```
+
+The preset uses LiteLLM's `openai/` prefix with `api_base="http://127.0.0.1:8000/v1"`
+and a placeholder `api_key` (Rapid-MLX requires no API key).
+It configures `llm`, `summary_llm`, `agent.agent_llm`, and `embedding`,
+as well as the enrichment LLM, to use the local server.
+External document metadata lookups and multimodal parsing are disabled to keep this recipe local.
+PaperQA's evidence re-ranking and contextual summaries use the local `summary_llm`.
+If you change the server port or models, update the model names, corresponding `model_list` entries,
+and `embedding_config` in a copy of the preset, then load that file with `get_settings("/path/to/settings.json")`.
 
 ### Embedding Model
 
