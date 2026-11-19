@@ -653,9 +653,14 @@ locally on Apple Silicon (macOS, M-series).
 Install it and start an OpenAI-compatible server in a separate terminal:
 
 ```bash
-pip install rapid-mlx
+pip install "rapid-mlx @ git+https://github.com/raullenchai/Rapid-MLX"
 rapid-mlx serve qwen3.5-4b-4bit --embedding-model embeddinggemma-2-4bit
 ```
+
+PaperQA's agent calls tools with `tool_choice="required"`, which needs
+[Rapid-MLX #5879](https://github.com/raullenchai/Rapid-MLX/pull/5879).
+Until a release after v1.0.4 includes it, install from the main branch as shown above;
+with v1.0.4 the agent step can fail with HTTP 422.
 
 After the initial dependency, model, and tokenizer downloads, inference can run offline.
 Use LiteLLM's bundled model-cost map to avoid its remote update check:
@@ -692,7 +697,9 @@ as well as the enrichment LLM, to use the local server.
 External document metadata lookups and multimodal parsing are disabled to keep this recipe local.
 PaperQA's evidence re-ranking and contextual summaries use the local `summary_llm`.
 If you change the server port or models, update the model names, corresponding `model_list` entries,
-and `embedding_config` in a copy of the preset, then load that file with `get_settings("/path/to/settings.json")`.
+and `embedding_config` in a copy of the preset.
+Save the copy as `~/.pqa/settings/my_rapid_mlx.json` and load it by name with
+`get_settings("my_rapid_mlx")` or `pqa -s my_rapid_mlx`.
 
 ### Embedding Model
 
