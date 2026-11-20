@@ -653,14 +653,12 @@ locally on Apple Silicon (macOS, M-series).
 Install it and start an OpenAI-compatible server in a separate terminal:
 
 ```bash
-pip install "rapid-mlx @ git+https://github.com/raullenchai/Rapid-MLX"
+pip install "rapid-mlx>=1.0.5"
 rapid-mlx serve qwen3.5-4b-4bit --embedding-model embeddinggemma-2-4bit
 ```
 
-PaperQA's agent calls tools with `tool_choice="required"`, which needs
-[Rapid-MLX #5879](https://github.com/raullenchai/Rapid-MLX/pull/5879).
-Until a release after v1.0.4 includes it, install from the main branch as shown above;
-with v1.0.4 the agent step can fail with HTTP 422.
+PaperQA's agent calls tools with `tool_choice="required"`, which needs Rapid-MLX 1.0.5 or later;
+with older releases the agent step can fail with HTTP 422.
 
 After the initial dependency, model, and tokenizer downloads, inference can run offline.
 Use LiteLLM's bundled model-cost map to avoid its remote update check:
