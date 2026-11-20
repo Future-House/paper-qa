@@ -1,0 +1,67 @@
+{
+  "llm": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+  "llm_config": {
+    "model_list": [
+      {
+        "model_name": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+        "litellm_params": {
+          "model": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+          "api_base": "http://127.0.0.1:8000/v1",
+          "api_key": "rapid-mlx"
+        }
+      }
+    ]
+  },
+  "summary_llm": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+  "summary_llm_config": {
+    "model_list": [
+      {
+        "model_name": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+        "litellm_params": {
+          "model": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+          "api_base": "http://127.0.0.1:8000/v1",
+          "api_key": "rapid-mlx"
+        }
+      }
+    ]
+  },
+  "embedding": "openai/embeddinggemma-2-4bit",
+  "embedding_config": {
+    "kwargs": {
+      "api_base": "http://127.0.0.1:8000/v1",
+      "api_key": "rapid-mlx"
+    }
+  },
+  "parsing": {
+    "use_doc_details": false,
+    "multimodal": false,
+    "enrichment_llm": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+    "enrichment_llm_config": {
+      "model_list": [
+        {
+          "model_name": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+          "litellm_params": {
+            "model": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+            "api_base": "http://127.0.0.1:8000/v1",
+            "api_key": "rapid-mlx"
+          }
+        }
+      ]
+    }
+  },
+  "agent": {
+    "agent_llm": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+    "agent_llm_config": {
+      "model_list": [
+        {
+          "model_name": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+          "litellm_params": {
+            "model": "openai/mlx-community/Qwen3.5-4B-MLX-4bit",
+            "api_base": "http://127.0.0.1:8000/v1",
+            "api_key": "rapid-mlx"
+          }
+        }
+      ]
+    }
+  }
+}
