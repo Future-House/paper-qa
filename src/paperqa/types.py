@@ -168,6 +168,14 @@ class Text(Embeddable):
     media: list[ParsedMedia] = Field(
         default_factory=list, description="Optional list of associated media."
     )
+    embedding_model_fingerprint: str | None = Field(
+        default=None,
+        description=(
+            "Fingerprint of the embedding model configuration that produced"
+            " `embedding`. None means unembedded or produced before this metadata"
+            " was tracked."
+        ),
+    )
     doc: Doc | DocDetails = Field(
         union_mode="left_to_right",
         description="Source document this text chunk originates from.",

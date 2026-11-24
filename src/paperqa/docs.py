@@ -26,6 +26,7 @@ from paperqa.core import llm_parse_json, map_fxn_summary
 from paperqa.llms import (
     NumpyVectorStore,
     VectorStore,
+    embedding_model_fingerprint,
 )
 from paperqa.prompts import CANNOT_ANSWER_PHRASE, EMPTY_CONTEXTS
 from paperqa.readers import read_doc
@@ -369,6 +370,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
         # 1. Calculate text embeddings if not already present
         if embedding_model and texts[0].embedding is None:
+            model_fingerprint = embedding_model_fingerprint(embedding_model)
             for t, t_embedding in zip(
                 texts,
                 await embedding_model.embed_documents(
@@ -384,6 +386,7 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 strict=True,
             ):
                 t.embedding = t_embedding
+                t.embedding_model_fingerprint = model_fingerprint
         # 2. Update texts' and Doc's name
         if doc.docname in self.docnames:
             new_docname = self._get_unique_name(doc.docname)
@@ -437,6 +440,26 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
     async def _build_texts_index(
         self, embedding_model: EmbeddingModel, with_enrichment: bool = False
     ) -> None:
+        model_fingerprint = embedding_model_fingerprint(embedding_model)
+        stale_texts = [
+            t
+            for t in self.texts
+            if t.embedding is not None
+            and t.embedding_model_fingerprint != model_fingerprint
+        ]
+        if stale_texts:
+            logger.info(
+                f"Invalidating {len(stale_texts)} text embeddings produced by a"
+                " different embedding model configuration."
+            )
+            for text in stale_texts:
+                text.embedding = None
+                text.embedding_model_fingerprint = None
+            self.texts_index.clear()
+        for text in self.texts:
+            if text.embedding is None:
+                text.embedding_model_fingerprint = None
+
         texts = [t for t in self.texts if t not in self.texts_index]
         # For any embeddings we are supposed to lazily embed, embed them now
         to_embed = [t for t in texts if t.embedding is None]
@@ -451,7 +474,9 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
                 strict=True,
             ):
                 t.embedding = t_embedding
-        await self.texts_index.add_texts_and_embeddings(texts)
+                t.embedding_model_fingerprint = model_fingerprint
+        if texts:
+            await self.texts_index.add_texts_and_embeddings(texts)
 
     async def retrieve_texts(
         self,
