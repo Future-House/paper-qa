@@ -1,5 +1,7 @@
 import asyncio
+import hashlib
 import itertools
+import json
 import logging
 import threading
 import uuid
@@ -45,6 +47,23 @@ except ImportError:
     qdrant_installed = False
 
 logger = logging.getLogger(__name__)
+
+
+def embedding_model_fingerprint(model: EmbeddingModel) -> str:
+    """Compute a stable identifier for the model that produced an embedding."""
+    model_data = {
+        "type": f"{type(model).__module__}.{type(model).__qualname__}",
+        "name": model.name,
+        "ndim": model.ndim,
+        "config": model.config,
+    }
+    serialized = json.dumps(
+        model_data,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    return hashlib.sha256(serialized.encode()).hexdigest()
 
 
 def cosine_similarity(a, b):
@@ -513,6 +532,9 @@ class QdrantVectorStore(VectorStore):  # noqa: PLW1641  # TODO: add __hash__
                     name=payload.get("name", ""),
                     doc=docs.docs[doc_data["dockey"]],
                     embedding=vector_value,  # ty: ignore[invalid-argument-type]
+                    embedding_model_fingerprint=payload.get(
+                        "embedding_model_fingerprint"
+                    ),
                 )
                 docs.texts.append(text)
 

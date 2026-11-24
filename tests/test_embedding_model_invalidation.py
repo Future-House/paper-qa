@@ -4,7 +4,15 @@ import pytest
 from lmi import EmbeddingModel
 from pydantic import PrivateAttr
 
-from paperqa import Doc, Docs, NumpyVectorStore, QdrantVectorStore, Text, VectorStore
+from paperqa import (
+    Doc,
+    Docs,
+    NumpyVectorStore,
+    QdrantVectorStore,
+    Settings,
+    Text,
+    VectorStore,
+)
 from paperqa.llms import embedding_model_fingerprint
 
 
@@ -41,6 +49,11 @@ def test_embedding_model_fingerprint_tracks_model_identity(subtests) -> None:
     with subtests.test(msg="stable-for-equal-model-configuration"):
         assert embedding_model_fingerprint(model) == embedding_model_fingerprint(
             model.model_copy()
+        )
+        assert embedding_model_fingerprint(
+            Settings.from_name("fast").get_embedding_model()
+        ) == embedding_model_fingerprint(
+            Settings.from_name("fast").get_embedding_model()
         )
 
     with subtests.test(msg="changes-with-configuration"):
@@ -85,9 +98,7 @@ async def test_changing_embedding_model_reembeds_same_shape_texts(
     assert text.embedding == first_model.vector
     assert text.embedding_model_fingerprint == embedding_model_fingerprint(first_model)
 
-    matches = await docs.retrieve_texts(
-        "query", k=1, embedding_model=second_model
-    )
+    matches = await docs.retrieve_texts("query", k=1, embedding_model=second_model)
 
     assert matches == [text]
     assert text.embedding == second_model.vector
@@ -123,9 +134,7 @@ async def test_changing_embedding_model_reembeds_different_shape_texts(
     )
 
     await docs.aadd_texts([text], doc, embedding_model=first_model)
-    matches = await docs.retrieve_texts(
-        "query", k=1, embedding_model=second_model
-    )
+    matches = await docs.retrieve_texts("query", k=1, embedding_model=second_model)
 
     assert matches == [text]
     assert len(text.embedding) == 3
@@ -137,9 +146,7 @@ async def test_changing_embedding_model_reembeds_different_shape_texts(
 @pytest.mark.asyncio
 async def test_legacy_embedding_without_fingerprint_is_reembedded() -> None:
     docs, doc, text = _make_docs()
-    model = RecordingEmbeddingModel(
-        name="legacy-model", ndim=2, vector=[1.0, 0.0]
-    )
+    model = RecordingEmbeddingModel(name="legacy-model", ndim=2, vector=[1.0, 0.0])
 
     await docs.aadd_texts([text], doc, embedding_model=model)
     text.embedding_model_fingerprint = None
