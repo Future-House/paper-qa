@@ -13,7 +13,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=SF+Districts+in+the+style+of+Andy+Warhol,+with+Math&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=SF+Districts+in+the+style+of+Andy+Warhol,+with+Math&rows=3
     response:
       body:
         string: !!binary |

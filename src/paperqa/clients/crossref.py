@@ -42,6 +42,8 @@ CROSSREF_BASE_URL = f"https://{CROSSREF_HOST}"
 CROSSREF_API_REQUEST_TIMEOUT = float(
     os.environ.get("CROSSREF_API_REQUEST_TIMEOUT", "10.0")
 )  # seconds
+CROSSREF_TITLE_SEARCH_ROWS = 3
+CROSSREF_TITLE_SEARCH_REQUIRED_FIELDS = frozenset({"DOI"})
 CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
     "title": {"title"},
     "doi": {"DOI"},
@@ -77,6 +79,51 @@ CROSSREF_API_MAPPING: dict[str, Collection[str]] = {
 }
 
 _ISSUED_WARNINGS = [False, False]  # 0 is API key, 1 is email
+
+
+def _crossref_publication_date(item: dict[str, Any]) -> tuple[int, int, int]:
+    """Get a sortable publication date from a Crossref work."""
+    try:
+        date_parts = item["published"]["date-parts"][0]
+        year, month, day = [*date_parts, 0, 0, 0][:3]
+        return int(year), int(month), int(day)
+    except (KeyError, IndexError, TypeError, ValueError):
+        return 0, 0, 0
+
+
+def _normalize_crossref_title(title: str) -> str:
+    """Normalize a title for exact-match detection."""
+    return " ".join("".join(c if c.isalnum() else " " for c in title.casefold()).split())
+
+
+def _select_crossref_title_match(
+    items: list[dict[str, Any]], title: str, title_similarity_threshold: float
+) -> dict[str, Any]:
+    """Select a deterministic title match from Crossref search results."""
+    best_item: dict[str, Any] | None = None
+    best_key: tuple[bool, float, tuple[int, int, int], str] | None = None
+    normalized_title = _normalize_crossref_title(title)
+    for item in items:
+        item_titles = item.get("title")
+        if not item_titles:
+            continue
+        item_title = str(item_titles[0])
+        similarity = strings_similarity(item_title, title)
+        if similarity < title_similarity_threshold:
+            continue
+        doi = item.get("DOI")
+        key = (
+            _normalize_crossref_title(item_title) != normalized_title,
+            -similarity,
+            tuple(-part for part in _crossref_publication_date(item)),
+            doi if isinstance(doi, str) else "",
+        )
+        if best_key is None or key < best_key:
+            best_key = key
+            best_item = item
+    if best_item is None:
+        raise DOINotFoundError(f"Crossref results did not match for title {title!r}.")
+    return best_item
 
 
 def crossref_headers() -> dict[str, str]:
@@ -276,7 +323,7 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
         url += f"/{quote(doi, safe='')}"
     params = {"mailto": get_crossref_mailto()}
     if title:
-        params.update({"query.title": title, "rows": "1"})
+        params.update({"query.title": title, "rows": str(CROSSREF_TITLE_SEARCH_ROWS)})
     if authors:
         params.update(
             {"query.author": " ".join([a.strip() for a in authors if len(a) > 1])}
@@ -289,19 +336,18 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
         # crossref has a special endpoint for bibtex, so we don't need to request it here
         if "bibtex" not in fields:
             query_bibtex = False
-        params.update(
-            {
-                "select": ",".join(
-                    union_collections_to_ordered_list(
-                        [
-                            CROSSREF_API_MAPPING[field]
-                            for field in fields
-                            if field in CROSSREF_API_MAPPING and field != "bibtex"
-                        ]
-                    )
+        params.update({
+            "select": ",".join(
+                union_collections_to_ordered_list(
+                    [
+                        CROSSREF_API_MAPPING[field]
+                        for field in fields
+                        if field in CROSSREF_API_MAPPING and field != "bibtex"
+                    ]
+                    + [CROSSREF_TITLE_SEARCH_REQUIRED_FIELDS]
                 )
-            }
-        )
+            )
+        })
 
     response = await client.get(
         url,
@@ -329,12 +375,14 @@ async def get_doc_details_from_crossref(  # noqa: PLR0912
     # restructure data if it comes back as a list result
     # it'll also be a list if we searched by title and it's empty
     if "items" in message:
-        try:
-            message = message["items"][0]
-        except IndexError as e:
-            raise DOINotFoundError(
-                f"Crossref API did not return any items for {inputs_msg}."
-            ) from e
+        items: list[dict[str, Any]] = message["items"]
+        if not items:
+            raise DOINotFoundError(f"Crossref API did not return any items for {inputs_msg}.")
+        message = (
+            _select_crossref_title_match(items, title, title_similarity_threshold)
+            if title is not None
+            else items[0]
+        )
     # since score is not consistent between queries, we need to rely on our own criteria
     # title similarity must be > title_similarity_threshold
     if (

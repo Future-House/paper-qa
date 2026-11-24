@@ -80,7 +80,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=3
     response:
       body:
         string: !!binary |
@@ -1080,7 +1080,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Gravity+hill&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Gravity+hill&rows=3
     response:
       body:
         string: !!binary |
@@ -2544,7 +2544,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=National+Flag+of+Canada+Day&rows=3
     response:
       body:
         string: !!binary |
@@ -3504,7 +3504,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Gravity+hill&rows=1
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=Gravity+hill&rows=3
     response:
       body:
         string: !!binary |

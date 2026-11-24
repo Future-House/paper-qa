@@ -119,7 +119,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=1&select=DOI%2Ctitle
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Augmenting+large+language+models+with+chemistry+tools&rows=3&select=DOI%2Ctitle
     response:
       body:
         string:

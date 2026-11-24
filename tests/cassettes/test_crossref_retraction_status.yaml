@@ -13,7 +13,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=The+Dilemma+and+Countermeasures+of+Music+Education+under+the+Background+of+Big+Data&rows=1&select=DOI%2Cauthor%2Ccontainer-title%2Ctitle
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=The+Dilemma+and+Countermeasures+of+Music+Education+under+the+Background+of+Big+Data&rows=3&select=DOI%2Cauthor%2Ccontainer-title%2Ctitle
     response:
       body:
         string:
