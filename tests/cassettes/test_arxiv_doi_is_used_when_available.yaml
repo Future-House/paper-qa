@@ -13,7 +13,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Attention+is+All+you+Need&rows=1&query.author=Ashish+Vaswani+Noam+Shazeer+Niki+Parmar+Jakob+Uszkoreit+Llion+Jones+Aidan+N.+Gomez+Lukasz+Kaiser+Illia+Polosukhin
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Attention+is+All+you+Need&rows=3&query.author=Ashish+Vaswani+Noam+Shazeer+Niki+Parmar+Jakob+Uszkoreit+Llion+Jones+Aidan+N.+Gomez+Lukasz+Kaiser+Illia+Polosukhin
     response:
       body:
         string: !!binary |

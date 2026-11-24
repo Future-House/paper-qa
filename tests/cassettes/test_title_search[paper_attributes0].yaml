@@ -13,7 +13,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&rows=1
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+reactive+molecular+dynamics+study&rows=3
     response:
       body:
         string: !!binary |

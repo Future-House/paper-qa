@@ -125,7 +125,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&rows=1&query.author=Wellawatte+et+al&select=DOI,author,container-title,is-referenced-by-count,title
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&rows=3&query.author=Wellawatte+et+al&select=DOI,author,container-title,is-referenced-by-count,title
     response:
       body:
         string: !!binary |
@@ -6590,7 +6590,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&rows=1&query.author=Wellawatte+et+al&select=DOI,author,container-title,is-referenced-by-count,title
+      uri: https://api.crossref.org/works?mailto=example@papercrow.ai&query.title=A+Perspective+on+Explanations+of+Molecular+Prediction+Models&rows=3&query.author=Wellawatte+et+al&select=DOI,author,container-title,is-referenced-by-count,title
     response:
       body:
         string: !!binary |

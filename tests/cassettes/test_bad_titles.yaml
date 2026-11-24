@@ -13,7 +13,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=askldjrq3rjaw938h&rows=1
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=askldjrq3rjaw938h&rows=3
     response:
       body:
         string: '{"status":"ok","message-type":"work-list","message-version":"1.0.0","message":{"facets":{},"total-results":0,"items":[],"items-per-page":1,"query":{"start-index":0,"search-terms":null}}}'
@@ -183,7 +183,7 @@ interactions:
         user-agent:
           - python-httpx/0.28.1
       method: GET
-      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+study&rows=1
+      uri: https://api.crossref.org/works?mailto=example%40papercrow.ai&query.title=Effect+of+native+oxide+layers+on+copper+thin-film+tensile+properties%3A+A+study&rows=3
     response:
       body:
         string: !!binary |
