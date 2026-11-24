@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pytest
-from lmi import EmbeddingModel
+from lmi import EmbeddingModel, HybridEmbeddingModel
 from pydantic import PrivateAttr
 
 from paperqa import (
@@ -74,6 +74,30 @@ def test_embedding_model_fingerprint_tracks_model_identity(subtests) -> None:
         assert embedding_model_fingerprint(model) != embedding_model_fingerprint(
             other_shape
         )
+
+
+@pytest.mark.offline
+def test_embedding_model_fingerprint_tracks_nested_model_identity() -> None:
+    def make_hybrid(dense_name: str, dense_vector: list[float]) -> HybridEmbeddingModel:
+        return HybridEmbeddingModel(
+            name="hybrid",
+            models=[
+                RecordingEmbeddingModel(name=dense_name, ndim=2, vector=dense_vector),
+                RecordingEmbeddingModel(name="sparse", ndim=1, vector=[1.0]),
+            ],
+        )
+
+    model = make_hybrid("dense-a", [1.0, 0.0])
+
+    assert embedding_model_fingerprint(model) == embedding_model_fingerprint(
+        model.model_copy(deep=True)
+    )
+    assert embedding_model_fingerprint(model) != embedding_model_fingerprint(
+        make_hybrid("dense-b", [1.0, 0.0])
+    )
+    assert embedding_model_fingerprint(model) != embedding_model_fingerprint(
+        make_hybrid("dense-a", [0.0, 1.0])
+    )
 
 
 @pytest.mark.offline

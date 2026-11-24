@@ -49,14 +49,50 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-def embedding_model_fingerprint(model: EmbeddingModel) -> str:
-    """Compute a stable identifier for the model that produced an embedding."""
+def _embedding_model_identity(model: EmbeddingModel, seen: set[int]) -> dict[str, Any]:
+    model_type = f"{type(model).__module__}.{type(model).__qualname__}"
+    if id(model) in seen:
+        return {"type": model_type, "recursive": True}
+
+    seen.add(id(model))
     model_data = {
-        "type": f"{type(model).__module__}.{type(model).__qualname__}",
+        "type": model_type,
         "name": model.name,
         "ndim": model.ndim,
-        "config": model.config,
+        "config": _fingerprint_value(model.config, seen),
     }
+    component_fields = {
+        field_name: _fingerprint_value(getattr(model, field_name), seen)
+        for field_name in sorted(type(model).model_fields)
+        if field_name not in {"name", "ndim", "config"}
+    }
+    if component_fields:
+        model_data["components"] = component_fields
+    return model_data
+
+
+def _fingerprint_value(value: Any, seen: set[int]) -> Any:
+    if isinstance(value, EmbeddingModel):
+        return _embedding_model_identity(value, seen)
+    if isinstance(value, dict):
+        return {
+            str(key): _fingerprint_value(item, seen)
+            for key, item in sorted(value.items(), key=lambda pair: str(pair[0]))
+        }
+    if isinstance(value, (list, tuple)):
+        return [_fingerprint_value(item, seen) for item in value]
+    if isinstance(value, (set, frozenset)):
+        items = [_fingerprint_value(item, seen) for item in value]
+        return sorted(
+            items,
+            key=lambda item: json.dumps(item, sort_keys=True, default=str),
+        )
+    return value
+
+
+def embedding_model_fingerprint(model: EmbeddingModel) -> str:
+    """Compute a stable identifier for the model that produced an embedding."""
+    model_data = _embedding_model_identity(model, seen=set())
     serialized = json.dumps(
         model_data,
         sort_keys=True,
