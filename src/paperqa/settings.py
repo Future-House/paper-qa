@@ -13,6 +13,7 @@ from pydoc import locate
 from typing import (
     Any,
     ClassVar,
+    Literal,
     Protocol,
     TypeAlias,
     assert_never,
@@ -159,6 +160,17 @@ class AnswerSettings(BaseModel):
     skip_evidence_citation_strip: bool = Field(
         default=False,
         description="Whether to skip stripping citations from evidence.",
+    )
+    evidence_retraction_filter: bool = Field(
+        default=False,
+        description="Whether to filter or warn on retracted papers during evidence retrieval.",
+    )
+    retraction_action: Literal["drop", "warn"] = Field(
+        default="drop",
+        description=(
+            "Action to take when a retracted paper is encountered: 'drop' to exclude or"
+            " 'warn' to append warning."
+        ),
     )
 
 
@@ -834,6 +846,18 @@ class Settings(BaseSettings):
     @property
     def md5(self) -> str:
         return hexdigest(self.model_dump_json(exclude={"md5"}))
+
+    evidence_retraction_filter: bool = Field(
+        default=False,
+        description="Whether to filter or warn on retracted papers during evidence retrieval.",
+    )
+    retraction_action: Literal["drop", "warn"] = Field(
+        default="drop",
+        description=(
+            "Action to take when a retracted paper is encountered: 'drop' to exclude or"
+            " 'warn' to append warning."
+        ),
+    )
 
     answer: AnswerSettings = Field(default_factory=AnswerSettings)
     parsing: ParsingSettings = Field(default_factory=ParsingSettings)

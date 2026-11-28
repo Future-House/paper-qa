@@ -22,6 +22,7 @@ from lmi.utils import gather_with_concurrency
 from pydantic import BaseModel, ConfigDict, Field
 
 from paperqa.clients import DEFAULT_CLIENTS, DocMetadataClient
+from paperqa.contrib.retraction import RetractionFilter
 from paperqa.core import llm_parse_json, map_fxn_summary
 from paperqa.llms import (
     NumpyVectorStore,
@@ -535,6 +536,10 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
             else matches
         )
 
+        retraction_filter = RetractionFilter.from_settings(evidence_settings)
+        if retraction_filter is not None:
+            matches = retraction_filter.apply_to_matches(matches)
+
         prompt_templates = None
         if not answer_config.evidence_skip_summary:
             if prompt_config.use_json:
@@ -576,11 +581,18 @@ class Docs(BaseModel):  # noqa: PLW1641  # TODO: add __hash__
 
         # Filter out failed context creations or irrelevant contexts,
         # and don't add duplicate contexts
+        new_contexts = [
+            c
+            for c, _ in results
+            if c is not None and c.score > 0 and c not in session.contexts
+        ]
+        if retraction_filter is not None:
+            new_contexts = retraction_filter.apply_to_contexts(new_contexts)
         session.contexts += list(
             {
                 c
-                for c, _ in results
-                if c is not None and c.score > 0 and c not in session.contexts
+                for c in new_contexts
+                if c not in session.contexts
             }
         )
         return session
